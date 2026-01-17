@@ -9,11 +9,42 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: "#4f46e5",   // indigo
-        secondary: "#22c55e", // green
-        danger: "#ef4444",    // red
-        warning: "#f59e0b",   // amber
-        dark: "#111827",
+        /* ===== Brand Colors ===== */
+        primary: "#4f46e5",     // Indigo (Main brand)
+        secondary: "#22c55e",   // Green (Confirm / Success)
+        danger: "#ef4444",      // Red (Error / Delete)
+        warning: "#f59e0b",     // Amber (Warning)
+        info: "#0ea5e9",        // Sky Blue (Info / Alerts)
+        accent: "#f43f5e",      // Pink / Accent highlight
+        highlight: "#f97316",   // Orange / Highlighted actions
+
+        /* ===== Dark & Neutral ===== */
+        dark: "#6fa8dc",         // Dark background (Sidebar, general dark areas)
+        darkSoft: "#3480c5",     // Soft dark (hover, secondary dark elements)
+        muted: "#6b7280",        // Muted / Secondary text
+        border: "#e5e7eb",       // Border / Divider color
+        grayLight: "#d1d5db",    // Light gray / Disabled / Placeholder
+
+        /* ===== Backgrounds ===== */
+        bgMain: "#f9fafb",       // Main app background
+        bgCard: "#ffffff",       // Card background
+        bgHover: "#f3f4f6",      // Hover background
+        bgSidebar: "#f8fafc",    // Sidebar background
+        bgHeader: "#ffffff",     // Header background
+
+        /* ===== Status Colors ===== */
+        success: "#16a34a",      // Success state
+        successSoft: "#dcfce7",  // Soft success background
+        dangerSoft: "#fee2e2",   // Soft error background
+        warningSoft: "#fef3c7",  // Soft warning background
+        infoSoft: "#e0f2fe",     // Soft info background
+
+        /* ===== POS Specific ===== */
+        cash: "#22c55e",         // Cash payment
+        credit: "#6366f1",       // Credit card
+        pending: "#facc15",      // Pending orders
+        refund: "#8b5cf6",       // Refund / Return
+        discount: "#ec4899",     // Discount / Offer
       },
     },
   },

@@ -1,7 +1,7 @@
 <template>
     <BackendLayout>
         <div>
-            <p>Welcome, Admin!</p>
+            <p>Welcome, Admin dashboard!</p>
         </div>
     </BackendLayout>
 </template>

@@ -1,103 +1,142 @@
 <template>
-  <div class="flex items-center justify-center min-h-screen bg-gradient-to-r from-indigo-100 via-white to-green-100">
-    <div class="bg-white shadow-xl rounded-2xl w-full max-w-lg p-10 border border-gray-200">
-      <!-- Header -->
-      <div class="text-center mb-8">
-        <h2 class="text-3xl font-extrabold text-gray-800 mb-2">Admin Login</h2>
-        <p class="text-gray-500">Enter your credentials to access the POS system</p>
-      </div>
-
-      <!-- Login Form -->
-      <form method="POST" action="/admin/login" class="space-y-6">
-        <!-- CSRF -->
-        <input type="hidden" name="_token" :value="csrfToken" />
-
-        <!-- Email -->
-        <div>
-          <label class="block text-gray-700 font-medium mb-2">Email</label>
-          <input
-            name="email"
-            type="email"
-            placeholder="admin@example.com"
-            class="w-full border border-gray-300 rounded-lg py-3 px-4 focus:ring-2 focus:ring-indigo-500"
-            required
-          />
-        </div>
-
-        <!-- Password -->
-        <div class="relative">
-          <label class="block text-gray-700 font-medium mb-2">Password</label>
-          <input
-            :type="showPassword ? 'text' : 'password'"
-            name="password"
-            placeholder="********"
-            class="w-full border border-gray-300 rounded-lg py-3 px-4 pr-10 focus:ring-2 focus:ring-indigo-500"
-            required
-          />
-          <button
-            type="button"
-            @click="togglePassword"
-            class="absolute right-3 top-3 text-gray-500 focus:outline-none"
-          >
-            <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
-          </button>
-        </div>
-
-        <!-- Error Message -->
-        <p v-if="error" class="text-red-500 text-center text-sm">{{ error }}</p>
-
-        <!-- Submit Button -->
-        <button
-          type="submit"
-          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg font-semibold transition duration-300"
+    <div
+        class="flex items-center justify-center min-h-screen bg-gradient-to-r from-primary/20 via-bgMain to-secondary/20"
+    >
+        <div
+            class="bg-bgCard shadow-xl rounded-2xl w-full max-w-lg p-10 border border-border"
         >
-          Login
-        </button>
-      </form>
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-extrabold text-dark mb-2">
+                    Admin Login
+                </h2>
+                <p class="text-muted">
+                    Enter your credentials to access the POS system
+                </p>
+            </div>
 
-      <!-- Footer -->
-      <div class="mt-6 text-center text-gray-400 text-sm">
-        © {{ new Date().getFullYear() }} POS System. All rights reserved.
-      </div>
+            <!-- Login Form -->
+            <form method="POST" action="/admin/login" class="space-y-6">
+                <!-- CSRF -->
+                <input type="hidden" name="_token" :value="csrfToken" />
+
+                <!-- Email -->
+                <div>
+                    <label class="block text-dark font-medium mb-2">
+                        Email
+                    </label>
+                    <input
+                        name="email"
+                        type="email"
+                        placeholder="admin@example.com"
+                        class="w-full border border-border rounded-lg py-3 px-4 bg-bgMain focus:outline-none focus:ring-2 focus:ring-primary"
+                        required
+                    />
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label class="block text-dark font-medium mb-2">
+                        Password
+                    </label>
+
+                    <div class="relative">
+                        <input
+                            :type="showPassword ? 'text' : 'password'"
+                            name="password"
+                            placeholder="********"
+                            class="w-full border border-border rounded-lg py-3 px-4 pr-12 bg-bgMain focus:outline-none focus:ring-2 focus:ring-primary"
+                            required
+                        />
+
+                        <!-- Eye Icon -->
+                        <button
+                            type="button"
+                            @click="togglePassword"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center text-muted hover:text-primary transition focus:outline-none"
+                        >
+                            <i
+                                :class="
+                                    showPassword
+                                        ? 'fas fa-eye-slash'
+                                        : 'fas fa-eye'
+                                "
+                                class="text-lg"
+                            ></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Error Message -->
+                <p
+                    v-if="error"
+                    class="text-danger text-center text-sm font-medium"
+                >
+                    {{ error }}
+                </p>
+
+                <!-- Submit Button -->
+                <button
+                    type="submit"
+                    class="w-full bg-primary hover:bg-primary/90 text-white py-3 rounded-lg font-semibold transition duration-300"
+                >
+                    Login
+                </button>
+            </form>
+
+            <!-- Footer -->
+            <div class="mt-6 text-center text-muted text-sm">
+                © {{ new Date().getFullYear() }} POS System. All rights
+                reserved.
+            </div>
+        </div>
     </div>
-  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from "vue";
 
 export default defineComponent({
-  name: "AdminLogin",
-  setup() {
-    const error = ref("");
-    const csrfToken = ref("");
-    const showPassword = ref(false);
+    name: "AdminLogin",
+    setup() {
+        const error = ref<string>("");
+        const csrfToken = ref<string>("");
+        const showPassword = ref<boolean>(false);
 
-    const togglePassword = () => {
-      showPassword.value = !showPassword.value;
-    };
+        const togglePassword = () => {
+            showPassword.value = !showPassword.value;
+        };
 
-    onMounted(() => {
-      const el = document.getElementById("app");
-      if (el) {
-        csrfToken.value = el.dataset.csrf || "";
-        error.value = el.dataset.error || "";
-      }
-    });
+        onMounted(() => {
+            const el = document.getElementById("app") as HTMLElement | null;
+            if (el) {
+                csrfToken.value = el.dataset.csrf || "";
+                error.value = el.dataset.error || "";
+            }
+        });
 
-    return { error, csrfToken, showPassword, togglePassword };
-  },
+        return {
+            error,
+            csrfToken,
+            showPassword,
+            togglePassword,
+        };
+    },
 });
 </script>
 
 <style scoped>
-/* Smooth input focus transition */
 input:focus {
-  transition: all 0.3s ease;
+    transition: all 0.25s ease;
 }
 
-/* Button for eye icon */
 button i {
-  font-size: 1rem;
+    transition:
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+button:hover i {
+    transform: scale(1.1);
 }
 </style>
