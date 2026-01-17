@@ -6,7 +6,6 @@ module.exports = {
     "./resources/**/*.ts",
     "./resources/**/*.vue",
   ],
-
   theme: {
     extend: {
       colors: {
