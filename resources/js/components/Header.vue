@@ -1,19 +1,27 @@
 <template>
   <header class="bg-white shadow p-4 flex justify-between items-center">
-    <h1 class="font-bold text-xl text-dark">
-      <slot name="title">Dashboard</slot>
-    </h1>
-    <div>
-      <button class="px-4 py-2 bg-danger text-white rounded hover:bg-red-600">
-        Logout
-      </button>
-    </div>
+    <h1 class="text-xl font-bold text-primary">POS Admin</h1>
+    <button class="bg-danger text-white px-3 py-1 rounded hover:bg-red-600" @click="logout">
+      Logout
+    </button>
   </header>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import axios from 'axios';
+import { useRouter } from 'vue-router';
+
 export default defineComponent({
-  name: 'Header'
+  setup() {
+    const router = useRouter();
+
+    const logout = async () => {
+      await axios.post('/api/admin/logout');
+      router.push('/admin/login');
+    };
+
+    return { logout };
+  }
 });
 </script>
