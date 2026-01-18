@@ -24,11 +24,9 @@ import { useRouter } from "vue-router";
 
 export default defineComponent({
     setup() {
-        const router = useRouter();
-
-        const logout = async () => {
-            await axios.post("/api/admin/logout");
-            router.push("/admin/login");
+        const logout = () => {
+            // redirect to backend logout route
+            window.location.href = "/admin/login";
         };
 
         return { logout };
