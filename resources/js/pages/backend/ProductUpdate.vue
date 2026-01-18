@@ -5,7 +5,7 @@
         </div>
     </BackendLayout>
 </template>
-<script lg="ts">
+<script lang="ts">
 import { defineComponent } from "vue";
 import BackendLayout from "../../layouts/BackendLayout.vue";
 
