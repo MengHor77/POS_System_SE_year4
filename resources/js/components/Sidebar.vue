@@ -13,7 +13,7 @@
 
             <button
                 @click="$emit('toggle')"
-                class="text-muted hover:text-white transition"
+                class="text- muted hover:text-white transition"
             >
                 <i class="fas fa-bars text-lg"></i>
             </button>
@@ -98,7 +98,7 @@ export default defineComponent({
             {
                 icon: "fas fa-users",
                 label: "Cashiers",
-                route: "/admin/cashiers",
+                route: "/admin/cashier",
             },
             { icon: "fas fa-user", label: "Profile", route: "/admin/profile" },
         ]);
