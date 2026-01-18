@@ -9,7 +9,7 @@
             <Header />
 
             <!-- Main content fills the rest of the screen -->
-            <main class="flex-1 p-6 overflow-hidden">
+            <main class="flex-1 p-6 overflow-auto">
                 <slot />
             </main>
         </div>

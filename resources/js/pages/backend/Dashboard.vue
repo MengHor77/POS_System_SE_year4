@@ -55,6 +55,24 @@
                     </template>
                 </Card>
             </div>
+            <!-- Sales Graph and Best Selling Product -->
+            <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Sales Graph -->
+                <div
+                    class="bg-white p-6 rounded-2xl shadow-md h-96 flex items-center justify-center"
+                >
+                    <span class="text-gray-400">[Sales Graph Placeholder]</span>
+                </div>
+
+                <!-- Best Selling Products -->
+                <div
+                    class="bg-white p-6 rounded-2xl shadow-md h-96 flex items-center justify-center"
+                >
+                    <span class="text-gray-400"
+                        >[Best Selling Products Placeholder]</span
+                    >
+                </div>
+            </div>
         </div>
     </BackendLayout>
 </template>
