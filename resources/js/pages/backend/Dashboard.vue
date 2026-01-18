@@ -73,6 +73,11 @@
                     >
                 </div>
             </div>
+            <div
+                class="mt-8 bg-white p-6 rounded-2xl shadow-md items-center justify-center h-96"
+            >
+                <h1>Recent Sales</h1>
+            </div>
         </div>
     </BackendLayout>
 </template>
