@@ -15,7 +15,15 @@ class ProductController extends Controller
         return response()->json($products);
     }
 
-    // Store a new product
+
+    // Show a single product
+    public function show($id)
+    {
+        $product = Product::findOrFail($id);
+        return response()->json($product);
+    }
+
+        // Store a new product
     public function store(Request $request)
     {
         $request->validate([
@@ -28,21 +36,12 @@ class ProductController extends Controller
 
         $product = Product::create($request->all());
 
-        // Return created product as JSON
-        return response()->json([
-            'message' => 'Product created successfully.',
-            'product' => $product,
-        ], 201);
+    return response()->json([
+            'message' => 'Product added successfully',
+        ]);
     }
 
-    // Show a single product
-    public function show($id)
-    {
-        $product = Product::findOrFail($id);
-        return response()->json($product);
-    }
-
-    // Update a product
+    // Update product
     public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id);
@@ -57,20 +56,20 @@ class ProductController extends Controller
 
         $product->update($request->all());
 
-        return response()->json([
-            'message' => 'Product updated successfully.',
-            'product' => $product,
-        ]);
+    return response()->json([
+        'message' => 'Product updated successfully'
+    ]);
+
     }
 
-    // Delete a product
+    // Delete product
     public function destroy($id)
     {
         $product = Product::findOrFail($id);
         $product->delete();
 
-        return response()->json([
-            'message' => 'Product deleted successfully.',
+    return response()->json([
+            'message' => 'Product deleted successfully',
         ]);
     }
 }

@@ -5,11 +5,20 @@
 
         <!-- Main Content -->
         <div class="flex-1 flex flex-col transition-all duration-300 h-screen">
-            <!-- Header stays fixed height -->
+            <!-- Header -->
             <Header />
 
-            <!-- Main content fills the rest of the screen -->
+            <!-- Main content -->
             <main class="flex-1 p-6 overflow-auto">
+
+                <!-- ✅ GLOBAL SUCCESS MESSAGE -->
+                <div
+                    v-if="successMessage"
+                    class="mb-4 p-3 bg-green-100 text-green-700 rounded shadow"
+                >
+                    {{ successMessage }}
+                </div>
+
                 <slot />
             </main>
         </div>
@@ -17,7 +26,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, onMounted, onUnmounted } from "vue";
 import Header from "../components/Header.vue";
 import Sidebar from "../components/Sidebar.vue";
 
@@ -26,12 +35,33 @@ export default defineComponent({
     components: { Header, Sidebar },
     setup() {
         const collapsed = ref(false);
+        const successMessage = ref("");
 
         const toggleSidebar = () => {
             collapsed.value = !collapsed.value;
         };
 
-        return { collapsed, toggleSidebar };
+        const showSuccess = (event: any) => {
+            successMessage.value = event.detail;
+            setTimeout(() => {
+                successMessage.value = "";
+            }, 3000);
+        };
+
+        onMounted(() => {
+            window.addEventListener("success", showSuccess);
+        });
+
+        onUnmounted(() => {
+            window.removeEventListener("success", showSuccess);
+        });
+
+        return {
+            collapsed,
+            toggleSidebar,
+            successMessage,
+        };
     },
 });
 </script>
+

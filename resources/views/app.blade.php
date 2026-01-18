@@ -10,8 +10,13 @@
 </head>
 
 <body>
-    <div id="app" data-csrf="{{ csrf_token() }}" data-error="{{ session('error') ?? '' }}">
-    </div>
+ <div
+    id="app"
+    data-csrf="{{ csrf_token() }}"
+    data-success="{{ session('success') ?? '' }}"
+    data-error="{{ session('error') ?? '' }}"
+></div>
+
 </body>
 
 </html>
