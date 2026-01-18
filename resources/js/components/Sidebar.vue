@@ -6,7 +6,7 @@
     <!-- Logo + Toggle -->
     <div class="flex items-center justify-between p-6 border-b border-darkSoft">
       <span v-if="!collapsed" class="text-xl font-bold tracking-wide">
-        POS System
+       Phone Store
       </span>
 
       <button @click="$emit('toggle')" class="text-muted hover:text-white transition">
@@ -15,11 +15,11 @@
     </div>
 
     <!-- Menu -->
-    <nav class="flex-1 mt-4 space-y-1">
+    <nav class="flex-1 mt-4 space-y-1 px-2 ">
       <div
         v-for="item in menuItems"
         :key="item.label"
-        class="flex items-center px-4 py-3 cursor-pointer hover:bg-darkSoft transition"
+        class="flex items-center px-4 py-3 cursor-pointer hover:bg-darkSoft transition rounded-lg"
         :class="collapsed ? 'justify-center' : 'gap-3'"
       >
         <i :class="item.icon + ' text-lg'"></i>
