@@ -1,11 +1,11 @@
 <template>
     <aside
-        class="fixed top-0 left-0 h-screen bg-dark text-white transition-all duration-300 flex flex-col"
+        class="h-screen bg-dark text-white transition-all duration-300 flex flex-col"
         :class="collapsed ? 'w-20' : 'w-64'"
     >
         <!-- Logo + Toggle -->
         <div
-            class="flex items-center justify-between p-4 border-b border-darkSoft"
+            class="flex items-center justify-between p-6 border-b border-darkSoft"
         >
             <span v-if="!collapsed" class="text-xl font-bold tracking-wide">
                 POS System
@@ -13,7 +13,7 @@
 
             <button
                 @click="$emit('toggle')"
-                class="text-muted hover:text-white transition ml-2"
+                class="text-muted hover:text-white transition"
             >
                 <i class="fas fa-bars text-lg"></i>
             </button>
@@ -21,30 +21,24 @@
 
         <!-- Menu -->
         <nav class="flex-1 mt-4 space-y-1">
-            <SidebarItem
-                icon="fas fa-home"
-                label="Dashboard"
-                :collapsed="collapsed"
-            />
-            <SidebarItem
-                icon="fas fa-box"
-                label="Products"
-                :collapsed="collapsed"
-            />
-            <SidebarItem
-                icon="fas fa-receipt"
-                label="Orders"
-                :collapsed="collapsed"
-            />
-            <SidebarItem
-                icon="fas fa-users"
-                label="Users"
-                :collapsed="collapsed"
-            />
+           <div
+    v-for="item in menuItems"
+    :key="item.label"
+    class="flex items-center px-4 py-3 cursor-pointer hover:bg-darkSoft transition"
+    :class="collapsed ? 'justify-center' : 'gap-3'"
+>
+
+                <i :class="item.icon + ' text-lg'"></i>
+                <span v-if="!collapsed" class="whitespace-nowrap">
+                    {{ item.label }}
+                </span>
+            </div>
         </nav>
 
         <!-- Footer -->
-        <div class="p-4 border-t border-darkSoft text-sm text-muted">
+        <div
+            class="mt-auto p-4 border-t border-darkSoft text-sm text-muted text-center"
+        >
             <span v-if="!collapsed">© POS System</span>
         </div>
     </aside>
@@ -52,16 +46,25 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import SidebarItem from "./SidebarItem.vue";
 
 export default defineComponent({
     name: "Sidebar",
-    components: { SidebarItem },
     props: {
         collapsed: {
             type: Boolean,
             required: true,
         },
+    },
+    emits: ["toggle"],
+    setup() {
+        const menuItems = [
+            { icon: "fas fa-home", label: "Dashboard" },
+            { icon: "fas fa-box", label: "Products" },
+            { icon: "fas fa-receipt", label: "Orders" },
+            { icon: "fas fa-users", label: "Users" },
+        ];
+
+        return { menuItems };
     },
 });
 </script>

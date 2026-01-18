@@ -1,16 +1,13 @@
 <template>
-    <div class="flex min-h-screen bg-bgMain">
+    <div class="flex h-screen overflow-hidden bg-bgMain">
         <!-- Sidebar -->
         <Sidebar :collapsed="collapsed" @toggle="toggleSidebar" />
 
         <!-- Main Content -->
-        <div
-            class="flex-1 flex flex-col transition-all duration-300"
-            :class="collapsed ? 'ml-20' : 'ml-64'"
-        >
-            <Header @toggle-sidebar="toggleSidebar" />
+        <div class="flex-1 flex flex-col transition-all duration-300">
+            <Header />
 
-            <main class="flex-1 p-6">
+            <main class="flex-1 p-6 overflow-auto">
                 <slot />
             </main>
         </div>
