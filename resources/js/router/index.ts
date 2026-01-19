@@ -15,8 +15,11 @@ import ProductIndex from "../pages/backend/Product/Index.vue";
 import ProductCreate from "../pages/backend/Product/Create.vue";
 import ProductEdit from "../pages/backend/Product/Edit.vue";
 
+// Frontend Pages
+import Home from "../pages/frontend/Home.vue";          
+
 const routes = [
-    { path: "/", name: "home", component: AdminLogin },
+    { path: "/", name: "home", component: Home },
     { path: "/admin/login", name: "admin-login", component: AdminLogin },
     { path: "/admin/dashboard", name: "admin-dashboard", component: AdminDashboard },
 
