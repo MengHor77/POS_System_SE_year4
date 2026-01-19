@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Backend\AdminAuthController;
 use App\Http\Controllers\Backend\ProductController;
+use App\Http\Controllers\Backend\NotificationController;
 
 // Admin Auth
 Route::get('/admin/login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
@@ -21,6 +22,9 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::get('/report', function () { return view('app'); });
     Route::get('/cashier', function () { return view('app'); });
     Route::get('/profile', function () { return view('app'); });
+
+    Route::get('/notification/data', [NotificationController::class, 'lowStock']);
+    Route::get('/notification/count', [NotificationController::class, 'lowStockCount']);
 
     // Product CRUD (for Axios calls)
     Route::get('/product/data', [ProductController::class, 'index']);
