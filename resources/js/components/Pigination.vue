@@ -1,44 +1,53 @@
 <template>
-    <div class="flex items-center justify-between mt-6">
+    <div
+        class="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+    >
         <!-- Info -->
-        <p class="text-sm text-gray-600">
+        <p class="text-sm text-muted">
             Showing
-            <span class="font-medium">{{ from }}</span>
+            <span class="font-semibold text-dark">{{ from }}</span>
             to
-            <span class="font-medium">{{ to }}</span>
+            <span class="font-semibold text-dark">{{ to }}</span>
             of
-            <span class="font-medium">{{ total }}</span>
+            <span class="font-semibold text-dark">{{ total }}</span>
             results
         </p>
 
-        <!-- Controls -->
-        <div class="flex space-x-2">
+        <!-- Pagination Controls -->
+        <div
+            class="flex items-center gap-1 bg-bgCard border border-border rounded-xl p-1 shadow-sm"
+        >
+            <!-- Prev -->
             <button
-                class="px-3 py-1 border rounded disabled:opacity-50"
+                class="px-3 py-1.5 rounded-lg text-sm font-medium transition text-muted hover:bg-bgHover disabled:opacity-40 disabled:cursor-not-allowed"
                 :disabled="currentPage === 1"
                 @click="changePage(currentPage - 1)"
             >
-                Prev
+                ‹ Prev
             </button>
 
+            <!-- Page Numbers -->
             <button
                 v-for="page in pages"
                 :key="page"
                 @click="changePage(page)"
-                class="px-3 py-1 border rounded"
+                class="min-w-[36px] px-3 py-1.5 rounded-lg text-sm font-medium transition"
                 :class="
-                    page === currentPage ? 'bg-primary text-white' : 'bg-white'
+                    page === currentPage
+                        ? 'bg-primary text-white shadow'
+                        : 'text-dark hover:bg-bgHover'
                 "
             >
                 {{ page }}
             </button>
 
+            <!-- Next -->
             <button
-                class="px-3 py-1 border rounded disabled:opacity-50"
+                class="px-3 py-1.5 rounded-lg text-sm font-medium transition text-muted hover:bg-bgHover disabled:opacity-40 disabled:cursor-not-allowed"
                 :disabled="currentPage === lastPage"
                 @click="changePage(currentPage + 1)"
             >
-                Next
+                Next ›
             </button>
         </div>
     </div>

@@ -20,7 +20,7 @@ class NotificationController extends Controller
             $query->where('barcode', 'like', "%$barcode%");
         }
 
-        $products = $query->orderBy('stock', 'asc')->paginate(3);
+        $products = $query->orderBy('stock', 'asc')->paginate(5);
 
         return response()->json([
             'data' => $products->items(),
