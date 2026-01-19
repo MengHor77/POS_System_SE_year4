@@ -22,10 +22,10 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::get('/report', function () { return view('app'); });
     Route::get('/cashier', function () { return view('app'); });
     Route::get('/profile', function () { return view('app'); });
-
+     
+    // notification routes
     Route::get('/notification/data', [NotificationController::class, 'lowStock']);
     Route::get('/notification/count', [NotificationController::class, 'lowStockCount']);
-     // Notification CRUD
     Route::put('/notification/{id}', [NotificationController::class, 'update']);
     Route::delete('/notification/{id}', [NotificationController::class, 'destroy']);
 

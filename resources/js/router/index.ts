@@ -12,25 +12,37 @@ import Profile from "../pages/backend/Profile.vue";
 
 // Product Pages
 import ProductIndex from "../pages/backend/Product/Index.vue";
-import ProductCreate from "../pages/backend/Product/Create.vue";
-import ProductEdit from "../pages/backend/Product/Edit.vue";
 
 // Frontend Pages
-import Home from "../pages/frontend/Home.vue";          
+import Home from "../pages/frontend/Home.vue";
 
 const routes = [
     { path: "/", name: "home", component: Home },
     { path: "/admin/login", name: "admin-login", component: AdminLogin },
-    { path: "/admin/dashboard", name: "admin-dashboard", component: AdminDashboard },
+    {
+        path: "/admin/dashboard",
+        name: "admin-dashboard",
+        component: AdminDashboard,
+    },
 
     // Product routes
-    { path: "/admin/product", name: "product-index", component: ProductIndex },
-    { path: "/admin/product/create", name: "product-create", component: ProductCreate },
-    { path: "/admin/product/:id/edit", name: "product-edit", component: ProductEdit },
-
-    { path: "/admin/notification", name: "notification", component: Notification },
+    {
+        path: "/admin/product",
+        name: "product.index",
+        component: ProductIndex,
+        // no child routes for create/edit, will use modals
+    },
+    {
+        path: "/admin/notification",
+        name: "notification",
+        component: Notification,
+    },
     { path: "/admin/inventory", name: "inventory", component: Inventory },
-    { path: "/admin/purchase-order", name: "purchase-order", component: PurchaseOrder },
+    {
+        path: "/admin/purchase-order",
+        name: "purchase-order",
+        component: PurchaseOrder,
+    },
     { path: "/admin/report", name: "report", component: Report },
     { path: "/admin/cashier", name: "cashiers", component: Cashier },
     { path: "/admin/profile", name: "profile", component: Profile },
