@@ -3,7 +3,7 @@ import { createRouter, createWebHistory } from "vue-router";
 // Backend Pages
 import AdminLogin from "../pages/backend/AdminLogin.vue";
 import AdminDashboard from "../pages/backend/Dashboard.vue";
-import Notification from "../pages/backend/Notification/Notification.vue";
+import Notification from "../pages/backend/Notification/index.vue";
 import Inventory from "../pages/backend/Inventory.vue";
 import PurchaseOrder from "../pages/backend/PurchaseOrder.vue";
 import Report from "../pages/backend/Report.vue";
