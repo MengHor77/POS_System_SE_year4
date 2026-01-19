@@ -2,7 +2,7 @@
     <header
         class="bg-white shadow px-6 py-4 pb-5 flex justify-between items-center"
     >
-        <h1 class="text-xl font-bold text-primary">POS Admin</h1>
+        <h1 class="text-xl font-bold text-primary">Dashboard Admin</h1>
 
         <div class="flex gap-3">
             <h1 class="mt-2 font-bold">Admin</h1>

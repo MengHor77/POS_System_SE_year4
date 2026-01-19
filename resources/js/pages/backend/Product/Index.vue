@@ -49,6 +49,13 @@
                     </tr>
                 </tbody>
             </table>
+            <Pigination
+                :current-page="pagination.current_page"
+                :last-page="pagination.last_page"
+                :total="pagination.total"
+                :per-page="pagination.per_page"
+                @page-change="fetchProducts"
+            />
         </div>
     </BackendLayout>
 </template>
@@ -56,6 +63,7 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from "vue";
 import BackendLayout from "../../../layouts/BackendLayout.vue";
+import Pigination from "../../../components/Pigination.vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
 
@@ -70,14 +78,30 @@ interface Product {
 
 export default defineComponent({
     name: "ProductIndex",
-    components: { BackendLayout },
+    components: { BackendLayout, Pigination },
     setup() {
         const products = ref<Product[]>([]);
         const router = useRouter();
 
-        const fetchProducts = async () => {
-            const res = await axios.get("/admin/product/data");
-            products.value = res.data;
+        const pagination = ref({
+            current_page: 1,
+            last_page: 1,
+            per_page: 10,
+            total: 0,
+        });
+
+        const fetchProducts = async (page = 1) => {
+            const res = await axios.get("/admin/product/data", {
+                params: { page },
+            });
+
+            products.value = res.data.data;
+            pagination.value = {
+                current_page: res.data.current_page,
+                last_page: res.data.last_page,
+                per_page: res.data.per_page,
+                total: res.data.total,
+            };
         };
 
         const goCreate = () => router.push("/admin/product/create");
@@ -87,24 +111,20 @@ export default defineComponent({
             if (!confirm("Are you sure you want to delete this product?"))
                 return;
 
-            try {
-                await axios.delete(`/admin/product/${id}`);
-
-                window.dispatchEvent(
-                    new CustomEvent("success", {
-                        detail: "Product deleted successfully",
-                    }),
-                );
-
-                fetchProducts();
-            } catch (error) {
-                console.error(error);
-            }
+            await axios.delete(`/admin/product/${id}`);
+            fetchProducts(pagination.value.current_page);
         };
 
-        onMounted(fetchProducts);
+        onMounted(() => fetchProducts());
 
-        return { products, goCreate, goEdit, deleteProduct };
+        return {
+            products,
+            pagination,
+            goCreate,
+            goEdit,
+            deleteProduct,
+            fetchProducts,
+        };
     },
 });
 </script>

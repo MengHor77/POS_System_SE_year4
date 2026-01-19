@@ -9,12 +9,15 @@ use Illuminate\Http\Request;
 class ProductController extends Controller
 {
     // List all products
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::all();
+        $perPage = $request->get('per_page',5);
+
+        $products = Product::orderBy('id', 'desc')
+            ->paginate($perPage);
+
         return response()->json($products);
     }
-
 
     // Show a single product
     public function show($id)
