@@ -45,10 +45,10 @@
               </span>
             </td>
             <td class="border px-4 py-2 flex gap-2">
-              <button @click="editProduct(product)" class="bg-blue-500 text-white px-2 py-1 rounded">
+              <button @click="editProduct(product)" class="bg-bgBtnEdit text-white px-2 py-1 rounded">
                 Edit
               </button>
-              <button @click="deleteProduct(product.id)" class="bg-red-500 text-white px-2 py-1 rounded">
+              <button @click="deleteProduct(product.id)" class="bg-bgBtnDelete text-white px-2 py-1 rounded">
                 Delete
               </button>
             </td>

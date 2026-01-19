@@ -92,16 +92,16 @@
                     <button
                         type="button"
                         @click="router.back()"
-                        class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300"
+                        class="px-4 py-2 rounded-lg bg-bgBtnCancel text-white hover:bg-bgBtnCancelHover"
                     >
                         Cancel
                     </button>
 
                     <button
                         type="submit"
-                        class="px-4 py-2 rounded-lg bg-primary text-white hover:bg-blue-600"
+                        class="px-4 py-2 rounded-lg bg-bgBtnSave text-white hover:bg-bgBtnSaveHover"
                     >
-                        Save Product
+                        Save 
                     </button>
                 </div>
             </form>

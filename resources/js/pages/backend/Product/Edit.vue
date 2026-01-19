@@ -69,16 +69,16 @@
                     <button
                         type="button"
                         @click="goBack"
-                        class="px-4 py-2 rounded bg-gray-400 hover:bg-gray-500 text-white"
+                        class="px-4 py-2 rounded bg-bgBtnCancel hover:bg-bgBtnCancelHover text-white"
                     >
                         Cancel
                     </button>
 
                     <button
                         type="submit"
-                        class="px-4 py-2 rounded bg-primary hover:bg-blue-600 text-white"
+                        class="px-4 py-2 rounded bg-bgBtnSave hover:bg-bgBtnSaveHover text-white"
                     >
-                        Update Product
+                        save
                     </button>
                 </div>
             </form>

@@ -45,6 +45,16 @@ module.exports = {
         pending: "#facc15",      // Pending orders
         refund: "#8b5cf6",       // Refund / Return
         discount: "#ec4899",     // Discount / Offer
+
+         /* ===== Buttons ===== */
+        bgBtnEdit: "#3b82f6",       // Blue Edit
+        bgBtnEditHover: "#2563eb",  // Darker Blue on hover
+        bgBtnDelete: "#ef4444",     // Red Delete
+        bgBtnDeleteHover: "#dc2626",// Darker Red on hover
+        bgBtnSave: "#10b981",       // Green Save
+        bgBtnSaveHover: "#059669",  // Darker Green on hover
+        bgBtnCancel: "#6b7280",     // Gray Cancel
+        bgBtnCancelHover: "#4b5563",// Darker Gray on hover
       },
     },
   },

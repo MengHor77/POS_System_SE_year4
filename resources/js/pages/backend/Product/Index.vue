@@ -35,13 +35,13 @@
                         <td class="border px-4 py-2">
                             <button
                                 @click="goEdit(product.id)"
-                                class="bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 mr-2"
+                                class="bg-bgBtnEdit text-white px-2 py-1 rounded hover:bg-bgBtnEditHover mr-2"
                             >
                                 Edit
                             </button>
                             <button
                                 @click="deleteProduct(product.id)"
-                                class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                                class="bg-bgBtnDelete text-white px-2 py-1 rounded hover:bg-bgBtnDeleteHover"
                             >
                                 Delete
                             </button>
