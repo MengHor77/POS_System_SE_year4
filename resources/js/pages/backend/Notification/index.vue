@@ -6,7 +6,7 @@
       <!-- Barcode Filter -->
       <div class="mb-4 flex gap-2">
         <input v-model="barcode" type="text" placeholder="Filter by barcode" class="border p-2 rounded" />
-        <button @click="() => fetchLowStock(1)" class="bg-primary text-white px-4 py-2 rounded">Filter</button>
+        <button @click="fetchLowStock(1)" class="bg-primary text-white px-4 py-2 rounded">Filter</button>
       </div>
 
       <div v-if="products.length === 0" class="text-center text-gray-500 mt-10">
@@ -45,8 +45,12 @@
               </span>
             </td>
             <td class="border px-4 py-2 flex gap-2">
-              <button class="bg-blue-500 text-white px-2 py-1 rounded">Edit</button>
-              <button class="bg-red-500 text-white px-2 py-1 rounded">Delete</button>
+              <button @click="editProduct(product)" class="bg-blue-500 text-white px-2 py-1 rounded">
+                Edit
+              </button>
+              <button @click="deleteProduct(product.id)" class="bg-red-500 text-white px-2 py-1 rounded">
+                Delete
+              </button>
             </td>
           </tr>
         </tbody>
@@ -54,11 +58,19 @@
 
       <!-- Pagination -->
       <div v-if="pagination.last_page > 1" class="flex gap-2 mt-4">
-        <button v-for="page in pagination.last_page" :key="page" @click="() => fetchLowStock(page)"
+        <button v-for="page in pagination.last_page" :key="page" @click="fetchLowStock(page)"
           class="px-3 py-1 border rounded hover:bg-gray-200">
           {{ page }}
         </button>
       </div>
+
+      <!-- Edit Modal -->
+      <EditProduct
+        v-if="editingProduct"
+        :product="editingProduct"
+        @close="editingProduct = null"
+        @updated="fetchLowStock(pagination.current_page)"
+      />
     </div>
   </BackendLayout>
 </template>
@@ -67,6 +79,7 @@
 import { defineComponent, ref, onMounted } from "vue";
 import BackendLayout from "../../../layouts/BackendLayout.vue";
 import axios from "axios";
+import EditProduct from "./Edit.vue";
 
 interface Product {
   id: number;
@@ -79,26 +92,17 @@ interface Product {
 
 export default defineComponent({
   name: "Notification",
-  components: { BackendLayout },
+  components: { BackendLayout, EditProduct },
   setup() {
     const products = ref<Product[]>([]);
     const barcode = ref("");
-    const pagination = ref({
-      current_page: 1,
-      last_page: 1,
-      per_page: 10,
-      total: 0,
-    });
+    const pagination = ref({ current_page: 1, last_page: 1, per_page: 10, total: 0 });
+    const editingProduct = ref<Product | null>(null);
 
     const fetchLowStock = async (page = 1) => {
       const res = await axios.get("/admin/notification/data", {
-        params: {
-          page,
-          per_page: pagination.value.per_page,
-          barcode: barcode.value,
-        },
+        params: { page, per_page: pagination.value.per_page, barcode: barcode.value },
       });
-
       products.value = res.data.data;
       pagination.value = {
         current_page: res.data.current_page,
@@ -108,17 +112,19 @@ export default defineComponent({
       };
     };
 
+    const editProduct = (product: Product) => {
+      editingProduct.value = { ...product };
+    };
+
+    const deleteProduct = async (id: number) => {
+      if (!confirm("Are you sure you want to delete this product?")) return;
+      await axios.delete(`/admin/notification/${id}`);
+      fetchLowStock(pagination.value.current_page);
+    };
+
     onMounted(() => fetchLowStock());
 
-    return { products, barcode, pagination, fetchLowStock };
+    return { products, barcode, pagination, editingProduct, fetchLowStock, editProduct, deleteProduct };
   },
 });
 </script>
-
-<!-- <script lang="ts">
-import { defineComponent } from "vue";
-export default defineComponent({
-    name: "Notification",
-    components: { BackendLayout },
-});
-</script> -->

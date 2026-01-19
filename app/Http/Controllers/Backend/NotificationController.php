@@ -41,4 +41,32 @@ class NotificationController extends Controller
             'total' => $total
         ]);
     }
+
+    // ✅ Update product
+    public function update(Request $request, $id)
+    {
+        $product = Product::findOrFail($id);
+
+        $validated = $request->validate([
+           'name'    => 'sometimes|required|string|max:255',
+            'brand'   => 'sometimes|required|string|max:255',
+            'barcode' => 'sometimes|required|integer|unique:products,barcode,' . $id,
+            'price'   => 'sometimes|required|numeric',
+            'stock'   => 'sometimes|required|integer',
+        ]);
+
+        $product->update($validated);
+
+        return response()->json(['message' => 'Product updated successfully']);
+    }
+
+    // ✅ Delete product
+    public function destroy($id)
+    {
+        $product = Product::findOrFail($id);
+        $product->delete();
+
+        return response()->json(['message' => 'Product deleted successfully']);
+    }
+
 }

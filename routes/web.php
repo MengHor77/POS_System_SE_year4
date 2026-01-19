@@ -25,6 +25,9 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
 
     Route::get('/notification/data', [NotificationController::class, 'lowStock']);
     Route::get('/notification/count', [NotificationController::class, 'lowStockCount']);
+     // Notification CRUD
+    Route::put('/notification/{id}', [NotificationController::class, 'update']);
+    Route::delete('/notification/{id}', [NotificationController::class, 'destroy']);
 
     // Product CRUD (for Axios calls)
     Route::get('/product/data', [ProductController::class, 'index']);
