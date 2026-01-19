@@ -1,6 +1,15 @@
 <template>
   <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-bgCard p-6 rounded-2xl shadow-md w-full max-w-lg relative">
+
+      <!-- Close Button -->
+      <button
+        @click="$emit('close')"
+        class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold"
+      >
+        &times;
+      </button>
+
       <h2 class="text-2xl font-bold mb-4">Add New Product</h2>
 
       <form @submit.prevent="saveProduct" class="space-y-4">
@@ -102,8 +111,8 @@ export default defineComponent({
     const saveProduct = async () => {
       try {
         await axios.post("/admin/product", form);
-        emit("created"); // notify parent
-        emit("close"); // close modal
+        emit("created"); // notify parent to refresh table
+        emit("close");   // close modal
       } catch (error) {
         console.error(error);
         alert("Failed to save product.");
