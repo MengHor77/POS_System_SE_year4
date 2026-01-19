@@ -1,5 +1,5 @@
 <template>
-    <div class="flex h-screen bg-bgMain">
+  <div class="flex h-screen overflow-hidden bg-bgMain">
         <!-- Sidebar -->
         <Sidebar :collapsed="collapsed" @toggle="toggleSidebar" />
 
@@ -9,7 +9,7 @@
             <Header />
 
             <!-- Main content -->
-            <main class="flex-1 p-6 overflow-auto">
+            <main class="flex-1 overflow-y-auto p-3">
 
                 <!-- ✅ GLOBAL SUCCESS MESSAGE -->
                 <div
