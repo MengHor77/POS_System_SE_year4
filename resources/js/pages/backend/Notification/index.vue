@@ -6,20 +6,14 @@
             </h1>
 
             <!-- Barcode Filter -->
-            <div class="mb-4 flex gap-2">
-                <input
-                    v-model="barcode"
-                    type="text"
-                    placeholder="Filter by barcode"
-                    class="border p-2 rounded"
-                />
-                <button
-                    @click="fetchLowStock(1)"
-                    class="bg-primary text-white px-4 py-2 rounded"
-                >
-                    Filter
-                </button>
-            </div>
+            <Filter
+                v-model="barcode"
+                placeholder="Filter by barcode or name"
+                @filter="fetchLowStock(1)"
+                containerClass="mb-4 flex gap-2 w-20"
+                inputClass="border p-2 rounded flex-1"
+                buttonClass="bg-darkSoft text-white px-4 py-2 rounded"
+            />
 
             <div
                 v-if="products.length === 0"
@@ -120,6 +114,7 @@ import BackendLayout from "../../../layouts/BackendLayout.vue";
 import axios from "axios";
 import EditProduct from "./Edit.vue";
 import Pigination from "../../../components/Pigination.vue";
+import Filter from "../../../components/Filter.vue";
 
 interface Product {
     id: number;
@@ -132,7 +127,7 @@ interface Product {
 
 export default defineComponent({
     name: "Notification",
-    components: { BackendLayout, EditProduct, Pigination },
+    components: { BackendLayout, EditProduct, Pigination, Filter },
     setup() {
         const products = ref<Product[]>([]);
         const barcode = ref("");
@@ -149,7 +144,7 @@ export default defineComponent({
                 params: {
                     page,
                     per_page: pagination.value.per_page,
-                    barcode: barcode.value,
+                    search: barcode.value, // <-- send search to backend
                 },
             });
             products.value = res.data.data;

@@ -9,15 +9,26 @@ use Illuminate\Http\Request;
 class ProductController extends Controller
 {
     // List all products
-    public function index(Request $request)
-    {
-        $perPage = $request->get('per_page',5);
+ public function index(Request $request)
+{
+    $perPage = $request->get('per_page', 5);
+    $search = $request->get('search'); // the filter value
 
-        $products = Product::orderBy('id', 'desc')
-            ->paginate($perPage);
+    // Start query
+    $query = Product::query();
 
-        return response()->json($products);
+    // Apply search filter if exists
+    if ($search) {
+        $query->where('name', 'like', "%{$search}%")
+              ->orWhere('brand', 'like', "%{$search}%")
+              ->orWhere('barcode', 'like', "%{$search}%");
     }
+
+    // Order and paginate
+    $products = $query->orderBy('id', 'desc')->paginate($perPage);
+
+    return response()->json($products);
+}
 
     // Show a single product
     public function show($id)

@@ -11,13 +11,16 @@ class NotificationController extends Controller
     // Get low-stock products with optional barcode filter
     public function lowStock(Request $request)
     {
-        $threshold = 5; // Set low stock threshold
-        $barcode = $request->get('barcode');
+        $threshold = 5; // Low stock threshold
+        $search = $request->get('search'); // can be barcode or name
 
         $query = Product::where('stock', '<=', $threshold);
 
-        if ($barcode) {
-            $query->where('barcode', 'like', "%$barcode%");
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('barcode', 'like', "%{$search}%")
+                ->orWhere('name', 'like', "%{$search}%");
+            });
         }
 
         $products = $query->orderBy('stock', 'asc')->paginate(5);
@@ -30,6 +33,7 @@ class NotificationController extends Controller
             'total' => $products->total(),
         ]);
     }
+
 
     // Get total low-stock count for sidebar badge
     public function lowStockCount()
