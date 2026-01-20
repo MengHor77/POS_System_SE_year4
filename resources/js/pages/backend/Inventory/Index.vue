@@ -2,7 +2,15 @@
     <BackendLayout>
         <div class="p-6">
             <h1 class="text-2xl font-bold mb-6">Inventory Management</h1>
-
+            <!-- LOW STOCK ALERTS -->
+      <div class="space-y-4 mb-6">
+        <CardStockAlert
+          v-for="product in lowStockProducts"
+          :key="product.id"
+          :product="product"
+          @add-stock="openStockIn"
+        />
+      </div>
             <div class="bg-gray-100 p-6 rounded-xl shadow-sm">
                 <div class="mb-4">
                     <h2 class="font-semibold text-lg">Current Inventory</h2>
@@ -42,11 +50,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from "vue";
+import { defineComponent, ref, onMounted ,computed } from "vue";
 import axios from "axios";
 
 import BackendLayout from "../../../layouts/BackendLayout.vue";
 import CardInventory from "../../../components/CardInventory.vue";
+import CardStockAlert from "../../../components/CardStockAlert.vue";
 
 import Create from "./Create.vue";
 import Edit from "./Edit.vue";
@@ -61,7 +70,7 @@ interface Product {
 }
 
 export default defineComponent({
-    components: { BackendLayout, CardInventory, Create, Edit },
+    components: { BackendLayout, CardInventory, Create, Edit ,CardStockAlert},
 
     setup() {
         const products = ref<Product[]>([]);
@@ -83,7 +92,9 @@ export default defineComponent({
             selectedProduct.value = product;
             showStockOut.value = true;
         };
-
+const lowStockProducts = computed(() => {
+      return products.value.filter((p) => p.stock <= 5); // alert for stock <= 5
+    });
         onMounted(fetchProducts);
 
         return {
@@ -91,6 +102,7 @@ export default defineComponent({
             selectedProduct,
             showStockIn,
             showStockOut,
+            lowStockProducts,
             fetchProducts,
             openStockIn,
             openStockOut,
