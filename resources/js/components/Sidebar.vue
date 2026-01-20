@@ -12,7 +12,7 @@
             >
 
             <button
-                @click="$emit('toggle')"
+                @click="toggleSidebar"
                 class="px-3 rounded-full bg-bgHover hover:bg-primary text-darkSoft hover:text-white transition"
             >
                 <i
@@ -33,20 +33,20 @@
                 :key="item.label"
                 class="flex flex-col"
             >
-                <div
+                <router-link
+                    v-if="item.route"
+                    :to="item.route"
                     class="flex items-center px-4 py-3 cursor-pointer hover:bg-darkSoft transition rounded-lg"
+                    active-class="font-bold text-primary"
                     :class="collapsed ? 'justify-center' : 'gap-3'"
                 >
                     <i :class="item.icon + ' text-lg'"></i>
 
-                    <router-link
-                        v-if="!collapsed && item.route"
-                        :to="item.route"
-                        class="flex-1 flex items-center justify-between"
-                        active-class="font-bold text-primary"
+                    <span
+                        v-if="!collapsed"
+                        class="ml-3 flex-1 flex items-center justify-between"
                     >
                         {{ item.label }}
-                        <!-- Notification Badge -->
                         <span
                             v-if="
                                 item.label === 'Notification' &&
@@ -56,11 +56,17 @@
                         >
                             {{ item.count }}
                         </span>
-                    </router-link>
+                    </span>
+                </router-link>
 
-                    <span v-else-if="!collapsed && !item.route">{{
-                        item.label
-                    }}</span>
+                <!-- For items without a route -->
+                <div
+                    v-else
+                    class="flex items-center px-4 py-3 cursor-pointer hover:bg-darkSoft transition rounded-lg"
+                    :class="collapsed ? 'justify-center' : 'gap-3'"
+                >
+                    <i :class="item.icon + ' text-lg'"></i>
+                    <span v-if="!collapsed" class="ml-3">{{ item.label }}</span>
                 </div>
             </div>
         </nav>
@@ -75,14 +81,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, onMounted } from "vue";
+import { defineComponent, reactive, ref, onMounted } from "vue";
 import axios from "axios";
 
 export default defineComponent({
     name: "Sidebar",
-    props: { collapsed: { type: Boolean, required: true } },
-    emits: ["toggle"],
     setup() {
+        // Internal collapse state
+        const collapsed = ref(false);
+
+        const toggleSidebar = () => {
+            collapsed.value = !collapsed.value;
+        };
+
         // Menu items with routes
         const menuItems = reactive([
             {
@@ -129,7 +140,7 @@ export default defineComponent({
             { icon: "fas fa-user", label: "Profile", route: "/admin/profile" },
         ]);
 
-        // Fetch low-stock count for notification badge
+        // Fetch low-stock notification count
         const fetchNotificationCount = async () => {
             try {
                 const res = await axios.get("/admin/notification/count");
@@ -144,15 +155,14 @@ export default defineComponent({
 
         onMounted(() => {
             fetchNotificationCount();
-            // Optional: refresh count every 30 seconds
-            setInterval(fetchNotificationCount, 30000);
+            setInterval(fetchNotificationCount, 30000); // refresh every 30 seconds
         });
 
-        return { menuItems };
+        return { menuItems, collapsed, toggleSidebar };
     },
 });
 </script>
 
 <style scoped>
-/* Optional: smooth hover effect */
+/* Optional: smooth hover effect or custom colors */
 </style>
