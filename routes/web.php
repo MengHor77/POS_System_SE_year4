@@ -35,6 +35,12 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::get('/product/{id}', [ProductController::class, 'show']);
     Route::put('/product/{id}', [ProductController::class, 'update']);
     Route::delete('/product/{id}', [ProductController::class, 'destroy']);
+
+    Route::get('/inventory/data', [InventoryController::class, 'index']);
+    Route::post('/inventory/{id}/stock-in', [InventoryController::class, 'stockIn']);
+    Route::post('/inventory/{id}/stock-out', [InventoryController::class, 'stockOut']);
+    Route::get('/inventory/low-stock', [InventoryController::class, 'lowStock']);
+
 });
 
 // Frontend catch-all for Vue SPA
