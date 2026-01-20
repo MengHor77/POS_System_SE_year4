@@ -1,244 +1,110 @@
 <template>
-    <BackendLayout>
-        <div class="flex justify-center mt-10 px-4">
-            <!-- Profile form card -->
-            <div
-                v-if="loaded"
-                class="bg-bgCard p-8 rounded-2xl shadow-md w-full max-w-lg"
+  <BackendLayout>
+    <div class="p-6 bg-bgMain min-h-screen">
+      <h1 class="text-3xl font-bold mb-6 text-primary">Admin Profiles</h1>
+
+      <!-- TABLE -->
+      <div class="bg-bgCard rounded-2xl shadow overflow-hidden">
+        <table class="w-full border-collapse">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="p-3 text-left">ID</th>
+              <th class="p-3 text-left">Name</th>
+              <th class="p-3 text-left">Email</th>
+              <th class="p-3 text-center">Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr
+              v-for="admin in admins"
+              :key="admin.id"
+              class="border-t hover:bg-gray-50"
             >
-                <h1 class="text-3xl font-bold mb-6 text-primary text-center">
-                    Admin Profile
-                </h1>
-
-                <!-- Success / Error Messages -->
-                <div
-                    v-if="message"
-                    class="mb-4 text-center text-green-600 font-semibold"
+              <td class="p-3">{{ admin.id }}</td>
+              <td class="p-3">{{ admin.name }}</td>
+              <td class="p-3">{{ admin.email }}</td>
+              <td class="p-3 text-center">
+                <button
+                  @click="openEdit(admin.id)"
+                  class="px-4 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                 >
-                    {{ message }}
-                </div>
-                <div
-                    v-if="errorMessage"
-                    class="mb-4 text-center text-red-600 font-semibold"
-                >
-                    {{ errorMessage }}
-                </div>
+                  Edit
+                </button>
+              </td>
+            </tr>
 
-                <form @submit.prevent="updateProfile" class="space-y-4">
-                    <!-- Name -->
-                    <div>
-                        <label class="block mb-1 font-semibold">Name</label>
-                        <input
-                            v-model="form.name"
-                            type="text"
-                            placeholder="Enter name"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                            required
-                        />
-                    </div>
+            <tr v-if="admins.length === 0">
+              <td colspan="4" class="p-4 text-center text-gray-500">
+                No admins found
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-                    <!-- Email -->
-                    <div>
-                        <label class="block mb-1 font-semibold">Email</label>
-                        <input
-                            v-model="form.email"
-                            type="email"
-                            placeholder="Enter email"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                            required
-                        />
-                    </div>
-
-                    <!-- Old Password -->
-                    <div class="relative">
-                        <label class="block mb-1 font-semibold"
-                            >Old Password</label
-                        >
-                        <input
-                            :type="showOldPassword ? 'text' : 'password'"
-                            v-model="form.old_password"
-                            placeholder="Enter old password if changing"
-                            class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                        />
-                        <button
-                            type="button"
-                            class="absolute inset-y-0 right-3 flex items-center text-lg text-gray-500 hover:text-gray-700 transition"
-                            @click="showOldPassword = !showOldPassword"
-                        >
-                            <i
-                                :class="
-                                    showOldPassword
-                                        ? 'fas fa-eye-slash'
-                                        : 'fas fa-eye'
-                                "
-                            ></i>
-                        </button>
-                    </div>
-
-                    <!-- New Password -->
-                    <div class="relative">
-                        <label class="block mb-1 font-semibold"
-                            >New Password</label
-                        >
-                        <input
-                            :type="showNewPassword ? 'text' : 'password'"
-                            v-model="form.password"
-                            placeholder="Enter new password"
-                            class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                        />
-                        <button
-                            type="button"
-                            class="absolute inset-y-0 right-3 flex items-center text-lg text-gray-500 hover:text-gray-700 transition"
-                            @click="showNewPassword = !showNewPassword"
-                        >
-                            <i
-                                :class="
-                                    showNewPassword
-                                        ? 'fas fa-eye-slash'
-                                        : 'fas fa-eye'
-                                "
-                            ></i>
-                        </button>
-                    </div>
-
-                    <!-- Confirm Password -->
-                    <div class="relative">
-                        <label class="block mb-1 font-semibold"
-                            >Confirm Password</label
-                        >
-                        <input
-                            :type="showConfirmPassword ? 'text' : 'password'"
-                            v-model="form.password_confirmation"
-                            placeholder="Confirm new password"
-                            class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                        />
-                        <button
-                            type="button"
-                            class="absolute inset-y-0 right-3 flex items-center text-lg text-gray-500 hover:text-gray-700 transition"
-                            @click="showConfirmPassword = !showConfirmPassword"
-                        >
-                            <i
-                                :class="
-                                    showConfirmPassword
-                                        ? 'fas fa-eye-slash'
-                                        : 'fas fa-eye'
-                                "
-                            ></i>
-                        </button>
-                    </div>
-
-                    <!-- Save Button -->
-                    <div class="flex justify-end mt-4">
-                        <button
-                            type="submit"
-                            class="px-6 py-2 rounded-lg bg-bgBtnSave text-white hover:bg-bgBtnSaveHover transition"
-                        >
-                            Save
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Loading Spinner -->
-            <div v-else class="flex flex-col items-center justify-center h-64">
-                <div
-                    class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"
-                ></div>
-                <span class="text-gray-500">Loading profile...</span>
-            </div>
-        </div>
-    </BackendLayout>
+      <!-- EDIT POPUP -->
+      <Edit
+        v-if="showEditModal && selectedId !== null"
+        :id="selectedId"
+        @close="closeEdit"
+        @updated="fetchAdmins"
+      />
+    </div>
+  </BackendLayout>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from "vue";
 import axios from "axios";
 import BackendLayout from "../../../layouts/BackendLayout.vue";
+import Edit from "./Edit.vue";
 
-interface Form {
-    name: string;
-    email: string;
-    old_password: string;
-    password: string;
-    password_confirmation: string;
+interface Admin {
+  id: number;
+  name: string;
+  email: string;
 }
 
 export default defineComponent({
-    name: "Profile",
-    components: { BackendLayout },
-    setup() {
-        const form = ref<Form>({
-            name: "",
-            email: "",
-            old_password: "",
-            password: "",
-            password_confirmation: "",
-        });
+  name: "ProfileIndex",
+  components: { BackendLayout, Edit },
+  setup() {
+    const admins = ref<Admin[]>([]);
+    const showEditModal = ref(false);
+    const selectedId = ref<number | null>(null);
 
-        const loaded = ref(false); // ✅ smooth loading
-        const showOldPassword = ref(false);
-        const showNewPassword = ref(false);
-        const showConfirmPassword = ref(false);
-        const message = ref("");
-        const errorMessage = ref("");
+    // Load admin list
+    const fetchAdmins = async () => {
+      try {
+        const res = await axios.get("/admin/profile/data");
+        admins.value = res.data;
+      } catch (err) {
+        console.error("Failed to load admins", err);
+      }
+    };
 
-        // Fetch profile data
-        const fetchProfile = async () => {
-            try {
-                const res = await axios.get("/admin/profile");
-                form.value.name = res.data.name;
-                form.value.email = res.data.email;
-            } catch (err) {
-                console.error(err);
-                errorMessage.value = "Failed to load profile.";
-            } finally {
-                loaded.value = true; // ✅ show form only after data is ready
-            }
-        };
+    // Open edit popup
+    const openEdit = (id: number) => {
+      selectedId.value = id;
+      showEditModal.value = true;
+    };
 
-        // Update profile
-        const updateProfile = async () => {
-            try {
-                const res = await axios.post("/admin/profile", form.value);
-                message.value = res.data.message;
-                errorMessage.value = "";
-                form.value.old_password = "";
-                form.value.password = "";
-                form.value.password_confirmation = "";
-            } catch (err: any) {
-                errorMessage.value =
-                    err.response?.data?.message || "Update failed";
-                message.value = "";
-            }
-        };
+    // Close edit popup
+    const closeEdit = () => {
+      showEditModal.value = false;
+      selectedId.value = null;
+    };
 
-        onMounted(fetchProfile);
+    onMounted(fetchAdmins);
 
-        return {
-            form,
-            loaded,
-            showOldPassword,
-            showNewPassword,
-            showConfirmPassword,
-            updateProfile,
-            message,
-            errorMessage,
-        };
-    },
+    return { admins, showEditModal, selectedId, openEdit, closeEdit, fetchAdmins };
+  },
 });
 </script>
 
 <style scoped>
-.loader {
-    border-top-color: #3498db;
-    animation: spin 1s linear infinite;
-}
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
+tbody tr:hover {
+  transition: background-color 0.2s ease-in-out;
 }
 </style>

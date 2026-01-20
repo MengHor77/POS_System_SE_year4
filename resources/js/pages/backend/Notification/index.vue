@@ -8,6 +8,7 @@
 
             <!-- Barcode Filter -->
             <Filter
+                v-if="products.length > 0"
                 v-model="barcode"
                 placeholder="Filter by barcode or name"
                 @filter="fetchLowStock(1)"
@@ -20,7 +21,14 @@
                 v-if="products.length === 0"
                 class="text-center text-gray-500 mt-10"
             >
-                🎉 All products have sufficient stock
+                🎉 All products have sufficient stock. the product less than
+                amount 6 show here. You can
+                <router-link
+                    to="/admin/product"
+                    class="text-blue-600 underline hover:text-blue-800"
+                >
+                    adjust stock here
+                </router-link>
             </div>
 
             <table

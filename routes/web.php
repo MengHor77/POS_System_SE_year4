@@ -35,17 +35,21 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
         '/cashier',
         '/sale',      
         '/profile',
+        '/profile/edit/{id}', // ✅ add edit page
+
     ];
 
     foreach ($spaRoutes as $route) {
         Route::get($route, fn() => view('app'));
     }
 
-    // Profile admin
-    Route::get('/profile/data', [ProfileController::class, 'index']);
-    Route::post('/profile', [ProfileController::class, 'update']);
-
-    // Dashboard data
+  // Admin Profile Table
+    Route::get('/profile/data', [ProfileController::class, 'list']);
+    
+    // Single Admin for Edit
+    Route::get('/profile/{id}', [ProfileController::class, 'show']);
+    Route::post('/profile/{id}', [ProfileController::class, 'update']);
+    // Dashboard Data API
     Route::get('/dashboard/data', [DashboardController::class, 'index']);
 
     // Notification API

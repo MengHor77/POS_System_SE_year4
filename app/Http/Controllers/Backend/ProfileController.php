@@ -3,43 +3,59 @@
 namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class ProfileController extends Controller
 {
-    // Show admin profile
-    public function index()
+    /**
+     * 🔹 List all admins (for table in Index.vue)
+     */
+    public function list()
     {
-        $admin = Auth::guard('admin')->user();
-        return response()->json($admin); 
+        return response()->json(Admin::select('id','name','email')->get());
     }
 
-    // Update admin profile
-    public function update(Request $request)
+    /**
+     * 🔹 Show single admin (for Edit.vue)
+     */
+    public function show($id)
     {
-        $admin = Auth::guard('admin')->user();
+        return response()->json(Admin::findOrFail($id));
+    }
+
+    /**
+     * 🔹 Update admin (with old password check)
+     */
+    public function update(Request $request, $id)
+    {
+        $admin = Admin::findOrFail($id);
 
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:admins,email,'.$admin->id,
-            'password' => 'nullable|string|min:6|confirmed', // password_confirmation field
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|unique:admins,email,' . $admin->id,
+            'old_password' => 'nullable|string',
+            'password' => 'nullable|string|min:6|confirmed', // password_confirmation required if password is present
         ]);
 
         $admin->name = $request->name;
         $admin->email = $request->email;
 
-        if ($request->password) {
+        // If changing password, check old password
+        if ($request->filled('password')) {
+            if (!$request->filled('old_password') || !Hash::check($request->old_password, $admin->password)) {
+                return response()->json(['message' => 'Old password is incorrect'], 422);
+            }
             $admin->password = Hash::make($request->password);
         }
 
         $admin->save();
 
         return response()->json([
-            'message' => 'Profile updated successfully',
-            'admin' => $admin
+            'message' => 'Admin updated successfully',
+            'admin' => $admin,
         ]);
     }
 }
-

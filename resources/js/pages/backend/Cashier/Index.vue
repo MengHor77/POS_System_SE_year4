@@ -1,7 +1,7 @@
 <template>
   <BackendLayout>
     <div class="p-6 bg-bgMain min-h-screen">
-      <h1 class="text-3xl font-bold mb-6">Cashiers List</h1>
+      <h1 class="text-3xl font-bold mb-6 text-primary">Cashiers Management</h1>
 
       <!-- Add New Cashier -->
       <button

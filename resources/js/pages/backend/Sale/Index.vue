@@ -2,7 +2,7 @@
     <BackendLayout>
         <template #default>
             <div class="container mx-auto">
-                <h1 class="text-2xl font-bold mb-4">Sales Page</h1>
+                <h1 class="text-2xl font-bold mb-4 text-primary">Sales Management</h1>
 
                 <table class="min-w-full bg-white rounded-lg shadow">
                     <thead>
