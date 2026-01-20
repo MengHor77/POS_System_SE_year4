@@ -4,13 +4,9 @@
             <h1 class="text-3xl font-bold mb-6 text-primary">Products Management</h1>
 
             <!-- Add New Product Button -->
-            <button
-                @click="openCreateModal"
-                class="mb-4 bg-dark text-white px-4 py-2 rounded hover:bg-darkSoft"
-            >
-                Add New Product
-            </button>
-            <!-- Filter Component -->
+       <div class="flex flex-row justify-between">
+         <div>
+             <!-- Filter Component -->
             <Filter
                 v-model="search"
                 placeholder="Filter by barcode or name"
@@ -19,6 +15,17 @@
                 inputClass="border p-2 rounded flex-1"
                 buttonClass="bg-darkSoft text-white px-4 py-2 rounded"
             />
+           </div>
+            <div>
+             <button
+                @click="openCreateModal"
+                class="mb-4 bg-dark text-white px-4 py-2 rounded hover:bg-darkSoft"
+            >
+                Add New Product
+            </button>
+           </div>
+          
+       </div>
 
             <!-- Products Table -->
             <table
