@@ -11,7 +11,7 @@ import CashierIndex from "../pages/backend/Cashier/Index.vue";
 import CashierCreate from "../pages/backend/Cashier/Create.vue";
 import CashierEdit from "../pages/backend/Cashier/Edit.vue";
 import Profile from "../pages/backend/Profile.vue";
-import Sale from "../pages/backend/Sale/Index.vue";
+import SaleIndex from "../pages/backend/Sale/Index.vue";
 // Product Pages
 import ProductIndex from "../pages/backend/Product/Index.vue";
 
@@ -20,6 +20,7 @@ import Home from "../pages/frontend/Home.vue";
 
 const routes = [
     { path: "/", name: "home", component: Home },
+
     { path: "/admin/login", name: "admin-login", component: AdminLogin },
     {
         path: "/admin/dashboard",
@@ -45,21 +46,14 @@ const routes = [
         name: "purchase-order",
         component: PurchaseOrder,
     },
-    { path: "/admin/sale", name: "report", component: Sale },
+    { path: "/admin/sale", name: "sale", component: SaleIndex },
     { path: "/admin/report", name: "report", component: Report },
     {
         path: "/admin/cashier",
         component: CashierIndex,
     },
-    {
-        path: "/admin/cashier/create",
-        component: CashierCreate,
-    },
-    {
-        path: "/admin/cashier/:id/edit",
-        component: CashierEdit,
-        props: true,
-    },
+    { path: "/admin/cashier/create", component: CashierCreate },
+    { path: "/admin/cashier/:id/edit", component: CashierEdit, props: true },
     { path: "/admin/profile", name: "profile", component: Profile },
 ];
 

@@ -14,6 +14,7 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <!-- Show sales if exist -->
                         <tr v-for="sale in sales" :key="sale.id">
                             <td class="px-4 py-2 border">
                                 {{ sale.product_name }}
@@ -28,6 +29,16 @@
                                 {{ sale.created_at }}
                             </td>
                         </tr>
+
+                        <!-- Show message if no sales -->
+                        <tr v-if="sales.length === 0">
+                            <td
+                                class="px-4 py-4 border text-center text-gray-500"
+                                colspan="4"
+                            >
+                                No sales to display.
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -40,26 +51,40 @@ import { defineComponent, ref, onMounted } from "vue";
 import BackendLayout from "../../../layouts/BackendLayout.vue";
 import axios from "axios";
 
+interface Sale {
+    id: number;
+    product_name: string;
+    quantity: number;
+    total_amount: number;
+    created_at: string;
+}
+
 export default defineComponent({
     name: "SaleIndex",
     components: { BackendLayout },
     setup() {
-        const sales = ref([]);
+        const sales = ref<Sale[]>([]);
 
         const fetchSales = async () => {
             try {
-                const res = await axios.get("/admin/sales"); // your controller route
+                const res = await axios.get("/admin/sale/data");
                 sales.value = res.data;
             } catch (error) {
                 console.error(error);
+                sales.value = []; // fallback
             }
         };
 
-        onMounted(() => {
-            fetchSales();
-        });
+        onMounted(() => fetchSales());
 
         return { sales };
     },
 });
 </script>
+
+<style scoped>
+table th {
+    background-color: #f3f4f6;
+    text-align: left;
+}
+</style>
