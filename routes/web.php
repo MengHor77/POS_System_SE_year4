@@ -42,7 +42,7 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     }
 
     // Profile admin
-    Route::get('/profile', [ProfileController::class, 'index']);
+    Route::get('/profile/data', [ProfileController::class, 'index']);
     Route::post('/profile', [ProfileController::class, 'update']);
 
     // Dashboard data
