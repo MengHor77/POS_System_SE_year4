@@ -1,7 +1,7 @@
 <template>
   <BackendLayout>
     <div class="p-6 bg-bgMain min-h-screen">
-      <h1 class="text-3xl font-bold mb-6">Cashiers</h1>
+      <h1 class="text-3xl font-bold mb-6">Cashiers List</h1>
 
       <!-- Add New Cashier -->
       <button
@@ -14,14 +14,14 @@
       <!-- Search -->
       <Filter
         v-model="search"
-        placeholder="Search by name or email"
+        placeholder="Filter by name or email"
         @filter="fetchCashiers(1)"
-        containerClass="mb-4 flex gap-2"
+        containerClass="mb-4 flex gap-2 w-20"
         inputClass="border p-2 rounded flex-1"
         buttonClass="bg-darkSoft text-white px-4 py-2 rounded"
       />
 
-      <!-- Table -->
+      <!-- Cashiers Table -->
       <table class="w-full table-auto border-collapse border border-gray-300">
         <thead>
           <tr class="bg-gray-100">
@@ -37,7 +37,18 @@
             <td class="border px-4 py-2">{{ cashier.id }}</td>
             <td class="border px-4 py-2">{{ cashier.name }}</td>
             <td class="border px-4 py-2">{{ cashier.email }}</td>
-            <td class="border px-4 py-2 capitalize">{{ cashier.status }}</td>
+            <td class="border px-4 py-2">
+              <span
+                @click="toggleStatus(cashier)"
+                :class="{
+                  'px-2 py-1 rounded cursor-pointer text-white': true,
+                  'bg-green-500': cashier.status === 'active',
+                  'bg-red-500': cashier.status === 'inactive',
+                }"
+              >
+                {{ cashier.status }}
+              </span>
+            </td>
             <td class="border px-4 py-2 flex gap-2">
               <button
                 @click="openEditModal(cashier)"
@@ -103,19 +114,13 @@ export default defineComponent({
   components: { BackendLayout, Pigination, CreateCashier, EditCashier, Filter },
   setup() {
     const cashiers = ref<Cashier[]>([]);
-    const editingCashier = ref<Cashier | null>(null);
+    const editingCashier = ref<(Cashier & { password?: string }) | null>(null);
     const showCreateModal = ref(false);
     const search = ref("");
-
-    const pagination = ref({
-      current_page: 1,
-      last_page: 1,
-      per_page: 5,
-      total: 0,
-    });
+    const pagination = ref({ current_page: 1, last_page: 1, per_page: 5, total: 0 });
 
     const fetchCashiers = async (page = 1) => {
-      const res = await axios.get("/admin/cashier", {
+      const res = await axios.get("/admin/cashier/data", {
         params: { page, per_page: pagination.value.per_page, search: search.value },
       });
       cashiers.value = res.data.data;
@@ -132,8 +137,13 @@ export default defineComponent({
     };
 
     const deleteCashier = async (id: number) => {
-      if (!confirm("Are you sure you want to delete this cashier?")) return;
+      if (!confirm("Are you sure?")) return;
       await axios.delete(`/admin/cashier/${id}`);
+      fetchCashiers(pagination.value.current_page);
+    };
+
+    const toggleStatus = async (cashier: Cashier) => {
+      await axios.patch(`/admin/cashier/${cashier.id}/toggle-status`);
       fetchCashiers(pagination.value.current_page);
     };
 
@@ -143,11 +153,12 @@ export default defineComponent({
       cashiers,
       editingCashier,
       showCreateModal,
-      search,
       pagination,
+      search,
       fetchCashiers,
       openEditModal,
       deleteCashier,
+      toggleStatus,
     };
   },
 });
