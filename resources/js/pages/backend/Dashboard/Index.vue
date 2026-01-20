@@ -12,7 +12,7 @@
             <!-- Main Stats Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <!-- Total Revenue -->
-                <Card
+                <CardDashboard
                     class="bg-bgCard"
                     title="Total Revenue"
                     :value="'$' + totalRevenue"
@@ -22,10 +22,10 @@
                             class="fas fa-dollar-sign text-secondary text-2xl"
                         ></i>
                     </template>
-                </Card>
+                </CardDashboard>
 
                 <!-- Today's Sale -->
-                <Card
+                <CardDashboard
                     class="bg-bgCard"
                     title="Today's Sale"
                     :value="'$' + todaysSale"
@@ -33,10 +33,10 @@
                     <template #icon>
                         <i class="fas fa-calendar-day text-info text-2xl"></i>
                     </template>
-                </Card>
+                </CardDashboard>
 
                 <!-- This Month -->
-                <Card
+                <CardDashboard
                     class="bg-bgCard"
                     title="This Month"
                     :value="'$' + thisMonth"
@@ -46,10 +46,10 @@
                             class="fas fa-calendar-alt text-warning text-2xl"
                         ></i>
                     </template>
-                </Card>
+                </CardDashboard>
 
                 <!-- This Year -->
-                <Card
+                <CardDashboard
                     class="bg-bgCard"
                     title="This Year"
                     :value="'$' + thisYear"
@@ -57,12 +57,12 @@
                     <template #icon>
                         <i class="fas fa-calendar text-primary text-2xl"></i>
                     </template>
-                </Card>
+                </CardDashboard>
             </div>
 
             <!-- Additional Section -->
             <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card
+                <CardDashboard
                     class="bg-bgCard"
                     title="Pending Shipments"
                     :value="pendingShipments"
@@ -70,9 +70,9 @@
                     <template #icon>
                         <i class="fas fa-truck text-pending text-2xl"></i>
                     </template>
-                </Card>
+                </CardDashboard>
 
-                <Card
+                <CardDashboard
                     class="bg-bgCard"
                     title="Notifications"
                     :value="lowStockCount"
@@ -80,7 +80,7 @@
                     <template #icon>
                         <i class="fas fa-bell text-danger text-2xl"></i>
                     </template>
-                </Card>
+                </CardDashboard>
             </div>
 
             <!-- Sales Graph & Best Selling Products -->
@@ -156,7 +156,7 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from "vue";
 import axios from "axios";
-import Card from "../../../components/Card.vue";
+import CardDashboard from "../../../components/CardDashboard.vue";
 import BackendLayout from "../../../layouts/BackendLayout.vue";
 
 interface BestSellingProduct {
@@ -174,7 +174,7 @@ interface RecentSale {
 
 export default defineComponent({
     name: "Dashboard",
-    components: { Card, BackendLayout },
+    components: { CardDashboard, BackendLayout },
     setup() {
         const totalRevenue = ref(0);
         const todaysSale = ref(0);

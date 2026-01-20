@@ -21,7 +21,7 @@ class InventoryController extends Controller
                       ->orWhere('barcode', 'like', "%{$search}%");
             })
             ->orderBy('stock', 'asc')
-            ->paginate(10);
+            ->paginate(5);
 
         return response()->json($products);
     }
