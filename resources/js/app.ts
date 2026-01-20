@@ -3,6 +3,7 @@ import App from './App.vue';
 import router from './router';
 import axios from 'axios';
 import '../css/app.css';
+import '@fortawesome/fontawesome-free/css/all.css';
 
 const appDiv = document.getElementById('app');
 

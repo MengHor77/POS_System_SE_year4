@@ -1,8 +1,9 @@
 <template>
     <BackendLayout>
         <div class="p-6 bg-bgMain min-h-screen">
-            <h1 class="text-3xl font-bold mb-6 text-danger">
-                🔔 Low Stock Notifications
+            <h1 class="text-3xl font-bold mb-6 text-warning">
+                <i class="fas fa-bell text-2xl"></i>
+                Low Stock Notifications
             </h1>
 
             <!-- Barcode Filter -->

@@ -4,7 +4,7 @@
     <div class="bg-bgCard p-6 rounded-2xl shadow-md w-full max-w-lg relative">
       <!-- Modal Header -->
       <div class="flex justify-between items-center mb-4">
-        <h2 class="text-2xl font-bold text-gray-800">Edit Product</h2>
+        <h2 class="text-2xl font-bold text-primary">Edit Product</h2>
         <button @click="$emit('close')" class="text-gray-400 hover:text-gray-700 text-2xl font-bold">&times;</button>
       </div>
 

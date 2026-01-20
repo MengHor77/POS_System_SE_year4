@@ -1,7 +1,7 @@
 <template>
   <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-bgCard p-6 rounded-2xl shadow-md w-full max-w-lg relative">
-      <h2 class="text-2xl font-bold mb-4">Edit Cashier</h2>
+      <h2 class="text-2xl font-bold mb-4 text-primary">Edit Cashier</h2>
 
       <form @submit.prevent="updateCashier" class="space-y-4">
         <div>
