@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 
 // Backend Pages
 import AdminLogin from "../pages/backend/AdminLogin.vue";
-import AdminDashboard from "../pages/backend/Dashboard.vue";
+import AdminDashboard from "../pages/backend/Dashboard/Index.vue";
 import Notification from "../pages/backend/Notification/index.vue";
 import Inventory from "../pages/backend/Inventory/Index.vue";
 import PurchaseOrder from "../pages/backend/PurchaseOrder.vue";

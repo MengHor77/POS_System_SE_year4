@@ -102,8 +102,8 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from "vue";
 import axios from "axios";
-import Card from "../../components/Card.vue";
-import BackendLayout from "../../layouts/BackendLayout.vue";
+import Card from "../../../components/Card.vue";
+import BackendLayout from "../../../layouts/BackendLayout.vue";
 
 interface BestSellingProduct {
   id: number;
