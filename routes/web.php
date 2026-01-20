@@ -4,6 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Backend\AdminAuthController;
 use App\Http\Controllers\Backend\ProductController;
 use App\Http\Controllers\Backend\NotificationController;
+use App\Http\Controllers\Backend\DashboardController;
+use App\Http\Controllers\Backend\InventoryController;
+use App\Http\Controllers\Backend\SaleController;
+use App\Http\Controllers\Backend\CashierController;
 
 // Admin Auth
 Route::get('/admin/login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
@@ -21,8 +25,15 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::get('/purchase-order', function () { return view('app'); });
     Route::get('/report', function () { return view('app'); });
     Route::get('/cashier', function () { return view('app'); });
+    Route::get('/sale', function() { return view('app'); });
+
+    Route::get('/sale', [SaleController::class, 'index']);
+
     Route::get('/profile', function () { return view('app'); });
-     
+    
+    Route::get('/dashboard/data', [DashboardController::class, 'index']);
+
+
     // notification routes
     Route::get('/notification/data', [NotificationController::class, 'lowStock']);
     Route::get('/notification/count', [NotificationController::class, 'lowStockCount']);
@@ -41,6 +52,17 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::post('/inventory/{id}/stock-out', [InventoryController::class, 'stockOut']);
     Route::get('/inventory/low-stock', [InventoryController::class, 'lowStock']);
 
+});
+
+
+Route::prefix('admin')->middleware('auth:admin')->group(function () {
+    Route::get('/cashier', fn () => view('app'));
+
+    Route::get('/cashier/data', [CashierController::class, 'index']);
+    Route::post('/cashier', [CashierController::class, 'store']);
+    Route::put('/cashier/{id}', [CashierController::class, 'update']);
+    Route::delete('/cashier/{id}', [CashierController::class, 'destroy']);
+    Route::patch('/cashier/{id}/status', [CashierController::class, 'toggleStatus']);
 });
 
 // Frontend catch-all for Vue SPA

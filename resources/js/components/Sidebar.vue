@@ -5,7 +5,7 @@
     >
         <!-- Logo + Toggle -->
         <div
-            class="flex items-center justify-between p-6 border-b  border-darkSoft"
+            class="flex items-center justify-between p-6 border-b border-darkSoft"
         >
             <span v-if="!collapsed" class="text-xl font-bold tracking-wide"
                 >Phone Store</span
@@ -120,6 +120,11 @@ export default defineComponent({
                 icon: "fas fa-users",
                 label: "Cashiers",
                 route: "/admin/cashier",
+            },
+            {
+                icon: "fas fa-money-bill-wave",
+                label: "Sales",
+                route: "/admin/sale",
             },
             { icon: "fas fa-user", label: "Profile", route: "/admin/profile" },
         ]);

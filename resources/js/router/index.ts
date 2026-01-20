@@ -7,9 +7,11 @@ import Notification from "../pages/backend/Notification/index.vue";
 import Inventory from "../pages/backend/Inventory/Index.vue";
 import PurchaseOrder from "../pages/backend/PurchaseOrder.vue";
 import Report from "../pages/backend/Report.vue";
-import Cashier from "../pages/backend/Cashier.vue";
+import CashierIndex from "../pages/backend/Cashier/Index.vue";
+import CashierCreate from "../pages/backend/Cashier/Create.vue";
+import CashierEdit from "../pages/backend/Cashier/Edit.vue";
 import Profile from "../pages/backend/Profile.vue";
-
+import Sale from "../pages/backend/Sale/Index.vue";
 // Product Pages
 import ProductIndex from "../pages/backend/Product/Index.vue";
 
@@ -43,8 +45,21 @@ const routes = [
         name: "purchase-order",
         component: PurchaseOrder,
     },
+    { path: "/admin/sale", name: "report", component: Sale },
     { path: "/admin/report", name: "report", component: Report },
-    { path: "/admin/cashier", name: "cashiers", component: Cashier },
+    {
+        path: "/admin/cashier",
+        component: CashierIndex,
+    },
+    {
+        path: "/admin/cashier/create",
+        component: CashierCreate,
+    },
+    {
+        path: "/admin/cashier/:id/edit",
+        component: CashierEdit,
+        props: true,
+    },
     { path: "/admin/profile", name: "profile", component: Profile },
 ];
 
