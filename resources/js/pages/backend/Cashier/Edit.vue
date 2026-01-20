@@ -49,7 +49,7 @@
                         class="input-field pr-10"
                     />
                     <span
-                        class="absolute inset-y-0 right-3 flex items-center text-xl text-gray-500 hover:text-gray-700 transition"
+                        class="absolute pt-6 inset-y-0 right-3 flex items-center text-xl text-gray-500 hover:text-gray-700 transition"
                         @click="showPassword = !showPassword"
                     >
                         <i
