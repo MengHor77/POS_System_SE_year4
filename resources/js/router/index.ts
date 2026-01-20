@@ -10,7 +10,7 @@ import Report from "../pages/backend/Report.vue";
 import CashierIndex from "../pages/backend/Cashier/Index.vue";
 import CashierCreate from "../pages/backend/Cashier/Create.vue";
 import CashierEdit from "../pages/backend/Cashier/Edit.vue";
-import Profile from "../pages/backend/Profile.vue";
+import Profile from "../pages/backend/Profile/Index.vue";
 import SaleIndex from "../pages/backend/Sale/Index.vue";
 // Product Pages
 import ProductIndex from "../pages/backend/Product/Index.vue";
@@ -27,7 +27,13 @@ const routes = [
         name: "admin-dashboard",
         component: AdminDashboard,
     },
-
+    {
+        path: "/admin/profile",
+        name: "Profile",
+        component: Profile,
+        meta: { requiresAuth: true },
+    },
+    
     // Product routes
     {
         path: "/admin/product",

@@ -8,6 +8,7 @@ use App\Http\Controllers\Backend\DashboardController;
 use App\Http\Controllers\Backend\InventoryController;
 use App\Http\Controllers\Backend\SaleController;
 use App\Http\Controllers\Backend\CashierController;
+use App\Http\Controllers\Backend\ProfileController;
 
 // ----------------------
 // Admin Authentication
@@ -39,6 +40,10 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     foreach ($spaRoutes as $route) {
         Route::get($route, fn() => view('app'));
     }
+
+    // Profile admin
+    Route::get('/profile', [ProfileController::class, 'index']);
+    Route::post('/profile', [ProfileController::class, 'update']);
 
     // Dashboard data
     Route::get('/dashboard/data', [DashboardController::class, 'index']);
