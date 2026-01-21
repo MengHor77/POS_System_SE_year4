@@ -32,6 +32,7 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
         '/inventory',
         '/purchase-order',
         '/report',
+        '/supplier',
         '/cashier',
         '/sale',      
         '/profile',
@@ -64,6 +65,11 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::get('/product/{id}', [ProductController::class, 'show']);
     Route::put('/product/{id}', [ProductController::class, 'update']);
     Route::delete('/product/{id}', [ProductController::class, 'destroy']);
+
+    Route::get('/supplier/data', [ProductSupplierController::class, 'index']);
+    Route::post('/supplier', [ProductSupplierController::class, 'store']);
+    Route::put('/supplier/{id}', [ProductSupplierController::class, 'update']);
+    Route::delete('/supplier/{id}', [ProductSupplierController::class, 'destroy']);
 
     // Inventory API
     Route::get('/inventory/data', [InventoryController::class, 'index']);

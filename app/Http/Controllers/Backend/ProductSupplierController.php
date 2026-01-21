@@ -8,50 +8,56 @@ use Illuminate\Http\Request;
 
 class ProductSupplierController extends Controller
 {
-    public function index()
+    // List
+    public function index(Request $request)
     {
-        $suppliers = ProductSupplier::with('product')->get();
+        $search = $request->search;
+
+        $suppliers = ProductSupplier::with('product')
+            ->when($search, function ($q) use ($search) {
+                $q->where('supplier_name', 'like', "%$search%");
+            })
+            ->paginate($request->per_page ?? 5);
+
         return response()->json($suppliers);
     }
 
+    // Store
     public function store(Request $request)
     {
-        $request->validate([
+        $data = $request->validate([
             'product_id' => 'required|exists:products,id',
-            'supplier_name' => 'required|string|max:255',
-            'quantity' => 'required|integer|min:1',
+            'supplier_name' => 'required|string',
+            'quantity' => 'required|integer|min:0',
             'price' => 'nullable|numeric|min:0',
         ]);
 
-        $supplier = ProductSupplier::create($request->all());
+        ProductSupplier::create($data);
 
-        return response()->json([
-            'message' => 'Supplier added successfully',
-            'supplier' => $supplier,
-        ]);
+        return response()->json(['message' => 'Supplier created']);
     }
 
+    // Update
     public function update(Request $request, $id)
     {
         $supplier = ProductSupplier::findOrFail($id);
 
-        $request->validate([
+        $data = $request->validate([
             'product_id' => 'required|exists:products,id',
-            'supplier_name' => 'required|string|max:255',
-            'quantity' => 'required|integer|min:1',
+            'supplier_name' => 'required|string',
+            'quantity' => 'required|integer|min:0',
             'price' => 'nullable|numeric|min:0',
         ]);
 
-        $supplier->update($request->all());
+        $supplier->update($data);
 
-        return response()->json($supplier);
+        return response()->json(['message' => 'Supplier updated']);
     }
 
+    // Delete
     public function destroy($id)
     {
-        $supplier = ProductSupplier::findOrFail($id);
-        $supplier->delete();
-
-        return response()->json(['message' => 'Deleted successfully']);
+        ProductSupplier::findOrFail($id)->delete();
+        return response()->json(['message' => 'Supplier deleted']);
     }
 }
