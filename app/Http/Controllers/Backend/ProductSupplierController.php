@@ -8,21 +8,19 @@ use Illuminate\Http\Request;
 
 class ProductSupplierController extends Controller
 {
-    // List
+    // List suppliers (paginated)
     public function index(Request $request)
     {
         $search = $request->search;
 
         $suppliers = ProductSupplier::with('product')
-            ->when($search, function ($q) use ($search) {
-                $q->where('supplier_name', 'like', "%$search%");
-            })
-            ->paginate($request->per_page ?? 5);
+            ->when($search, fn($q) => $q->where('supplier_name', 'like', "%$search%"))
+            ->get(); // or paginate($request->per_page ?? 5)
 
         return response()->json($suppliers);
     }
 
-    // Store
+    // Store new supplier
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -37,7 +35,7 @@ class ProductSupplierController extends Controller
         return response()->json(['message' => 'Supplier created']);
     }
 
-    // Update
+    // Update existing supplier
     public function update(Request $request, $id)
     {
         $supplier = ProductSupplier::findOrFail($id);
@@ -54,7 +52,7 @@ class ProductSupplierController extends Controller
         return response()->json(['message' => 'Supplier updated']);
     }
 
-    // Delete
+    // Delete supplier
     public function destroy($id)
     {
         ProductSupplier::findOrFail($id)->delete();

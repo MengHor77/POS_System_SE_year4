@@ -14,7 +14,7 @@ import Profile from "../pages/backend/Profile/Index.vue";
 import SaleIndex from "../pages/backend/Sale/Index.vue";
 // Product Pages
 import ProductIndex from "../pages/backend/Product/Index.vue";
-import SupplierIndex from "../pages/backend/ProductSuplyer/Index.vue";
+import SupplierIndex from '../pages/backend/ProductSuplyer/Index.vue';
 
 // Frontend Pages
 import Home from "../pages/frontend/Home.vue";
@@ -22,11 +22,8 @@ import Home from "../pages/frontend/Home.vue";
 const routes = [
     // Supplier Page
 
-    {
-        path: "/admin/supplier",
-        name: "supplier.Index",
-        component: SupplierIndex,
-    },
+       { path: '/admin/supplier', name: 'supplier.Index', component: SupplierIndex },
+
 
     { path: "/", name: "home", component: Home },
 

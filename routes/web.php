@@ -9,6 +9,7 @@ use App\Http\Controllers\Backend\InventoryController;
 use App\Http\Controllers\Backend\SaleController;
 use App\Http\Controllers\Backend\CashierController;
 use App\Http\Controllers\Backend\ProfileController;
+use App\Http\Controllers\Backend\ProductSupplierController;
 
 // ----------------------
 // Admin Authentication
@@ -66,6 +67,7 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::put('/product/{id}', [ProductController::class, 'update']);
     Route::delete('/product/{id}', [ProductController::class, 'destroy']);
 
+     // Product Supplier CRUD SPA endpoints
     Route::get('/supplier/data', [ProductSupplierController::class, 'index']);
     Route::post('/supplier', [ProductSupplierController::class, 'store']);
     Route::put('/supplier/{id}', [ProductSupplierController::class, 'update']);

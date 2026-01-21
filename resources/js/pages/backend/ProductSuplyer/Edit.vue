@@ -1,140 +1,66 @@
 <template>
-    <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 relative">
-            <button
-                @click="$emit('close')"
-                class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl"
-            >
-                ✕
-            </button>
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-bgCard p-6 rounded-2xl shadow-md w-full max-w-lg relative">
+            <h2 class="text-2xl font-bold mb-4 text-primary">Edit Supplier</h2>
 
-            <h2 class="text-xl font-bold text-primary mb-6">
-                Edit Supplier
-            </h2>
-
-            <form @submit.prevent="updateProduct" class="space-y-4">
+            <form @submit.prevent="updateSupplier" class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium mb-1">
-                        Product Name
-                    </label>
-                    <input
-                        v-model="form.name"
-                        class="w-full border rounded-lg px-3 py-2 bg-gray-100"
-                        disabled
-                    />
+                    <label>Product</label>
+                    <select v-model="form.product_id" class="input-field" required>
+                        <option v-for="p in products" :key="p.id" :value="p.id">{{ p.name }}</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Supplier Name</label>
+                    <input v-model="form.supplier_name" type="text" class="input-field" required />
+                </div>
+                <div>
+                    <label>Quantity</label>
+                    <input v-model.number="form.quantity" type="number" class="input-field" min="0" required />
+                </div>
+                <div>
+                    <label>Price</label>
+                    <input v-model.number="form.price" type="number" class="input-field" min="0" step="0.01" />
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium mb-1">
-                        Quantity
-                    </label>
-                    <input
-                        type="number"
-                        v-model.number="form.stock"
-                        class="w-full border rounded-lg px-3 py-2"
-                    />
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium mb-1">Price</label>
-                    <input
-                        type="number"
-                        step="0.01"
-                        v-model.number="form.price"
-                        class="w-full border rounded-lg px-3 py-2"
-                    />
-                </div>
-
-                <div class="flex justify-end gap-3 pt-4">
-                    <button
-                        type="button"
-                        @click="$emit('close')"
-                        class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        type="submit"
-                        class="px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary/90"
-                    >
-                        Update
-                    </button>
+                <div class="flex justify-end gap-4">
+                    <button type="button" @click="$emit('close')" class="px-4 py-2 bg-gray-400 text-white rounded">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Save</button>
                 </div>
             </form>
         </div>
     </div>
 </template>
 
-
 <script lang="ts">
-import { defineComponent, reactive, watch } from "vue";
-import axios from "axios";
+import { defineComponent, reactive, ref, watch, onMounted } from 'vue';
+import axios from 'axios';
 
-interface Product {
-    id: number;
-    name: string;
-}
-
-interface Supplier {
-    id: number;
-    product: Product;
-    supplier_name: string;
-    quantity: number;
-    price: number;
-}
+interface Product { id: number; name: string; }
+interface Supplier { id: number; product_id: number; supplier_name: string; quantity: number; price: number; }
 
 export default defineComponent({
-    name: "EditProduct",
-
-    props: {
-        supplier: {
-            type: Object as () => Supplier,
-            required: true,
-        },
-    },
-
+    name: 'EditProductSupplier',
+    props: { supplier: { type: Object as () => Supplier, required: true } },
     setup(props, { emit }) {
-        const form = reactive({
-            id: props.supplier.product.id,
-            name: props.supplier.product.name,
-            brand: "",
-            barcode: 0,
-            price: props.supplier.price,
-            stock: props.supplier.quantity,
-        });
+        const form = reactive({ ...props.supplier });
+        const products = ref<Product[]>([]);
 
-        watch(
-            () => props.supplier,
-            (newVal) => {
-                form.id = newVal.product.id;
-                form.name = newVal.product.name;
-                form.price = newVal.price;
-                form.stock = newVal.quantity;
-            },
-        );
-
-        const updateProduct = async () => {
-            await axios.put(`/admin/product/${form.id}`, form);
-            emit("updated");
-            emit("close");
+        const fetchProducts = async () => {
+            const res = await axios.get('/admin/product/data');
+            products.value = res.data.data;
         };
 
-        return { form, updateProduct };
+        watch(() => props.supplier, (newVal) => Object.assign(form, newVal));
+
+        const updateSupplier = async () => {
+            await axios.put(`/admin/supplier/${form.id}`, form);
+            emit('updated');
+            emit('close');
+        };
+
+        onMounted(fetchProducts);
+        return { form, products, updateSupplier };
     },
 });
 </script>
-
-<style scoped>
-.input-field {
-    width: 100%;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid #ccc;
-    border-radius: 0.5rem;
-    outline: none;
-    transition: border 0.2s;
-}
-.input-field:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 1px #3b82f6;
-}
-</style>
