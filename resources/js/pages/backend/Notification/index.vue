@@ -33,63 +33,66 @@
 
             <table
                 v-else
-                class="w-full table-auto border-collapse border border-gray-300"
+                class="w-full border-border rounded-lg overflow-hidden"
             >
-                <thead>
-                    <tr class="bg-gray-100">
-                        <th class="border px-4 py-2">ID</th>
-                        <th class="border px-4 py-2">Name</th>
-                        <th class="border px-4 py-2">Brand</th>
-                        <th class="border px-4 py-2">Barcode</th>
-                        <th class="border px-4 py-2">Price</th>
-                        <th class="border px-4 py-2">Stock</th>
-                        <th class="border px-4 py-2">Status</th>
-                        <th class="border px-4 py-2">Actions</th>
+                <thead class="bg-tableHeader text-sm">
+                    <tr class="bg-gray-100 rounded-lg border">
+                        <th class="p-3 border-y text-start">ID</th>
+                        <th class="p-3 border-y text-start">Name</th>
+                        <th class="p-3 border-y text-start">Brand</th>
+                        <th class="p-3 border-y text-start">Barcode</th>
+                        <th class="p-3 border-y text-start">Price</th>
+                        <th class="p-3 border-y text-start">Stock</th>
+                        <th class="p-3 border-y text-start">Status</th>
+                        <th class="p-3 border-y text-start">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr
                         v-for="product in products"
                         :key="product.id"
-                        class="hover:bg-gray-50"
+                        class="text-sm hover:bg-tableRowHover transition"
                     >
-                        <td class="border px-4 py-2">{{ product.id }}</td>
-                        <td class="border px-4 py-2">{{ product.name }}</td>
-                        <td class="border px-4 py-2">{{ product.brand }}</td>
-                        <td class="border px-4 py-2">{{ product.barcode }}</td>
-                        <td class="border px-4 py-2">{{ product.price }}</td>
+                        <td class="p-3 border-y text-start">
+                            {{ product.id }}
+                        </td>
+                        <td class="p-3 border-y text-start">
+                            {{ product.name }}
+                        </td>
+                        <td class="p-3 border-y text-start">
+                            {{ product.brand }}
+                        </td>
+                        <td class="p-3 border-y text-start">
+                            {{ product.barcode }}
+                        </td>
+                        <td class="p-3 border-y text-start">
+                            {{ product.price }}
+                        </td>
                         <td
-                            class="border px-4 py-2 font-bold"
+                            class="p-3 border-y text-start font-bold"
                             :class="product.stock <= 5 ? 'text-red-500' : ''"
                         >
                             {{ product.stock }}
                         </td>
-                        <td class="border px-4 py-2">
+                        <td class="p-3 border-y text-start">
                             <span
-                                class="px-2 py-1 text-xs rounded"
-                                :class="
-                                    product.stock <= 5
-                                        ? 'bg-red-500 text-white'
-                                        : 'bg-green-500 text-white'
-                                "
+                                class="px-2 py-1 text-xs rounded-full bg-red-500 text-white"
                             >
-                                {{
-                                    product.stock <= 5 ? "LOW STOCK" : "ENOUGH"
-                                }}
+                                Low Stock
                             </span>
                         </td>
-                        <td class="border px-4 py-2 flex gap-2">
+                        <td class="p-3 border-y text-start flex gap-2">
                             <button
                                 @click="editProduct(product)"
-                                class="bg-bgBtnEdit text-white px-2 py-1 rounded"
+                                class="px-3 py-1 rounded-lg bg-blue-100 text-bgBtnEdit hover:bg-bgBtnEdit hover:text-white transition"
                             >
-                                Edit
+                                <i class="fas fa-pen"></i>
                             </button>
                             <button
                                 @click="deleteProduct(product.id)"
-                                class="bg-bgBtnDelete text-white px-2 py-1 rounded"
+                                class="px-3 py-1 rounded-lg bg-dangerSoft text-danger hover:bg-bgBtnDelete hover:text-white transition"
                             >
-                                Delete
+                                <i class="fas fa-trash"></i>
                             </button>
                         </td>
                     </tr>
@@ -153,7 +156,7 @@ export default defineComponent({
                 params: {
                     page,
                     per_page: pagination.value.per_page,
-                    search: barcode.value, // <-- send search to backend
+                    search: barcode.value,
                 },
             });
             products.value = res.data.data;
