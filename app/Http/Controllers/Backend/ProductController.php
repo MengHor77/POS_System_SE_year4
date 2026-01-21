@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backend;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Database\QueryException;
 
 class ProductController extends Controller
 {
@@ -38,21 +39,31 @@ class ProductController extends Controller
     }
 
         // Store a new product
-    public function store(Request $request)
+     public function store(Request $request)
     {
         $request->validate([
-            'name'    => 'required|string|max:255',
-            'brand'   => 'required|string|max:255',
+            'name' => 'required|string|max:255',
+            'brand' => 'required|string|max:255',
             'barcode' => 'required|integer|unique:products,barcode',
-            'price'   => 'required|numeric',
-            'stock'   => 'required|integer',
+            'price' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
         ]);
 
-        $product = Product::create($request->all());
-
-    return response()->json([
-            'message' => 'Product added successfully',
-        ]);
+        try {
+            $product = Product::create($request->all());
+            return response()->json([
+                'message' => 'Product created successfully',
+                'product' => $product,
+            ]);
+        } catch (QueryException $e) {
+            // check for duplicate barcode error
+            if ($e->errorInfo[1] == 1062) {
+                return response()->json([
+                    'message' => 'This barcode already exists. Please enter a new barcode.'
+                ], 409); // 409 Conflict
+            }
+            return response()->json(['message' => 'Failed to save product.'], 500);
+        }
     }
 
     // Update product

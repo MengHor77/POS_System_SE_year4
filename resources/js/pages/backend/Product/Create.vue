@@ -108,16 +108,20 @@ export default defineComponent({
       stock: 0,
     });
 
-    const saveProduct = async () => {
-      try {
-        await axios.post("/admin/product", form);
-        emit("created"); // notify parent to refresh table
-        emit("close");   // close modal
-      } catch (error) {
-        console.error(error);
-        alert("Failed to save product.");
-      }
-    };
+   const saveProduct = async () => {
+  try {
+    await axios.post("/admin/product", form);
+    emit("created"); // notify parent to refresh table
+    emit("close");   // close modal
+  } catch (error: any) {
+    if (error.response && error.response.status === 409) {
+      emit("error", error.response.data.message); // send flash message to parent
+    } else {
+      emit("error", "Failed to save product.");
+    }
+  }
+};
+
 
     return { form, saveProduct };
   },

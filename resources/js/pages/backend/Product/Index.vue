@@ -5,6 +5,17 @@
                 Products Management
             </h1>
 
+            <!-- Flash Message -->
+            <div
+                v-if="flashMessage"
+                :class="[
+                    'p-4 rounded mb-4 text-white transition-all duration-300',
+                    flashType === 'success' ? 'bg-green-500' : 'bg-red-500',
+                ]"
+            >
+                {{ flashMessage }}
+            </div>
+
             <!-- Add New Product Button -->
             <div class="flex flex-row justify-between">
                 <div>
@@ -101,13 +112,31 @@
             <CreateProduct
                 v-if="showCreateModal"
                 @close="showCreateModal = false"
-                @created="fetchProducts(pagination.current_page)"
+                @created="
+                    () => {
+                        fetchProducts(pagination.current_page);
+                        showFlashMessage(
+                            'Product created successfully!',
+                            'success',
+                        );
+                    }
+                "
+                @error="(msg: string) => showFlashMessage(msg, 'error')"
             />
             <EditProduct
                 v-if="editingProduct"
                 :product="editingProduct"
                 @close="editingProduct = null"
-                @updated="fetchProducts(pagination.current_page)"
+                @updated="
+                    () => {
+                        fetchProducts(pagination.current_page);
+                        showFlashMessage(
+                            'Product updated successfully!',
+                            'success',
+                        );
+                    }
+                "
+                @error="(msg: string) => showFlashMessage(msg, 'error')"
             />
         </div>
     </BackendLayout>
@@ -144,6 +173,7 @@ export default defineComponent({
         const products = ref<Product[]>([]);
         const editingProduct = ref<Product | null>(null);
         const showCreateModal = ref(false);
+        const search = ref("");
 
         const pagination = ref({
             current_page: 1,
@@ -152,14 +182,26 @@ export default defineComponent({
             total: 0,
         });
 
-        const search = ref("");
+        // Flash message
+        const flashMessage = ref("");
+        const flashType = ref<"success" | "error">("success");
+        const showFlashMessage = (
+            message: string,
+            type: "success" | "error" = "success",
+        ) => {
+            flashMessage.value = message;
+            flashType.value = type;
+            setTimeout(() => {
+                flashMessage.value = "";
+            }, 3000);
+        };
 
         const fetchProducts = async (page = 1) => {
             const res = await axios.get("/admin/product/data", {
                 params: {
                     page,
                     per_page: pagination.value.per_page,
-                    search: search.value, // <-- send the filter value
+                    search: search.value,
                 },
             });
 
@@ -185,6 +227,7 @@ export default defineComponent({
                 return;
             await axios.delete(`/admin/product/${id}`);
             fetchProducts(pagination.value.current_page);
+            showFlashMessage("Product deleted successfully!", "success");
         };
 
         onMounted(() => fetchProducts());
@@ -199,6 +242,9 @@ export default defineComponent({
             openCreateModal,
             openEditModal,
             deleteProduct,
+            flashMessage,
+            flashType,
+            showFlashMessage,
         };
     },
 });
