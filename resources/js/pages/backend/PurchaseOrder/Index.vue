@@ -207,21 +207,41 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, computed } from "vue";
 import BackendLayout from "../../../layouts/BackendLayout.vue";
+import Pigination from "../../../components/Pigination.vue";
 
 export default defineComponent({
-    components: { BackendLayout },
+    components: { BackendLayout, Pigination },
 
     setup() {
         const showCreate = ref(false);
         const showEdit = ref(false);
         const editId = ref<number | null>(null);
+        const currentPage = ref(1);
+        const perPage = ref(5);
 
         const products = ref([
             { id: 1, name: "iPhone 14" },
             { id: 2, name: "Galaxy S23" },
         ]);
+
+        const total = computed(() => purchaseOrders.value.length);
+
+        const lastPage = computed(() =>
+            Math.ceil(total.value / perPage.value),
+        );
+
+        const paginatedPurchaseOrders = computed(() => {
+            const start = (currentPage.value - 1) * perPage.value;
+            const end = start + perPage.value;
+            return purchaseOrders.value.slice(start, end);
+        });
+
+        const handlePageChange = (page: number) => {
+            if (page < 1 || page > lastPage.value) return;
+            currentPage.value = page;
+        };
 
         const purchaseOrders = ref<any[]>([
             {
@@ -308,7 +328,15 @@ export default defineComponent({
             updatePO,
             deletePO,
             statusClass,
+            currentPage,
+            perPage,
+            total,
+            lastPage,
+            paginatedPurchaseOrders,
+            handlePageChange,
+
         };
+
     },
 });
 </script>

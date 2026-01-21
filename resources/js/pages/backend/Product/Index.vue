@@ -1,72 +1,92 @@
 <template>
     <BackendLayout>
         <div class="p-6 bg-bgMain min-h-screen">
-            <h1 class="text-3xl font-bold mb-6 text-primary">Products Management</h1>
+            <h1 class="text-3xl font-bold mb-6 text-primary">
+                Products Management
+            </h1>
 
             <!-- Add New Product Button -->
-       <div class="flex flex-row justify-between">
-         <div>
-             <!-- Filter Component -->
-            <Filter
-                v-model="search"
-                placeholder="Filter by barcode or name"
-                @filter="fetchProducts(1)"
-                containerClass="mb-4 flex gap-2 w-20"
-                inputClass="border p-2 rounded flex-1"
-                buttonClass="bg-darkSoft text-white px-4 py-2 rounded"
-            />
-           </div>
-            <div>
-             <button
-                @click="openCreateModal"
-                class="mb-4 bg-dark text-white px-4 py-2 rounded hover:bg-darkSoft"
-            >
-                Add New Product
-            </button>
-           </div>
-          
-       </div>
+            <div class="flex flex-row justify-between">
+                <div>
+                    <!-- Filter Component -->
+                    <Filter
+                        v-model="search"
+                        placeholder="Filter by barcode or name"
+                        @filter="fetchProducts(1)"
+                        containerClass="mb-4 flex gap-2 w-20"
+                        inputClass="border p-2 rounded flex-1"
+                        buttonClass="bg-darkSoft text-white px-4 py-2 rounded"
+                    />
+                </div>
+                <div>
+                    <button
+                        @click="openCreateModal"
+                        class="mb-4 bg-dark text-white px-4 py-2 rounded hover:bg-darkSoft"
+                    >
+                        Add New Product
+                    </button>
+                </div>
+            </div>
 
             <!-- Products Table -->
-            <table
-                class="w-full border-border rounded-lg overflow-hidden"
-            >
-                <thead class="bg-tableHeader text-sm">
-                    <tr class="bg-gray-100 rounded-lg border " :style="{ backgroundColor: 'var(--table-header)' }">
-                        <th class=" p-3 border-y text-start">ID</th>
-                        <th class=" p-3 border-y text-start">Name</th>
-                        <th class=" p-3 border-y text-start">Brand</th>
-                        <th class=" p-3 border-y text-start">Barcode</th>
-                        <th class=" p-3 border-y text-start">Price</th>
-                        <th class=" p-3 border-y text-start">Stock</th>
-                        <th class=" p-3 border-y text-start">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="product in products" :key="product.id" class="text-sm hover:bg-tableRowHover transition">
-                        <td class=" p-3 border-y text-start">{{ product.id }}</td>
-                        <td class=" p-3 border-y text-start">{{ product.name }}</td>
-                        <td class=" p-3 border-y text-start">{{ product.brand }}</td>
-                        <td class=" p-3 border-y text-start">{{ product.barcode }}</td>
-                        <td class=" p-3 border-y text-start">{{ product.price }}</td>
-                        <td class=" p-3 border-y text-start">{{ product.stock }}</td>
-                        <td class=" p-3 border-y text-start flex gap-2">
-                            <button
-                                @click="openEditModal(product)"
+            <div class="bg-bgCard rounded-xl shadow-card p-6">
+                <table class="w-full border-border rounded-lg overflow-hidden">
+                    <thead class="bg-tableHeader text-sm">
+                        <tr
+                            class="bg-gray-100 rounded-lg border"
+                            :style="{ backgroundColor: 'var(--table-header)' }"
+                        >
+                            <th class="p-3 border-y text-start">ID</th>
+                            <th class="p-3 border-y text-start">Name</th>
+                            <th class="p-3 border-y text-start">Brand</th>
+                            <th class="p-3 border-y text-start">Barcode</th>
+                            <th class="p-3 border-y text-start">Price</th>
+                            <th class="p-3 border-y text-start">Stock</th>
+                            <th class="p-3 border-y text-start">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr
+                            v-for="product in products"
+                            :key="product.id"
+                            class="text-sm hover:bg-tableRowHover transition"
+                        >
+                            <td class="p-3 border-y text-start">
+                                {{ product.id }}
+                            </td>
+                            <td class="p-3 border-y text-start">
+                                {{ product.name }}
+                            </td>
+                            <td class="p-3 border-y text-start">
+                                {{ product.brand }}
+                            </td>
+                            <td class="p-3 border-y text-start">
+                                {{ product.barcode }}
+                            </td>
+                            <td class="p-3 border-y text-start">
+                                {{ product.price }}
+                            </td>
+                            <td class="p-3 border-y text-start">
+                                {{ product.stock }}
+                            </td>
+                            <td class="p-3 border-y text-start flex gap-2">
+                                <button
+                                    @click="openEditModal(product)"
                                     class="px-3 py-1 rounded-lg bg-blue-100 text-bgBtnEdit hover:bg-bgBtnEdit hover:text-white transition"
-                            >
+                                >
                                     <i class="fas fa-pen"></i>
-                            </button>
-                            <button
-                                 @click="deleteProduct(product.id)"
+                                </button>
+                                <button
+                                    @click="deleteProduct(product.id)"
                                     class="px-3 py-1 rounded-lg bg-dangerSoft text-danger hover:bg-bgBtnDelete hover:text-white transition"
                                 >
                                     <i class="fas fa-trash"></i>
                                 </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
             <!-- Pagination -->
             <Pigination

@@ -31,73 +31,74 @@
                 </router-link>
             </div>
 
-            <table
-                v-else
-                class="w-full border-border rounded-lg overflow-hidden"
-            >
-                <thead class="bg-tableHeader text-sm">
-                    <tr class="bg-gray-100 rounded-lg border">
-                        <th class="p-3 border-y text-start">ID</th>
-                        <th class="p-3 border-y text-start">Name</th>
-                        <th class="p-3 border-y text-start">Brand</th>
-                        <th class="p-3 border-y text-start">Barcode</th>
-                        <th class="p-3 border-y text-start">Price</th>
-                        <th class="p-3 border-y text-start">Stock</th>
-                        <th class="p-3 border-y text-start">Status</th>
-                        <th class="p-3 border-y text-start">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr
-                        v-for="product in products"
-                        :key="product.id"
-                        class="text-sm hover:bg-tableRowHover transition"
-                    >
-                        <td class="p-3 border-y text-start">
-                            {{ product.id }}
-                        </td>
-                        <td class="p-3 border-y text-start">
-                            {{ product.name }}
-                        </td>
-                        <td class="p-3 border-y text-start">
-                            {{ product.brand }}
-                        </td>
-                        <td class="p-3 border-y text-start">
-                            {{ product.barcode }}
-                        </td>
-                        <td class="p-3 border-y text-start">
-                            {{ product.price }}
-                        </td>
-                        <td
-                            class="p-3 border-y text-start font-bold"
-                            :class="product.stock <= 5 ? 'text-red-500' : ''"
+            <div v-else class="bg-bgCard rounded-xl shadow-card p-6">
+                <table class="w-full border-border rounded-lg overflow-hidden">
+                    <thead class="bg-tableHeader text-sm">
+                        <tr class="bg-gray-100 rounded-lg">
+                            <th class="p-3 border-y text-start">ID</th>
+                            <th class="p-3 border-y text-start">Name</th>
+                            <th class="p-3 border-y text-start">Brand</th>
+                            <th class="p-3 border-y text-start">Barcode</th>
+                            <th class="p-3 border-y text-start">Price</th>
+                            <th class="p-3 border-y text-start">Stock</th>
+                            <th class="p-3 border-y text-start">Status</th>
+                            <th class="p-3 border-y text-start">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr
+                            v-for="product in products"
+                            :key="product.id"
+                            class="text-sm hover:bg-tableRowHover transition"
                         >
-                            {{ product.stock }}
-                        </td>
-                        <td class="p-3 border-y text-start">
-                            <span
-                                class="px-2 py-1 text-xs rounded-full bg-red-500 text-white"
+                            <td class="p-3 border-y text-start">
+                                {{ product.id }}
+                            </td>
+                            <td class="p-3 border-y text-start">
+                                {{ product.name }}
+                            </td>
+                            <td class="p-3 border-y text-start">
+                                {{ product.brand }}
+                            </td>
+                            <td class="p-3 border-y text-start">
+                                {{ product.barcode }}
+                            </td>
+                            <td class="p-3 border-y text-start">
+                                {{ product.price }}
+                            </td>
+                            <td
+                                class="p-3 border-y text-start font-bold"
+                                :class="
+                                    product.stock <= 5 ? 'text-red-500' : ''
+                                "
                             >
-                                Low Stock
-                            </span>
-                        </td>
-                        <td class="p-3 border-y text-start flex gap-2">
-                            <button
-                                @click="editProduct(product)"
-                                class="px-3 py-1 rounded-lg bg-blue-100 text-bgBtnEdit hover:bg-bgBtnEdit hover:text-white transition"
-                            >
-                                <i class="fas fa-pen"></i>
-                            </button>
-                            <button
-                                @click="deleteProduct(product.id)"
-                                class="px-3 py-1 rounded-lg bg-dangerSoft text-danger hover:bg-bgBtnDelete hover:text-white transition"
-                            >
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                                {{ product.stock }}
+                            </td>
+                            <td class="p-3 border-y text-start">
+                                <span
+                                    class="px-2 py-1 text-xs rounded-full bg-red-500 text-white"
+                                >
+                                    Low Stock
+                                </span>
+                            </td>
+                            <td class="p-3 border-y text-start flex gap-2">
+                                <button
+                                    @click="editProduct(product)"
+                                    class="px-3 py-1 rounded-lg bg-blue-100 text-bgBtnEdit hover:bg-bgBtnEdit hover:text-white transition"
+                                >
+                                    <i class="fas fa-pen"></i>
+                                </button>
+                                <button
+                                    @click="deleteProduct(product.id)"
+                                    class="px-3 py-1 rounded-lg bg-dangerSoft text-danger hover:bg-bgBtnDelete hover:text-white transition"
+                                >
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
             <Pigination
                 v-if="pagination.last_page > 1"
