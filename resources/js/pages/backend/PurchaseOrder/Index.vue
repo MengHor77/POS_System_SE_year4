@@ -1,17 +1,13 @@
 <template>
     <BackendLayout>
         <div class="p-6 bg-bgMain min-h-screen">
-
             <!-- HEADER -->
             <div class="flex justify-between items-center mb-6">
-                <h1 class="text-2xl font-bold text-primary">
-                    Purchase Orders
-                </h1>
+                <h1 class="text-2xl font-bold text-primary">Purchase Orders</h1>
 
                 <button
                     @click="openCreate"
-                    class="px-4 py-2 rounded-lg bg-bgBtnSave text-white
-                           hover:bg-bgBtnSaveHover transition shadow-soft"
+                    class="px-4 py-2 rounded-lg bg-bgBtnSave text-white hover:bg-bgBtnSaveHover transition shadow-soft"
                 >
                     <i class="fas fa-plus mr-2"></i>
                     New Purchase Order
@@ -20,16 +16,16 @@
 
             <!-- TABLE -->
             <div class="bg-bgCard rounded-xl shadow-card p-6">
-                <table class="w-full border border-border rounded-lg overflow-hidden">
+                <table class="w-full border-border rounded-lg overflow-hidden">
                     <thead class="bg-tableHeader text-sm">
                         <tr>
-                            <th class="p-3 border">#</th>
-                            <th class="p-3 border">PO No</th>
-                            <th class="p-3 border">Supplier</th>
-                            <th class="p-3 border">Product</th>
-                            <th class="p-3 border">Qty</th>
-                            <th class="p-3 border">Status</th>
-                            <th class="p-3 border text-center">Actions</th>
+                            <th class="p-3 border-y text-start">No</th>
+                            <th class="p-3 border-y text-start">PO No</th>
+                            <th class="p-3 border-y text-start">Supplier</th>
+                            <th class="p-3 border-y text-start">Product</th>
+                            <th class="p-3 border-y text-start">Qty</th>
+                            <th class="p-3 border-y text-start">Status</th>
+                            <th class="p-3 border-y text-start">Actions</th>
                         </tr>
                     </thead>
 
@@ -39,13 +35,23 @@
                             :key="po.id"
                             class="text-sm hover:bg-tableRowHover transition"
                         >
-                            <td class="p-3 border">{{ index + 1 }}</td>
-                            <td class="p-3 border font-semibold">{{ po.po_number }}</td>
-                            <td class="p-3 border">{{ po.supplier }}</td>
-                            <td class="p-3 border">{{ po.product_name }}</td>
-                            <td class="p-3 border">{{ po.quantity }}</td>
+                            <td class="p-3 border-y text-start">
+                                {{ index + 1 }}
+                            </td>
+                            <td class="p-3 border-y font-semibold text-start">
+                                {{ po.po_number }}
+                            </td>
+                            <td class="p-3 border-y text-start">
+                                {{ po.supplier }}
+                            </td>
+                            <td class="p-3 border-y text-start">
+                                {{ po.product_name }}
+                            </td>
+                            <td class="p-3 border-y text-start">
+                                {{ po.quantity }}
+                            </td>
 
-                            <td class="p-3 border">
+                            <td class="p-3 border-y text-start">
                                 <span
                                     class="px-3 py-1 rounded-full text-xs font-semibold"
                                     :class="statusClass(po.status)"
@@ -54,21 +60,17 @@
                                 </span>
                             </td>
 
-                            <td class="p-3 border text-center space-x-2">
+                            <td class="p-3 border-y text-start space-x-2">
                                 <button
                                     @click="openEdit(po)"
-                                    class="px-3 py-1 rounded-lg
-                                           bg-blue-100 text-bgBtnEdit
-                                           hover:bg-bgBtnEdit hover:text-white transition"
+                                    class="px-3 py-1 rounded-lg bg-blue-100 text-bgBtnEdit hover:bg-bgBtnEdit hover:text-white transition"
                                 >
                                     <i class="fas fa-pen"></i>
                                 </button>
 
                                 <button
                                     @click="deletePO(po.id)"
-                                    class="px-3 py-1 rounded-lg
-                                           bg-dangerSoft text-danger
-                                           hover:bg-bgBtnDelete hover:text-white transition"
+                                    class="px-3 py-1 rounded-lg bg-dangerSoft text-danger hover:bg-bgBtnDelete hover:text-white transition"
                                 >
                                     <i class="fas fa-trash"></i>
                                 </button>
@@ -89,7 +91,9 @@
                 v-if="showCreate"
                 class="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
             >
-                <div class="bg-bgCard w-full max-w-xl rounded-xl shadow-card p-6">
+                <div
+                    class="bg-bgCard w-full max-w-xl rounded-xl shadow-card p-6"
+                >
                     <h2 class="text-xl font-bold text-primary mb-4">
                         Create Purchase Order
                     </h2>
@@ -147,7 +151,9 @@
                 v-if="showEdit"
                 class="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
             >
-                <div class="bg-bgCard w-full max-w-xl rounded-xl shadow-card p-6">
+                <div
+                    class="bg-bgCard w-full max-w-xl rounded-xl shadow-card p-6"
+                >
                     <h2 class="text-xl font-bold text-primary mb-4">
                         Edit Purchase Order
                     </h2>
@@ -196,7 +202,6 @@
                     </form>
                 </div>
             </div>
-
         </div>
     </BackendLayout>
 </template>
@@ -263,18 +268,26 @@ export default defineComponent({
         };
 
         const updatePO = () => {
-            const index = purchaseOrders.value.findIndex(p => p.id === editId.value);
-            purchaseOrders.value[index] = { ...purchaseOrders.value[index], ...form.value };
+            const index = purchaseOrders.value.findIndex(
+                (p) => p.id === editId.value,
+            );
+            purchaseOrders.value[index] = {
+                ...purchaseOrders.value[index],
+                ...form.value,
+            };
             closeModal();
         };
 
         const deletePO = (id: number) => {
             if (!confirm("Delete this purchase order?")) return;
-            purchaseOrders.value = purchaseOrders.value.filter(p => p.id !== id);
+            purchaseOrders.value = purchaseOrders.value.filter(
+                (p) => p.id !== id,
+            );
         };
 
         const statusClass = (status: string) => {
-            if (status === "Approved") return "bg-poApprovedSoft text-poApproved";
+            if (status === "Approved")
+                return "bg-poApprovedSoft text-poApproved";
             return "bg-poPendingSoft text-poPending";
         };
 
