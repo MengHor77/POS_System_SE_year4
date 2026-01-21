@@ -123,6 +123,11 @@ export default defineComponent({
                 route: "/admin/purchase-order",
             },
             {
+                icon: "fas fa-truck",
+                label: "Supplier",
+                route: "/admin/supplier",
+            },
+            {
                 icon: "fas fa-chart-line",
                 label: "Report",
                 route: "/admin/report",
