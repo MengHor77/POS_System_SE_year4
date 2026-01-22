@@ -10,18 +10,24 @@ class ProductSupplierController extends Controller
 {
     public function index(Request $request)
     {
-        $search = $request->search;
         $perPage = $request->per_page ?? 5;
+        $search = $request->search;
 
-        $suppliers = ProductSupplier::with('product')
-            ->when($search, function($q) use ($search) {
-                $q->where('supplier_name', 'like', "%{$search}%");
-            })
-            ->paginate($perPage);
+        $query = ProductSupplier::with('product');
+
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('supplier_name', 'like', "%{$search}%")
+                ->orWhereHas('product', function($q2) use ($search) {
+                    $q2->where('name', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        $suppliers = $query->paginate($perPage);
 
         return response()->json($suppliers);
     }
-
 
     // Store new supplier
     public function store(Request $request)

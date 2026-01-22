@@ -17,20 +17,27 @@
             </div>
 
             <!-- Add Supplier Button -->
-            <button
-                @click="showCreate = true"
-                class="mb-4 bg-dark text-white px-4 py-2 rounded hover:bg-darkSoft"
-            >
-                Add new product Supplier
-            </button>
-
-            <!-- Filter -->
-            <Filter
-                v-model="filterText"
-                placeholder="Search supplier..."
-                @filter="() => fetch(1)"
-                class="mb-4"
-            />
+            <div class="flex flex-row gap-3 w-full">
+                <div class="w-50">
+                    <button
+                        @click="showCreate = true"
+                        class="bg-dark text-white px-4 py-2 rounded hover:bg-darkSoft"
+                    >
+                        Add new product Supplier
+                    </button>
+                </div>
+                <!-- Single Filter -->
+                <div class="w-80">
+                    <Filter
+                        v-model="filterText"
+                        placeholder="Search by Product or Supplier"
+                        @filter="() => fetch(1)"
+                        containerClass="px-2 flex gap-2 w-full"
+                        inputClass="border p-2 rounded flex-1"
+                        buttonClass="bg-dark hover:bg-darkSoft text-white px-4 py-2 rounded"
+                    />
+                </div>
+            </div>
 
             <!-- Suppliers Table -->
             <div class="bg-bgCard rounded-xl shadow-card p-6">
@@ -140,12 +147,20 @@ interface Pagination {
 }
 
 export default {
-    components: { BackendLayout, CreateSupplier, EditSupplier, Pigination, Filter },
+    components: {
+        BackendLayout,
+        CreateSupplier,
+        EditSupplier,
+        Pigination,
+        Filter,
+    },
     setup() {
         const suppliers = ref<Supplier[]>([]);
         const showCreate = ref(false);
         const editing = ref<Supplier | null>(null);
-        const filterText = ref(""); // Filter input
+
+        // Single filter input
+        const filterText = ref("");
 
         // Pagination reactive object
         const pagination = reactive<Pagination>({
@@ -158,20 +173,23 @@ export default {
         // Flash message
         const flashMessage = ref("");
         const flashType = ref<"success" | "error">("success");
-        const showFlashMessage = (message: string, type: "success" | "error" = "success") => {
+        const showFlashMessage = (
+            message: string,
+            type: "success" | "error" = "success",
+        ) => {
             flashMessage.value = message;
             flashType.value = type;
             setTimeout(() => (flashMessage.value = ""), 3000);
         };
 
-        // Fetch suppliers with pagination and filter
+        // Fetch suppliers with single search filter
         const fetch = async (page = 1) => {
             try {
                 const res = await axios.get("/admin/supplier/data", {
-                    params: { 
-                        page, 
-                        per_page: pagination.per_page, 
-                        search: filterText.value 
+                    params: {
+                        page,
+                        per_page: pagination.per_page,
+                        search: filterText.value, // single filter for Product or Supplier
                     },
                 });
 
@@ -202,7 +220,8 @@ export default {
 
         // Delete supplier
         const remove = async (id: number) => {
-            if (!confirm("Are you sure you want to delete this supplier?")) return;
+            if (!confirm("Are you sure you want to delete this supplier?"))
+                return;
             try {
                 await axios.delete(`/admin/supplier/${id}`);
                 showFlashMessage("Supplier deleted successfully!", "success");
@@ -215,7 +234,7 @@ export default {
 
         // Event handlers for Create/Edit
         const handleCreated = () => {
-            fetch(1); // reset to first page
+            fetch(1);
             showFlashMessage("Supplier created successfully!", "success");
             showCreate.value = false;
         };

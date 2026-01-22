@@ -26,7 +26,7 @@
                         @filter="fetchProducts(1)"
                         containerClass="mb-4 flex gap-2 w-20"
                         inputClass="border p-2 rounded flex-1"
-                        buttonClass="bg-darkSoft text-white px-4 py-2 rounded"
+                        buttonClass="bg-dark hover:bg-darkSoft text-white px-4 py-2 rounded"
                     />
                 </div>
                 <div>
