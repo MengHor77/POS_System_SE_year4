@@ -8,20 +8,20 @@ use Illuminate\Http\Request;
 
 class ProductSupplierController extends Controller
 {
-    // List suppliers (paginated)
     public function index(Request $request)
     {
         $search = $request->search;
+        $perPage = $request->per_page ?? 5;
 
-    $suppliers = ProductSupplier::with('product')
-        ->when($search, fn($q) => $q->where('supplier_name', 'like', "%$search%"))
-        ->get(); // or paginate($request->per_page ?? 5)
+        $suppliers = ProductSupplier::with('product')
+            ->when($search, function($q) use ($search) {
+                $q->where('supplier_name', 'like', "%{$search}%");
+            })
+            ->paginate($perPage);
 
-    // Ensure product data is included
-    return response()->json([
-        'data' => $suppliers
-    ]);
+        return response()->json($suppliers);
     }
+
 
     // Store new supplier
     public function store(Request $request)

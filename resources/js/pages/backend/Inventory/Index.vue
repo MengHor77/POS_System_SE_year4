@@ -1,7 +1,7 @@
 <template>
     <BackendLayout>
         <div class="p-6">
-            <h1 class="text-2xl font-bold mb-6">Inventory Management</h1>
+            <h1 class="text-2xl font-bold mb-6 text-primary">Inventory Management</h1>
             <!-- LOW STOCK ALERTS -->
       <div class="space-y-4 mb-6">
         <CardStockAlert
