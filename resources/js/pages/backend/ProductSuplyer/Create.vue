@@ -12,7 +12,7 @@
                 &times;
             </button>
 
-            <h2 class="text-2xl font-bold mb-4 text-primary">Add Supplier</h2>
+            <h2 class="text-2xl font-bold mb-4 text-primary">Add product Supplier</h2>
 
             <form @submit.prevent="save" class="space-y-4">
                 <div>
