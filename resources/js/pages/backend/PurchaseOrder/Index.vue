@@ -28,7 +28,13 @@
                     />
                 </div>
             </div>
-
+            <div>
+                <FlashMessage
+                    v-if="flash"
+                    :message="flash.message"
+                    :type="flash.type"
+                />
+            </div>
             <!-- Table -->
             <div class="bg-bgCard rounded-xl shadow-card p-6">
                 <table class="w-full border-border rounded-lg overflow-hidden">
@@ -113,6 +119,7 @@ import PurchaseOrderCreate from "./Create.vue";
 import PurchaseOrderEdit from "./Edit.vue";
 import Filter from "../../../components/Filter.vue";
 import Pigination from "../../../components/Pigination.vue";
+import FlashMessage from "../../../components/FlassMessage.vue";
 
 export default defineComponent({
     components: {
@@ -121,6 +128,7 @@ export default defineComponent({
         PurchaseOrderEdit,
         Filter,
         Pigination,
+        FlashMessage,
     },
     setup() {
         const purchaseOrders = ref<any[]>([]);
@@ -133,6 +141,18 @@ export default defineComponent({
         const lastPage = ref(1);
         const perPage = ref(5);
         const total = ref(0);
+
+        const flash = ref<{
+            message: string;
+            type: "success" | "error";
+        } | null>(null);
+
+        const showFlash = (
+            message: string,
+            type: "success" | "error" = "success",
+        ) => {
+            flash.value = { message, type };
+        };
 
         const fetch = async (page = 1) => {
             currentPage.value = page;
@@ -161,17 +181,24 @@ export default defineComponent({
 
         const deletePO = async (id: number) => {
             if (!confirm("Delete this purchase order?")) return;
-            await axios.delete(`/admin/purchase-order/${id}`);
-            fetch(currentPage.value);
+            try {
+                await axios.delete(`/admin/purchase-order/${id}`);
+                showFlash("Purchase order deleted!", "success");
+                fetch(currentPage.value);
+            } catch {
+                showFlash("Failed to delete purchase order.", "error");
+            }
         };
 
         const onCreated = () => {
             showCreate.value = false;
+            showFlash("Purchase order created!", "success");
             fetch(currentPage.value);
         };
 
         const onUpdated = () => {
             showEdit.value = false;
+            showFlash("Purchase order updated!", "success");
             fetch(currentPage.value);
         };
 
@@ -193,6 +220,8 @@ export default defineComponent({
             deletePO,
             onCreated,
             onUpdated,
+            flash,
+            showFlash,
         };
     },
 });
