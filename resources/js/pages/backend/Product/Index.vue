@@ -41,7 +41,7 @@
 
             <!-- Products Table -->
             <div class="bg-bgCard rounded-xl shadow-card p-6">
-                <table class="w-full border-border rounded-lg overflow-hidden">
+                <table class="w-full border-border rounded-lg overflow-hidden" >
                     <thead class="bg-tableHeader text-sm">
                         <tr
                             class="bg-gray-100 rounded-lg border"
