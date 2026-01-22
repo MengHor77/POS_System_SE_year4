@@ -1,92 +1,150 @@
 <template>
-  <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-    <div class="bg-bgCard w-full max-w-lg rounded-2xl p-6 shadow-lg">
-      <!-- Header -->
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold text-primary">Edit Admin</h2>
-        <button @click="$emit('close')" class="text-gray-500 hover:text-red-500">✕</button>
-      </div>
+    <div
+        class="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
+    >
+        <div class="bg-bgCard w-full max-w-lg rounded-2xl p-6 shadow-lg">
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-primary">Edit Admin</h2>
+                <button
+                    @click="$emit('close')"
+                    class="text-gray-500 hover:text-red-500"
+                >
+                    ✕
+                </button>
+            </div>
 
-      <!-- Messages -->
-      <div v-if="message" class="text-green-600 text-center mb-3">{{ message }}</div>
-      <div v-if="errorMessage" class="text-red-600 text-center mb-3">{{ errorMessage }}</div>
+            <!-- Messages -->
+            <div v-if="message" class="text-green-600 text-center mb-3">
+                {{ message }}
+            </div>
+            <div v-if="errorMessage" class="text-red-600 text-center mb-3">
+                {{ errorMessage }}
+            </div>
 
-      <!-- Form -->
-      <form @submit.prevent="updateAdmin" class="space-y-4">
-        <!-- Name -->
-        <div>
-          <label class="block font-semibold mb-1">Name</label>
-          <input v-model="form.name" class="w-full border rounded-lg px-4 py-2" required />
+            <!-- Form -->
+            <form @submit.prevent="updateAdmin" class="space-y-4">
+                <!-- Name -->
+                <div>
+                    <label class="block font-semibold mb-1">Name</label>
+                    <input
+                        v-model="form.name"
+                        class="w-full border rounded-lg px-4 py-2"
+                        required
+                    />
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label class="block font-semibold mb-1">Email</label>
+                    <input
+                        v-model="form.email"
+                        type="email"
+                        class="w-full border rounded-lg px-4 py-2"
+                        required
+                    />
+                </div>
+
+                <!-- Old Password -->
+
+                <div>
+                    <label class="block font-medium mb-2">Old Password</label>
+                    <div class="relative">
+                        <input
+                            :type="showOldPassword ? 'text' : 'password'"
+                            v-model="form.old_password"
+                            placeholder="Enter old password"
+                            class="w-full border border-border rounded-lg py-3 px-4 pr-12 bg-bgMain focus:outline-none focus:ring-2 focus:ring-primary"
+                        />
+                        <button
+                            type="button"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center text-muted hover:text-primary transition focus:outline-none"
+                            @click="showOldPassword = !showOldPassword"
+                        >
+                            <i
+                                :class="
+                                    showOldPassword
+                                        ? 'fas fa-eye-slash'
+                                        : 'fas fa-eye'
+                                "
+                            ></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- New Password -->
+                <div>
+                    <label class="block font-medium mb-2">New Password</label>
+                    <div class="relative">
+                        <input
+                            :type="showNewPassword ? 'text' : 'password'"
+                            v-model="form.password"
+                            placeholder="Enter new password"
+                            class="w-full border border-border rounded-lg py-3 px-4 pr-12 bg-bgMain focus:outline-none focus:ring-2 focus:ring-primary"
+                        />
+                        <button
+                            type="button"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center text-muted hover:text-primary transition focus:outline-none"
+                            @click="showNewPassword = !showNewPassword"
+                        >
+                            <i
+                                :class="
+                                    showNewPassword
+                                        ? 'fas fa-eye-slash'
+                                        : 'fas fa-eye'
+                                "
+                            ></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Confirm Password -->
+                <div>
+                    <label class="block font-medium mb-2"
+                        >Confirm Password</label
+                    >
+                    <div class="relative">
+                        <input
+                            :type="showConfirmPassword ? 'text' : 'password'"
+                            v-model="form.password_confirmation"
+                            placeholder="Confirm new password"
+                            class="w-full border border-border rounded-lg py-3 px-4 pr-12 bg-bgMain focus:outline-none focus:ring-2 focus:ring-primary"
+                        />
+                        <button
+                            type="button"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center text-muted hover:text-primary transition focus:outline-none"
+                            @click="showConfirmPassword = !showConfirmPassword"
+                        >
+                            <i
+                                :class="
+                                    showConfirmPassword
+                                        ? 'fas fa-eye-slash'
+                                        : 'fas fa-eye'
+                                "
+                            ></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex justify-end pt-4 space-x-2">
+                    <button
+                        type="button"
+                        @click="$emit('close')"
+                        class="px-4 py-2 rounded bg-bgBtnCancel hover:bg-bgBtnCancelHover text-white"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="submit"
+                        class="px-4 py-2 bg-bgBtnSave text-white rounded-lg"
+                    >
+                        Save
+                    </button>
+                </div>
+            </form>
         </div>
-
-        <!-- Email -->
-        <div>
-          <label class="block font-semibold mb-1">Email</label>
-          <input v-model="form.email" type="email" class="w-full border rounded-lg px-4 py-2" required />
-        </div>
-
-        <!-- Old Password -->
-        <div class="relative">
-          <label class="block font-semibold mb-1">Old Password</label>
-          <input
-            :type="showOldPassword ? 'text' : 'password'"
-            v-model="form.old_password"
-            placeholder="Enter old password"
-            class="w-full border rounded-lg px-4 py-2 pr-10"
-          />
-          <button
-            type="button"
-            class="absolute inset-y-0 right-3 flex items-center text-lg text-gray-500 hover:text-gray-700"
-            @click="showOldPassword = !showOldPassword"
-          >
-            <i :class="showOldPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
-          </button>
-        </div>
-
-        <!-- New Password -->
-        <div class="relative">
-          <label class="block font-semibold mb-1">New Password</label>
-          <input
-            :type="showNewPassword ? 'text' : 'password'"
-            v-model="form.password"
-            placeholder="Enter new password"
-            class="w-full border rounded-lg px-4 py-2 pr-10"
-          />
-          <button
-            type="button"
-            class="absolute inset-y-0 right-3 flex items-center text-lg text-gray-500 hover:text-gray-700"
-            @click="showNewPassword = !showNewPassword"
-          >
-            <i :class="showNewPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
-          </button>
-        </div>
-
-        <!-- Confirm Password -->
-        <div class="relative">
-          <label class="block font-semibold mb-1">Confirm Password</label>
-          <input
-            :type="showConfirmPassword ? 'text' : 'password'"
-            v-model="form.password_confirmation"
-            placeholder="Confirm new password"
-            class="w-full border rounded-lg px-4 py-2 pr-10"
-          />
-          <button
-            type="button"
-            class="absolute inset-y-0 right-3 flex items-center text-lg text-gray-500 hover:text-gray-700"
-            @click="showConfirmPassword = !showConfirmPassword"
-          >
-            <i :class="showConfirmPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
-          </button>
-        </div>
-
-        <!-- Actions -->
-        <div class="flex justify-end pt-4 space-x-2">
-          <button type="button" @click="$emit('close')" class="px-4 py-2 border rounded-lg">Cancel</button>
-          <button type="submit" class="px-4 py-2 bg-bgBtnSave text-white rounded-lg">Save</button>
-        </div>
-      </form>
     </div>
-  </div>
 </template>
 
 <script lang="ts">
@@ -94,60 +152,61 @@ import { defineComponent, ref, onMounted } from "vue";
 import axios from "axios";
 
 export default defineComponent({
-  name: "EditProfile",
-  props: { id: { type: Number, required: true } },
-  emits: ["close", "updated"],
-  setup(props, { emit }) {
-    const form = ref({
-      name: "",
-      email: "",
-      old_password: "",
-      password: "",
-      password_confirmation: "",
-    });
+    name: "EditProfile",
+    props: { id: { type: Number, required: true } },
+    emits: ["close", "updated"],
+    setup(props, { emit }) {
+        const form = ref({
+            name: "",
+            email: "",
+            old_password: "",
+            password: "",
+            password_confirmation: "",
+        });
 
-    const message = ref("");
-    const errorMessage = ref("");
+        const message = ref("");
+        const errorMessage = ref("");
 
-    // Show/hide passwords
-    const showOldPassword = ref(false);
-    const showNewPassword = ref(false);
-    const showConfirmPassword = ref(false);
+        // Show/hide passwords
+        const showOldPassword = ref(false);
+        const showNewPassword = ref(false);
+        const showConfirmPassword = ref(false);
 
-    // Fetch admin data
-    const fetchAdmin = async () => {
-      try {
-        const res = await axios.get(`/admin/profile/${props.id}`);
-        form.value.name = res.data.name;
-        form.value.email = res.data.email;
-      } catch {
-        errorMessage.value = "Failed to load admin data";
-      }
-    };
+        // Fetch admin data
+        const fetchAdmin = async () => {
+            try {
+                const res = await axios.get(`/admin/profile/${props.id}`);
+                form.value.name = res.data.name;
+                form.value.email = res.data.email;
+            } catch {
+                errorMessage.value = "Failed to load admin data";
+            }
+        };
 
-    // Update admin
-    const updateAdmin = async () => {
-      try {
-        await axios.post(`/admin/profile/${props.id}`, form.value);
-        message.value = "Updated successfully";
-        emit("updated");
-        setTimeout(() => emit("close"), 500);
-      } catch (err: any) {
-        errorMessage.value = err.response?.data?.message || "Update failed";
-      }
-    };
+        // Update admin
+        const updateAdmin = async () => {
+            try {
+                await axios.post(`/admin/profile/${props.id}`, form.value);
+                message.value = "Updated successfully";
+                emit("updated");
+                setTimeout(() => emit("close"), 500);
+            } catch (err: any) {
+                errorMessage.value =
+                    err.response?.data?.message || "Update failed";
+            }
+        };
 
-    onMounted(fetchAdmin);
+        onMounted(fetchAdmin);
 
-    return {
-      form,
-      message,
-      errorMessage,
-      showOldPassword,
-      showNewPassword,
-      showConfirmPassword,
-      updateAdmin,
-    };
-  },
+        return {
+            form,
+            message,
+            errorMessage,
+            showOldPassword,
+            showNewPassword,
+            showConfirmPassword,
+            updateAdmin,
+        };
+    },
 });
 </script>
