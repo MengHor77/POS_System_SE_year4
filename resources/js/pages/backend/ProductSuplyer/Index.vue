@@ -224,7 +224,7 @@ export default {
                 return;
             try {
                 await axios.delete(`/admin/supplier/${id}`);
-                showFlashMessage("Supplier deleted successfully!", "success");
+                showFlashMessage("product Supplier deleted successfully!", "success");
                 fetch(pagination.current_page);
             } catch (err) {
                 console.error(err);
@@ -235,7 +235,7 @@ export default {
         // Event handlers for Create/Edit
         const handleCreated = () => {
             fetch(1);
-            showFlashMessage("Supplier created successfully!", "success");
+            showFlashMessage("created product Supplier  successfully!", "success");
             showCreate.value = false;
         };
 
