@@ -11,32 +11,44 @@ class PurchaseOrderController extends Controller
     /**
      * List purchase orders (with search & pagination)
      */
-public function index(Request $request)
-{
-    $orders = PurchaseOrder::with(['productSupplier.product'])->latest()->get();
+    public function index(Request $request)
+    {
+        $search = $request->input('search', '');
+        $perPage = $request->input('per_page', 5);
 
-    $data = $orders->map(function ($order) {
-        return [
-            'id' => $order->id,
-            'supplier_name' => $order->supplier_name,
-            'quantity' => $order->quantity,
-            'status' => $order->status,
-            'product_supplier_id' => $order->product_supplier_id,
-            'product' => [
-                'id' => $order->productSupplier->product->id ?? null,
-                'name' => $order->productSupplier->product->name ?? '',
-            ],
-        ];
-    });
+        $query = PurchaseOrder::with(['productSupplier.product']);
 
-    return response()->json(['data' => $data]);
-}
+        if ($search) {
+            $query->whereHas('productSupplier.product', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%");
+            })->orWhere('supplier_name', 'like', "%{$search}%");
+        }
 
+        $orders = $query->latest()->paginate($perPage);
 
+        $data = $orders->getCollection()->map(function ($order) {
+            return [
+                'id' => $order->id,
+                'supplier_name' => $order->supplier_name,
+                'quantity' => $order->quantity,
+                'status' => $order->status,
+                'product_supplier_id' => $order->product_supplier_id,
+                'product' => [
+                    'id' => $order->productSupplier->product->id ?? null,
+                    'name' => $order->productSupplier->product->name ?? '',
+                ],
+            ];
+        });
 
-    /**
-     * Store purchase order
-     */
+        return response()->json([
+            'data' => $data,
+            'current_page' => $orders->currentPage(),
+            'last_page' => $orders->lastPage(),
+            'per_page' => $orders->perPage(),
+            'total' => $orders->total(),
+        ]);
+    }
+
     public function store(Request $request)
     {
             $validated = $request->validate([
