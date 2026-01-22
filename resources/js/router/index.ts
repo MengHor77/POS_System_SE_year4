@@ -15,7 +15,6 @@ import SaleIndex from "../pages/backend/Sale/Index.vue";
 // Product Pages
 import ProductIndex from "../pages/backend/Product/Index.vue";
 import SupplierIndex from '../pages/backend/ProductSuplyer/Index.vue';
-import PurchaseOrderIndex from "../pages/backend/PurchaseOrder/Index.vue";
 
 // Frontend Pages
 import Home from "../pages/frontend/Home.vue";
@@ -34,13 +33,7 @@ const routes = [
         name: "admin-dashboard",
         component: AdminDashboard,
     },
-    {
-        path: "/admin/profile",
-        name: "Profile",
-        component: Profile,
-        meta: { requiresAuth: true },
-    },
-
+    
     // Product routes
     {
         path: "/admin/product",
@@ -56,9 +49,10 @@ const routes = [
     { path: "/admin/inventory", name: "inventory", component: Inventory },
     {
         path: "/admin/purchase-order",
-        name: "purchase-order",
-        component: PurchaseOrder,
+        name: "purchase-order.index",
+        component: PurchaseOrder
     },
+
     { path: "/admin/sale", name: "sale", component: SaleIndex },
     { path: "/admin/report", name: "report", component: Report },
     {

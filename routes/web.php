@@ -47,11 +47,16 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
         Route::get($route, fn() => view('app'));
     }
 
-        // Purchase Order API
+          // CRUD API (all under /admin/purchase-order)
     Route::get('/purchase-order/data', [PurchaseOrderController::class, 'index']);
     Route::post('/purchase-order', [PurchaseOrderController::class, 'store']);
     Route::put('/purchase-order/{id}', [PurchaseOrderController::class, 'update']);
     Route::delete('/purchase-order/{id}', [PurchaseOrderController::class, 'destroy']);
+
+    // Needed for select dropdown
+    Route::get('/product-supplier', function () {
+        return \App\Models\ProductSupplier::with('product')->get();
+    });
 
     
   // Admin Profile Table

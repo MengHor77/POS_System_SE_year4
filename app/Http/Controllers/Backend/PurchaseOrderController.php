@@ -11,39 +11,44 @@ class PurchaseOrderController extends Controller
     /**
      * List purchase orders (with search & pagination)
      */
-    public function index(Request $request)
-    {
-        $search = $request->search;
+ public function index(Request $request)
+{
+    $orders = PurchaseOrder::with(['productSupplier.product'])->latest()->get();
 
-        $orders = PurchaseOrder::with('product')
-            ->when($search, function ($q) use ($search) {
-                $q->where('supplier_name', 'like', "%{$search}%")
-                  ->orWhereHas('product', function ($p) use ($search) {
-                      $p->where('name', 'like', "%{$search}%");
-                  });
-            })
-            ->latest()
-            ->paginate($request->per_page ?? 5);
+    // Transform for Vue
+    $data = $orders->map(function ($order) {
+        return [
+            'id' => $order->id,
+            'supplier_name' => $order->supplier_name,
+            'quantity' => $order->quantity,
+            'status' => $order->status,
+            'product' => [
+                'id' => $order->product->id ?? null,
+                'name' => $order->product->name ?? '',
+            ],
+        ];
+    });
 
-        return response()->json($orders);
-    }
+    return response()->json($data);
+}
+
 
     /**
      * Store purchase order
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'product_id'    => 'required|exists:products,id',
-            'supplier_name' => 'required|string|max:255',
-            'quantity'      => 'required|integer|min:1',
+            $validated = $request->validate([
+            'product_supplier_id' => 'required|exists:product_suppliers,id',
+            'supplier_name'       => 'required|string|max:255',
+            'quantity'            => 'required|integer|min:1',
         ]);
 
         $order = PurchaseOrder::create($validated);
 
         return response()->json([
             'message' => 'Purchase order created successfully',
-            'data'    => $order->load('product'),
+            'data' => $order->load('productSupplier.product'),
         ], 201);
     }
 
@@ -80,3 +85,4 @@ class PurchaseOrderController extends Controller
         ]);
     }
 }
+ 
