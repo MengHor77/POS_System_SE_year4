@@ -10,6 +10,8 @@ use App\Http\Controllers\Backend\SaleController;
 use App\Http\Controllers\Backend\CashierController;
 use App\Http\Controllers\Backend\ProfileController;
 use App\Http\Controllers\Backend\ProductSupplierController;
+use App\Http\Controllers\Backend\PurchaseOrderController;
+
 
 // ----------------------
 // Admin Authentication
@@ -45,6 +47,13 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
         Route::get($route, fn() => view('app'));
     }
 
+        // Purchase Order API
+    Route::get('/purchase-order/data', [PurchaseOrderController::class, 'index']);
+    Route::post('/purchase-order', [PurchaseOrderController::class, 'store']);
+    Route::put('/purchase-order/{id}', [PurchaseOrderController::class, 'update']);
+    Route::delete('/purchase-order/{id}', [PurchaseOrderController::class, 'destroy']);
+
+    
   // Admin Profile Table
     Route::get('/profile/data', [ProfileController::class, 'list']);
     
