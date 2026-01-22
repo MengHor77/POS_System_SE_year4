@@ -17,7 +17,7 @@
             </div>
 
             <!-- Add Supplier Button -->
-            <div class="flex flex-row gap-3 w-full">
+            <div class="flex flex-row gap-3 w-full pb-6">
                 <div class="w-50">
                     <button
                         @click="showCreate = true"
