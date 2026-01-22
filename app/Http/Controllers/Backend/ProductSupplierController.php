@@ -13,11 +13,14 @@ class ProductSupplierController extends Controller
     {
         $search = $request->search;
 
-        $suppliers = ProductSupplier::with('product')
-            ->when($search, fn($q) => $q->where('supplier_name', 'like', "%$search%"))
-            ->get(); // or paginate($request->per_page ?? 5)
+    $suppliers = ProductSupplier::with('product')
+        ->when($search, fn($q) => $q->where('supplier_name', 'like', "%$search%"))
+        ->get(); // or paginate($request->per_page ?? 5)
 
-        return response()->json($suppliers);
+    // Ensure product data is included
+    return response()->json([
+        'data' => $suppliers
+    ]);
     }
 
     // Store new supplier
