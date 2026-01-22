@@ -55,6 +55,7 @@
                             v-model="form.old_password"
                             placeholder="Enter old password"
                             class="w-full border border-border rounded-lg py-3 px-4 pr-12 bg-bgMain focus:outline-none focus:ring-2 focus:ring-primary"
+                            required
                         />
                         <button
                             type="button"
@@ -81,6 +82,7 @@
                             v-model="form.password"
                             placeholder="Enter new password"
                             class="w-full border border-border rounded-lg py-3 px-4 pr-12 bg-bgMain focus:outline-none focus:ring-2 focus:ring-primary"
+                            required
                         />
                         <button
                             type="button"
@@ -109,6 +111,7 @@
                             v-model="form.password_confirmation"
                             placeholder="Confirm new password"
                             class="w-full border border-border rounded-lg py-3 px-4 pr-12 bg-bgMain focus:outline-none focus:ring-2 focus:ring-primary"
+                            required
                         />
                         <button
                             type="button"
