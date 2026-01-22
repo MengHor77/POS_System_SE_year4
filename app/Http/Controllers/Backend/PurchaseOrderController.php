@@ -11,26 +11,27 @@ class PurchaseOrderController extends Controller
     /**
      * List purchase orders (with search & pagination)
      */
- public function index(Request $request)
+public function index(Request $request)
 {
     $orders = PurchaseOrder::with(['productSupplier.product'])->latest()->get();
 
-    // Transform for Vue
     $data = $orders->map(function ($order) {
         return [
             'id' => $order->id,
             'supplier_name' => $order->supplier_name,
             'quantity' => $order->quantity,
             'status' => $order->status,
+            'product_supplier_id' => $order->product_supplier_id,
             'product' => [
-                'id' => $order->product->id ?? null,
-                'name' => $order->product->name ?? '',
+                'id' => $order->productSupplier->product->id ?? null,
+                'name' => $order->productSupplier->product->name ?? '',
             ],
         ];
     });
 
-    return response()->json($data);
+    return response()->json(['data' => $data]);
 }
+
 
 
     /**
@@ -55,23 +56,24 @@ class PurchaseOrderController extends Controller
     /**
      * Update purchase order
      */
-    public function update(Request $request, $id)
-    {
-        $order = PurchaseOrder::findOrFail($id);
+ public function update(Request $request, $id)
+{
+    $order = PurchaseOrder::findOrFail($id);
 
-        $validated = $request->validate([
-            'product_id'    => 'required|exists:products,id',
-            'supplier_name' => 'required|string|max:255',
-            'quantity'      => 'required|integer|min:1',
-        ]);
+    $validated = $request->validate([
+        'product_supplier_id' => 'required|exists:product_suppliers,id',
+        'supplier_name'       => 'required|string|max:255',
+        'quantity'            => 'required|integer|min:1',
+    ]);
 
-        $order->update($validated);
+    $order->update($validated);
 
-        return response()->json([
-            'message' => 'Purchase order updated successfully',
-            'data'    => $order->load('product'),
-        ]);
-    }
+    return response()->json([
+        'message' => 'Purchase order updated successfully',
+        'data'    => $order->load('productSupplier.product'),
+    ]);
+}
+
 
     /**
      * Delete purchase order

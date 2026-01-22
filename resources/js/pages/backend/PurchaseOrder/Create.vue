@@ -9,21 +9,16 @@
 
       <!-- Form -->
       <form @submit.prevent="submit">
-        <!-- Product/Supplier -->
         <div class="mb-4">
-          <label class="block mb-1 font-semibold">Product</label>
+          <label class="block mb-1 font-semibold">Product / Supplier</label>
           <select
-            v-model.number="form.product_supplier_id"
+            v-model="form.product_supplier_id"
             @change="onProductChange"
             class="w-full px-3 py-2 border rounded-lg"
             required
           >
             <option :value="null">-- Select Product --</option>
-            <option
-              v-for="item in products"
-              :key="item.id"
-              :value="item.id"
-            >
+            <option v-for="item in products" :key="item.id" :value="item.id">
               {{ item.product.name }} ({{ item.supplier_name }})
             </option>
           </select>
@@ -31,27 +26,14 @@
 
         <div class="mb-4">
           <label class="block mb-1 font-semibold">Supplier Name</label>
-          <input
-            type="text"
-            v-model="form.supplier_name"
-            readonly
-            class="w-full px-3 py-2 border rounded-lg bg-gray-100"
-          />
+          <input type="text" v-model="form.supplier_name" readonly class="w-full px-3 py-2 border rounded-lg bg-gray-100"/>
         </div>
 
-        <!-- Quantity -->
         <div class="mb-4">
           <label class="block mb-1 font-semibold">Quantity</label>
-          <input
-            type="number"
-            min="1"
-            v-model.number="form.quantity"
-            class="w-full px-3 py-2 border rounded-lg"
-            required
-          />
+          <input type="number" min="1" v-model.number="form.quantity" class="w-full px-3 py-2 border rounded-lg"/>
         </div>
 
-        <!-- Footer -->
         <div class="flex justify-end gap-3 mt-6">
           <button type="button" @click="$emit('close')" class="px-4 py-2 rounded bg-gray-500 text-white hover:bg-gray-600">Cancel</button>
           <button type="submit" class="px-4 py-2 rounded bg-primary text-white hover:bg-primary/90">Save</button>
@@ -73,7 +55,7 @@ export default defineComponent({
     const form = ref({
       product_supplier_id: null as number | null,
       supplier_name: "",
-      quantity: 1,
+      quantity: 1
     });
 
     const loadProducts = async () => {
@@ -100,6 +82,6 @@ export default defineComponent({
     onMounted(loadProducts);
 
     return { products, form, onProductChange, submit };
-  },
+  }
 });
 </script>
