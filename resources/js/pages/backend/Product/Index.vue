@@ -17,19 +17,8 @@
             </div>
 
             <!-- Add New Product Button -->
-            <div class="flex flex-row justify-between">
-                <div>
-                    <!-- Filter Component -->
-                    <Filter
-                        v-model="search"
-                        placeholder="Filter by barcode or name"
-                        @filter="fetchProducts(1)"
-                        containerClass="mb-4 flex gap-2 w-20"
-                        inputClass="border p-2 rounded flex-1"
-                        buttonClass="bg-dark hover:bg-darkSoft text-white px-4 py-2 rounded"
-                    />
-                </div>
-                <div>
+            <div class="flex flex-row gap-3 w-full pb-6">
+                <div class="w-50">
                     <button
                         @click="openCreateModal"
                         class="mb-4 bg-dark text-white px-4 py-2 rounded hover:bg-darkSoft"
@@ -37,11 +26,22 @@
                         Add New Product
                     </button>
                 </div>
+                <div class="w-80">
+                    <!-- Filter Component -->
+                    <Filter
+                        v-model="search"
+                        placeholder="Filter by barcode or name"
+                        @filter="fetchProducts(1)"
+                        containerClass="px-2 flex gap-2 w-full"
+                        inputClass="border p-2 rounded flex-1"
+                        buttonClass="bg-dark hover:bg-darkSoft text-white px-4 py-2 rounded"
+                    />
+                </div>
             </div>
 
             <!-- Products Table -->
             <div class="bg-bgCard rounded-xl shadow-card p-6">
-                <table class="w-full border-border rounded-lg overflow-hidden" >
+                <table class="w-full border-border rounded-lg overflow-hidden">
                     <thead class="bg-tableHeader text-sm">
                         <tr
                             class="bg-gray-100 rounded-lg border"

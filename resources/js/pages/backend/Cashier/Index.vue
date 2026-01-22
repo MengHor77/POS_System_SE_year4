@@ -5,23 +5,29 @@
                 Cashiers Management
             </h1>
 
-            <!-- Add New Cashier -->
-            <button
-                @click="showCreateModal = true"
-                class="mb-4 bg-dark text-white px-4 py-2 rounded hover:bg-darkSoft"
-            >
-                Add New Cashier
-            </button>
+            <div class="flex flex-row gap-3 w-full pb-6">
+                <div class="w-50">
+                    <!-- Add New Cashier -->
+                    <button
+                        @click="showCreateModal = true"
+                        class="mb-4 bg-dark text-white px-4 py-2 rounded hover:bg-darkSoft"
+                    >
+                        Add New Cashier
+                    </button>
+                </div>
 
-            <!-- Search -->
-            <Filter
-                v-model="search"
-                placeholder="Filter by name or email"
-                @filter="fetchCashiers(1)"
-                containerClass="mb-4 flex gap-2 w-20"
-                inputClass="border p-2 rounded flex-1"
-                buttonClass="bg-darkSoft text-white px-4 py-2 rounded"
-            />
+                <div class="w-80">
+                    <!-- Search -->
+                    <Filter
+                        v-model="search"
+                        placeholder="Filter by name or email"
+                        @filter="fetchCashiers(1)"
+                        containerClass="px-2 flex gap-2 w-full"
+                        inputClass="border p-2 rounded flex-1"
+                        buttonClass="bg-dark hover:bg-darkSoft text-white px-4 py-2 rounded"
+                    />
+                </div>
+            </div>
 
             <div class="bg-bgCard rounded-xl shadow-card p-6">
                 <!-- Cashiers Table -->
