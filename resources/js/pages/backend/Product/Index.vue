@@ -30,64 +30,25 @@
             <FlassMessage :message="flashMessage" :type="flashType" />
 
             <!-- Products Table -->
-            <div class="bg-bgCard rounded-xl shadow-card p-6">
-                <table class="w-full border-border rounded-lg overflow-hidden">
-                    <thead class="bg-tableHeader text-sm">
-                        <tr
-                            class="bg-gray-100 rounded-lg border"
-                            :style="{ backgroundColor: 'var(--table-header)' }"
+            <Table :columns="columns" :data="products">
+                <!-- Actions column -->
+                <template #cell-actions="{ row }">
+                    <div class="flex gap-2">
+                        <button
+                            @click="openEditModal(row)"
+                            class="px-3 py-1 rounded-lg bg-blue-100 text-bgBtnEdit hover:bg-bgBtnEdit hover:text-white transition"
                         >
-                            <th class="p-3 border-y text-start">ID</th>
-                            <th class="p-3 border-y text-start">Name</th>
-                            <th class="p-3 border-y text-start">Brand</th>
-                            <th class="p-3 border-y text-start">Barcode</th>
-                            <th class="p-3 border-y text-start">Price</th>
-                            <th class="p-3 border-y text-start">Stock</th>
-                            <th class="p-3 border-y text-start">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr
-                            v-for="product in products"
-                            :key="product.id"
-                            class="text-sm hover:bg-tableRowHover transition"
+                            <i class="fas fa-pen"></i>
+                        </button>
+                        <button
+                            @click="deleteProduct(row.id)"
+                            class="px-3 py-1 rounded-lg bg-dangerSoft text-danger hover:bg-bgBtnDelete hover:text-white transition"
                         >
-                            <td class="p-3 border-y text-start">
-                                {{ product.id }}
-                            </td>
-                            <td class="p-3 border-y text-start">
-                                {{ product.name }}
-                            </td>
-                            <td class="p-3 border-y text-start">
-                                {{ product.brand }}
-                            </td>
-                            <td class="p-3 border-y text-start">
-                                {{ product.barcode }}
-                            </td>
-                            <td class="p-3 border-y text-start">
-                                {{ product.price }}
-                            </td>
-                            <td class="p-3 border-y text-start">
-                                {{ product.stock }}
-                            </td>
-                            <td class="p-3 border-y text-start flex gap-2">
-                                <button
-                                    @click="openEditModal(product)"
-                                    class="px-3 py-1 rounded-lg bg-blue-100 text-bgBtnEdit hover:bg-bgBtnEdit hover:text-white transition"
-                                >
-                                    <i class="fas fa-pen"></i>
-                                </button>
-                                <button
-                                    @click="deleteProduct(product.id)"
-                                    class="px-3 py-1 rounded-lg bg-dangerSoft text-danger hover:bg-bgBtnDelete hover:text-white transition"
-                                >
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </template>
+            </Table>
 
             <!-- Pagination -->
             <Pigination
@@ -141,6 +102,7 @@ import EditProduct from "./Edit.vue";
 import axios from "axios";
 import Filter from "../../../components/Filter.vue";
 import FlassMessage from "../../../components/FlassMessage.vue";
+import Table from "../../../components/Table.vue";
 
 interface Product {
     id: number;
@@ -160,12 +122,23 @@ export default defineComponent({
         EditProduct,
         Filter,
         FlassMessage,
+        Table,
     },
     setup() {
         const products = ref<Product[]>([]);
         const editingProduct = ref<Product | null>(null);
         const showCreateModal = ref(false);
         const search = ref("");
+
+        const columns = [
+            { key: "id", label: "ID" },
+            { key: "name", label: "Name" },
+            { key: "brand", label: "Brand" },
+            { key: "barcode", label: "Barcode" },
+            { key: "price", label: "Price" },
+            { key: "stock", label: "Stock" },
+            { key: "actions", label: "Actions" },
+        ];
 
         const pagination = ref({
             current_page: 1,
@@ -237,6 +210,7 @@ export default defineComponent({
             flashMessage,
             flashType,
             showFlashMessage,
+            columns,
         };
     },
 });
