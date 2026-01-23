@@ -31,53 +31,30 @@
             </div>
 
             <!-- Suppliers Table -->
-            <div class="bg-bgCard rounded-xl shadow-card p-6">
-                <table class="w-full bg-bgCard rounded shadow-card">
-                    <thead class="bg-tableHeader">
-                        <tr>
-                            <th class="p-3 border-y text-start">Product</th>
-                            <th class="p-3 border-y text-start">Supplier</th>
-                            <th class="p-3 border-y text-start">Quantity</th>
-                            <th class="p-3 border-y text-start">Price</th>
-                            <th class="p-3 border-y text-start">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr
-                            v-for="item in suppliers"
-                            :key="item.id"
-                            class="hover:bg-tableRowHover transition"
+            <Table :columns="columns" :data="suppliers">
+                <!-- Product column -->
+                <template #cell-product="{ row }">
+                    {{ row.product?.name || "Unknown" }}
+                </template>
+
+                <!-- Actions column -->
+                <template #cell-actions="{ row }">
+                    <div class="flex gap-2">
+                        <button
+                            @click="edit(row)"
+                            class="px-3 py-1 rounded-lg bg-blue-100 text-bgBtnEdit hover:bg-bgBtnEdit hover:text-white transition"
                         >
-                            <td class="p-3 border-y text-start">
-                                {{ item.product?.name || "Unknown" }}
-                            </td>
-                            <td class="p-3 border-y text-start">
-                                {{ item.supplier_name }}
-                            </td>
-                            <td class="p-3 border-y text-start">
-                                {{ item.quantity }}
-                            </td>
-                            <td class="p-3 border-y text-start">
-                                {{ item.price }}
-                            </td>
-                            <td class="p-3 border-y text-start flex gap-2">
-                                <button
-                                    @click="edit(item)"
-                                    class="px-3 py-1 rounded-lg bg-blue-100 text-bgBtnEdit hover:bg-bgBtnEdit hover:text-white transition"
-                                >
-                                    <i class="fas fa-pen"></i>
-                                </button>
-                                <button
-                                    @click="remove(item.id)"
-                                    class="px-3 py-1 rounded-lg bg-dangerSoft text-danger hover:bg-bgBtnDelete hover:text-white transition"
-                                >
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                            <i class="fas fa-pen"></i>
+                        </button>
+                        <button
+                            @click="remove(row.id)"
+                            class="px-3 py-1 rounded-lg bg-dangerSoft text-danger hover:bg-bgBtnDelete hover:text-white transition"
+                        >
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </template>
+            </Table>
 
             <!-- Pagination -->
             <Pigination
@@ -117,6 +94,7 @@ import EditSupplier from "./Edit.vue";
 import Pigination from "../../../components/Pigination.vue";
 import Filter from "../../../components/Filter.vue";
 import FlassMessage from "../../../components/FlassMessage.vue";
+import Table from "../../../components/Table.vue";
 
 interface Product {
     id: number;
@@ -147,6 +125,7 @@ export default {
         Pigination,
         Filter,
         FlassMessage,
+        Table,
     },
     setup() {
         const suppliers = ref<Supplier[]>([]);
@@ -155,6 +134,13 @@ export default {
 
         // Single filter input
         const filterText = ref("");
+        const columns = [
+            { key: "product", label: "Product" },
+            { key: "supplier_name", label: "Supplier" },
+            { key: "quantity", label: "Quantity" },
+            { key: "price", label: "Price" },
+            { key: "actions", label: "Actions" },
+        ];
 
         // Pagination reactive object
         const pagination = reactive<Pagination>({
@@ -273,6 +259,7 @@ export default {
             handleCreated,
             handleUpdated,
             handleError,
+            columns,
         };
     },
 };
