@@ -107,6 +107,7 @@
             />
             <EditSupplier
                 v-if="editing"
+                :key="editing.id" 
                 :supplier="editing"
                 @close="editing = null"
                 @updated="handleUpdated"
@@ -224,7 +225,10 @@ export default {
                 return;
             try {
                 await axios.delete(`/admin/supplier/${id}`);
-                showFlashMessage("product Supplier deleted successfully!", "success");
+                showFlashMessage(
+                    "product Supplier deleted successfully!",
+                    "success",
+                );
                 fetch(pagination.current_page);
             } catch (err) {
                 console.error(err);
@@ -235,15 +239,26 @@ export default {
         // Event handlers for Create/Edit
         const handleCreated = () => {
             fetch(1);
-            showFlashMessage("created product Supplier  successfully!", "success");
+            showFlashMessage(
+                "created product Supplier  successfully!",
+                "success",
+            );
             showCreate.value = false;
         };
 
-        const handleUpdated = () => {
-            fetch(pagination.current_page);
-            showFlashMessage("Supplier updated successfully!", "success");
-            editing.value = null;
-        };
+    const handleUpdated = (updatedSupplier: Supplier) => {
+    const index = suppliers.value.findIndex(
+        s => s.id === updatedSupplier.id
+    );
+
+    if (index !== -1) {
+        suppliers.value[index] = updatedSupplier;
+    }
+
+    showFlashMessage("Supplier updated successfully!", "success");
+    editing.value = null;
+};
+
 
         const handleError = (msg: string) => {
             showFlashMessage(msg, "error");

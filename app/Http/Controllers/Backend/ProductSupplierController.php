@@ -45,21 +45,28 @@ class ProductSupplierController extends Controller
     }
 
     // Update existing supplier
-    public function update(Request $request, $id)
-    {
-        $supplier = ProductSupplier::findOrFail($id);
+   public function update(Request $request, $id)
+{
+    $supplier = ProductSupplier::findOrFail($id);
 
-        $data = $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'supplier_name' => 'required|string',
-            'quantity' => 'required|integer|min:0',
-            'price' => 'nullable|numeric|min:0',
-        ]);
+    $data = $request->validate([
+        'product_id' => 'required|exists:products,id',
+        'supplier_name' => 'required|string',
+        'quantity' => 'required|integer|min:0',
+        'price' => 'nullable|numeric|min:0',
+    ]);
 
-        $supplier->update($data);
+    $supplier->update($data);
 
-        return response()->json(['message' => 'Supplier updated']);
-    }
+    // 🔥 VERY IMPORTANT
+    $supplier->load('product');
+
+    return response()->json([
+        'message' => 'Supplier updated',
+        'data' => $supplier
+    ]);
+}
+
 
     // Delete supplier
     public function destroy($id)

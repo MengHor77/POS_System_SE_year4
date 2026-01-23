@@ -13,7 +13,9 @@
                 &times;
             </button>
 
-            <h2 class="text-2xl font-bold mb-4 text-primary">Edit product Supplier</h2>
+            <h2 class="text-2xl font-bold mb-4 text-primary">
+                Edit product Supplier
+            </h2>
 
             <form @submit.prevent="updateSupplier" class="space-y-4">
                 <div>
@@ -104,34 +106,55 @@ interface Supplier {
 
 export default defineComponent({
     name: "EditSupplier",
-    props: { supplier: { type: Object as () => Supplier, required: true } },
+    props: {
+        supplier: { type: Object as () => Supplier, required: true },
+    },
+    emits: ["close", "updated"],
     setup(props, { emit }) {
         const form = reactive({ ...props.supplier });
         const products = ref<Product[]>([]);
+        const loading = ref(false);
 
         const fetchProducts = async () => {
+            if (products.value.length) return;
             const res = await axios.get("/admin/product/data");
             products.value = res.data.data;
         };
 
         watch(
             () => props.supplier,
-            (newVal) => Object.assign(form, newVal),
+            async (val) => {
+                if (!val) return;
+
+                // wait until products are loaded
+                if (products.value.length === 0) {
+                    await fetchProducts();
+                }
+
+                Object.assign(form, val);
+            },
+            { immediate: true },
         );
 
         const updateSupplier = async () => {
             try {
-                await axios.put(`/admin/supplier/${form.id}`, form);
-                emit("updated");
+                loading.value = true;
+
+                const res = await axios.put(`/admin/supplier/${form.id}`, form);
+
+                // 🔥 SEND UPDATED SUPPLIER BACK
+                emit("updated", res.data.data);
                 emit("close");
-            } catch (err) {
-                console.error(err);
-                alert("Failed to update supplier.");
+            } catch (e) {
+                alert("Update failed");
+            } finally {
+                loading.value = false;
             }
         };
 
         onMounted(fetchProducts);
-        return { form, products, updateSupplier };
+
+        return { form, products, updateSupplier, loading };
     },
 });
 </script>
