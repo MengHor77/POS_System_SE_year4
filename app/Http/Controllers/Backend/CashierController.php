@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class CashierController extends Controller
 {
-    // List cashiers with pagination
+    // List cashiers
     public function index(Request $request)
     {
         $perPage = $request->per_page ?? 5;
@@ -26,25 +26,25 @@ class CashierController extends Controller
         return response()->json([
             'data' => $cashiers->items(),
             'current_page' => $cashiers->currentPage(),
-            'last_page'    => $cashiers->lastPage(),
-            'per_page'     => $cashiers->perPage(),
-            'total'        => $cashiers->total(),
+            'last_page' => $cashiers->lastPage(),
+            'per_page' => $cashiers->perPage(),
+            'total' => $cashiers->total(),
         ]);
     }
 
-    // Create a new cashier
+    // Create cashier
     public function store(Request $request)
     {
         $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:cashiers,email',
-            'password' => 'required|min:6',
+            'password' => 'required|min:6|confirmed', // requires password_confirmation
         ]);
 
         $cashier = Cashier::create([
             'name'     => $request->name,
             'email'    => $request->email,
-            'password' => $request->password, // hashed automatically in model
+            'password' => $request->password,
             'status'   => 'active',
         ]);
 
@@ -57,32 +57,23 @@ class CashierController extends Controller
         $cashier = Cashier::findOrFail($id);
 
         $request->validate([
-            'name'           => 'required|string|max:255',
-            'email'          => 'required|email|unique:cashiers,email,' . $id,
-            'status'         => 'required|in:active,inactive',
-            'old_password'   => 'nullable|string',
-            'new_password'   => 'nullable|string|min:6|confirmed', // requires new_password_confirmation
+            'name'                 => 'required|string|max:255',
+            'email'                => 'required|email|unique:cashiers,email,' . $id,
+            'status'               => 'required|in:active,inactive',
+            'old_password'         => 'required|string',
+            'new_password'         => 'required|string|min:6|confirmed', // requires new_password_confirmation
         ]);
 
-        // If changing password, check old password
-        if ($request->new_password) {
-            if (!$request->old_password) {
-                return response()->json(['message' => 'Old password is required.'], 422);
-            }
-
-            if (!$cashier->checkPassword($request->old_password)) {
-                return response()->json(['message' => 'Old password is incorrect.'], 422);
-            }
-
-            // Set new password (mutator hashes automatically)
-            $cashier->password = $request->new_password;
+        // Check old password
+        if (!$cashier->checkPassword($request->old_password)) {
+            return response()->json(['message' => 'Old password is incorrect.'], 422);
         }
 
-        // Update other fields
+        // Update
         $cashier->name = $request->name;
         $cashier->email = $request->email;
         $cashier->status = $request->status;
-
+        $cashier->password = $request->new_password; // automatically hashed
         $cashier->save();
 
         return response()->json(['message' => 'Cashier updated successfully.']);
