@@ -28,66 +28,40 @@
                     />
                 </div>
             </div>
+            <Table :columns="columns" :data="cashiers">
+                <!-- Status column -->
+                <template #cell-status="{ row }">
+                    <span
+                        @click="toggleStatus(row)"
+                        :class="[
+                            'cursor-pointer px-2 py-1 text-xs rounded-full text-white',
+                            row.status === 'active'
+                                ? 'bg-green-500'
+                                : 'bg-red-500',
+                        ]"
+                    >
+                        {{ row.status }}
+                    </span>
+                </template>
 
-            <div class="bg-bgCard rounded-xl shadow-card p-6">
-                <!-- Cashiers Table -->
-                <table class="w-full border-border rounded-lg overflow-hidden">
-                    <thead class="bg-tableHeader text-sm">
-                        <tr class="bg-gray-100 rounded-lg border">
-                            <th class="p-3 border-y text-start">ID</th>
-                            <th class="p-3 border-y text-start">Name</th>
-                            <th class="p-3 border-y text-start">Email</th>
-                            <th class="p-3 border-y text-start">Status</th>
-                            <th class="p-3 border-y text-start">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr
-                            v-for="cashier in cashiers"
-                            :key="cashier.id"
-                            class="text-sm hover:bg-tableRowHover transition"
+                <!-- Actions column -->
+                <template #cell-actions="{ row }">
+                    <div class="flex gap-2">
+                        <button
+                            @click="openEditModal(row)"
+                            class="px-3 py-1 rounded-lg bg-blue-100 text-bgBtnEdit hover:bg-bgBtnEdit hover:text-white transition"
                         >
-                            <td class="p-3 border-y text-start">
-                                {{ cashier.id }}
-                            </td>
-                            <td class="p-3 border-y text-start">
-                                {{ cashier.name }}
-                            </td>
-                            <td class="p-3 border-y text-start">
-                                {{ cashier.email }}
-                            </td>
-                            <td class="p-3 border-y text-start">
-                                <span
-                                    @click="toggleStatus(cashier)"
-                                    :class="{
-                                        'px-2 py-1  cursor-pointer border-y text-white text-start': true,
-                                        'bg-green-500 px-2 py-1 text-xs rounded-full  text-white ':
-                                            cashier.status === 'active',
-                                        'bg-red-500 px-2 py-1 text-xs rounded-full  text-white':
-                                            cashier.status === 'inactive',
-                                    }"
-                                >
-                                    {{ cashier.status }}
-                                </span>
-                            </td>
-                            <td class="p-3 border-y text-start flex gap-2">
-                                <button
-                                    @click="openEditModal(cashier)"
-                                    class="px-3 py-1 rounded-lg bg-blue-100 text-bgBtnEdit hover:bg-bgBtnEdit hover:text-white transition"
-                                >
-                                    <i class="fas fa-pen"></i>
-                                </button>
-                                <button
-                                    @click="deleteCashier(cashier.id)"
-                                    class="px-3 py-1 rounded-lg bg-dangerSoft text-danger hover:bg-bgBtnDelete hover:text-white transition"
-                                >
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                            <i class="fas fa-pen"></i>
+                        </button>
+                        <button
+                            @click="deleteCashier(row.id)"
+                            class="px-3 py-1 rounded-lg bg-dangerSoft text-danger hover:bg-bgBtnDelete hover:text-white transition"
+                        >
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </template>
+            </Table>
 
             <!-- Pagination -->
             <Pigination
@@ -122,6 +96,7 @@ import CreateCashier from "./Create.vue";
 import EditCashier from "./Edit.vue";
 import Filter from "../../../components/Filter.vue";
 import axios from "axios";
+import Table from "../../../components/Table.vue";
 
 interface Cashier {
     id: number;
@@ -139,6 +114,7 @@ export default defineComponent({
         CreateCashier,
         EditCashier,
         Filter,
+        Table,
     },
     setup() {
         const cashiers = ref<Cashier[]>([]);
@@ -153,6 +129,14 @@ export default defineComponent({
             per_page: 5,
             total: 0,
         });
+
+        const columns = [
+            { key: "id", label: "ID" },
+            { key: "name", label: "Name" },
+            { key: "email", label: "Email" },
+            { key: "status", label: "Status" },
+            { key: "actions", label: "Actions" },
+        ];
 
         const fetchCashiers = async (page = 1) => {
             const res = await axios.get("/admin/cashier/data", {
@@ -198,6 +182,7 @@ export default defineComponent({
             openEditModal,
             deleteCashier,
             toggleStatus,
+            columns,
         };
     },
 });
