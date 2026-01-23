@@ -67,11 +67,24 @@ export default defineComponent({
     emits: ["page-change"],
     setup(props, { emit }) {
         const pages = computed(() => {
-            const pages = [];
-            for (let i = 1; i <= props.lastPage; i++) {
-                pages.push(i);
+            const totalPages = props.lastPage;
+            const current = props.currentPage;
+            const maxVisible = 5;
+
+            let start = Math.max(1, current - Math.floor(maxVisible / 2));
+            let end = start + maxVisible - 1;
+
+            if (end > totalPages) {
+                end = totalPages;
+                start = Math.max(1, end - maxVisible + 1);
             }
-            return pages;
+
+            const result = [];
+            for (let i = start; i <= end; i++) {
+                result.push(i);
+            }
+
+            return result;
         });
 
         const from = computed(
