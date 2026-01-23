@@ -5,16 +5,7 @@
                 Product Suppliers management
             </h1>
 
-            <!-- Flash Message -->
-            <div
-                v-if="flashMessage"
-                :class="[
-                    'p-4 rounded mb-4 text-white transition-all duration-300',
-                    flashType === 'success' ? 'bg-success' : 'bg-danger',
-                ]"
-            >
-                {{ flashMessage }}
-            </div>
+            <FlassMessage :message="flashMessage" :type="flashType" />
 
             <!-- Add Supplier Button -->
             <div class="flex flex-row gap-3 w-full pb-6">
@@ -107,7 +98,7 @@
             />
             <EditSupplier
                 v-if="editing"
-                :key="editing.id" 
+                :key="editing.id"
                 :supplier="editing"
                 @close="editing = null"
                 @updated="handleUpdated"
@@ -125,6 +116,7 @@ import CreateSupplier from "./Create.vue";
 import EditSupplier from "./Edit.vue";
 import Pigination from "../../../components/Pigination.vue";
 import Filter from "../../../components/Filter.vue";
+import FlassMessage from "../../../components/FlassMessage.vue";
 
 interface Product {
     id: number;
@@ -154,6 +146,7 @@ export default {
         EditSupplier,
         Pigination,
         Filter,
+        FlassMessage,
     },
     setup() {
         const suppliers = ref<Supplier[]>([]);
@@ -246,19 +239,18 @@ export default {
             showCreate.value = false;
         };
 
-    const handleUpdated = (updatedSupplier: Supplier) => {
-    const index = suppliers.value.findIndex(
-        s => s.id === updatedSupplier.id
-    );
+        const handleUpdated = (updatedSupplier: Supplier) => {
+            const index = suppliers.value.findIndex(
+                (s) => s.id === updatedSupplier.id,
+            );
 
-    if (index !== -1) {
-        suppliers.value[index] = updatedSupplier;
-    }
+            if (index !== -1) {
+                suppliers.value[index] = updatedSupplier;
+            }
 
-    showFlashMessage("Supplier updated successfully!", "success");
-    editing.value = null;
-};
-
+            showFlashMessage("Supplier updated successfully!", "success");
+            editing.value = null;
+        };
 
         const handleError = (msg: string) => {
             showFlashMessage(msg, "error");
