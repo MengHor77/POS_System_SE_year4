@@ -5,17 +5,6 @@
                 Products Management
             </h1>
 
-            <!-- Flash Message -->
-            <div
-                v-if="flashMessage"
-                :class="[
-                    'p-4 rounded mb-4 text-white transition-all duration-300',
-                    flashType === 'success' ? 'bg-green-500' : 'bg-red-500',
-                ]"
-            >
-                {{ flashMessage }}
-            </div>
-
             <!-- Add New Product Button -->
             <div class="flex flex-row gap-3 w-full pb-6">
                 <div class="w-50">
@@ -38,6 +27,7 @@
                     />
                 </div>
             </div>
+            <FlassMessage :message="flashMessage" :type="flashType" />
 
             <!-- Products Table -->
             <div class="bg-bgCard rounded-xl shadow-card p-6">
@@ -150,6 +140,7 @@ import CreateProduct from "./Create.vue";
 import EditProduct from "./Edit.vue";
 import axios from "axios";
 import Filter from "../../../components/Filter.vue";
+import FlassMessage from "../../../components/FlassMessage.vue";
 
 interface Product {
     id: number;
@@ -168,6 +159,7 @@ export default defineComponent({
         CreateProduct,
         EditProduct,
         Filter,
+        FlassMessage,
     },
     setup() {
         const products = ref<Product[]>([]);
