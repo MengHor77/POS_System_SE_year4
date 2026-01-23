@@ -22,7 +22,9 @@ class Cashier extends Authenticatable
         'password',
     ];
 
-    // Automatically hash password when setting it
+    /**
+     * Automatically hash the password when setting it
+     */
     public function setPasswordAttribute($value)
     {
         if ($value) {
@@ -30,7 +32,9 @@ class Cashier extends Authenticatable
         }
     }
 
-    // Verify old password
+    /**
+     * Verify old password
+     */
     public function checkPassword(string $password): bool
     {
         return Hash::check($password, $this->password);
