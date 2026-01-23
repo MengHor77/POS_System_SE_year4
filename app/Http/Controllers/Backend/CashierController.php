@@ -56,24 +56,30 @@ class CashierController extends Controller
     {
         $cashier = Cashier::findOrFail($id);
 
-        $request->validate([
-            'name'                 => 'required|string|max:255',
-            'email'                => 'required|email|unique:cashiers,email,' . $id,
-            'status'               => 'required|in:active,inactive',
-            'old_password'         => 'required|string',
-            'new_password'         => 'required|string|min:6|confirmed', // requires new_password_confirmation
-        ]);
+        $rules = [
+            'name'   => 'required|string|max:255',
+            'email'  => 'required|email|unique:cashiers,email,' . $id,
+            'status' => 'required|in:active,inactive',
+        ];
 
-        // Check old password
-        if (!$cashier->checkPassword($request->old_password)) {
-            return response()->json(['message' => 'Old password is incorrect.'], 422);
+        // Only validate password if user wants to change it
+        if ($request->old_password || $request->new_password || $request->new_password_confirmation) {
+            $rules['old_password'] = 'required|string';
+            $rules['new_password'] = 'required|string|min:6|confirmed';
         }
 
-        // Update
+        $request->validate($rules);
+
+        if ($request->old_password) {
+            if (!$cashier->checkPassword($request->old_password)) {
+                return response()->json(['message' => 'Old password is incorrect.'], 422);
+            }
+            $cashier->password = $request->new_password; // automatically hashed
+        }
+
         $cashier->name = $request->name;
         $cashier->email = $request->email;
         $cashier->status = $request->status;
-        $cashier->password = $request->new_password; // automatically hashed
         $cashier->save();
 
         return response()->json(['message' => 'Cashier updated successfully.']);

@@ -148,22 +148,19 @@ export default defineComponent({
     );
 
     const updateCashier = async () => {
-      // Check if user wants to change password
+      // Only validate password if user wants to change
       const changePassword =
         form.old_password || form.new_password || form.confirm_password;
 
       if (changePassword) {
         if (!form.old_password || !form.new_password || !form.confirm_password) {
-          return alert(
-            "Please fill all password fields to change password."
-          );
+          return alert("Please fill all password fields to change password.");
         }
         if (form.new_password !== form.confirm_password) {
           return alert("New password and confirm password do not match.");
         }
       }
 
-      // Validate required fields
       if (!form.name || !form.email || !form.status) {
         return alert("Please fill in all required fields.");
       }

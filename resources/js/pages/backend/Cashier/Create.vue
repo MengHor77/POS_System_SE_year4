@@ -56,15 +56,22 @@
                             @click="showPassword = !showPassword"
                         >
                             <i
-                                :class="
-                                    showPassword
-                                        ? 'fas fa-eye-slash'
-                                        : 'fas fa-eye'
-                                "
+                                :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"
                                 class="text-lg"
                             ></i>
                         </button>
                     </div>
+                </div>
+
+                <div>
+                    <label class="block font-medium mb-2">Confirm Password</label>
+                    <input
+                        :type="showPassword ? 'text' : 'password'"
+                        v-model="form.password_confirmation"
+                        placeholder="Confirm password"
+                        class="input-field pr-10"
+                        required
+                    />
                 </div>
 
                 <div class="flex justify-end gap-4 mt-4">
@@ -94,17 +101,26 @@ import axios from "axios";
 export default defineComponent({
     name: "CreateCashier",
     setup(_, { emit }) {
-        const form = reactive({ name: "", email: "", password: "" });
+        const form = reactive({
+            name: "",
+            email: "",
+            password: "",
+            password_confirmation: "", // added
+        });
         const showPassword = ref(false);
 
         const saveCashier = async () => {
+            if (form.password !== form.password_confirmation) {
+                return alert("Password and confirmation do not match!");
+            }
+
             try {
                 await axios.post("/admin/cashier", form);
                 emit("created");
                 emit("close");
-            } catch (error) {
+            } catch (error: any) {
                 console.error(error);
-                alert("Failed to create cashier.");
+                alert(error.response?.data?.message ?? "Failed to create cashier.");
             }
         };
 
