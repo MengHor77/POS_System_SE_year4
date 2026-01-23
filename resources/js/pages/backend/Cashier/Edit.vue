@@ -8,45 +8,72 @@
             <h2 class="text-2xl font-bold mb-4 text-primary">Edit Cashier</h2>
 
             <form @submit.prevent="updateCashier" class="space-y-4">
+                <!-- Name -->
                 <div>
                     <label class="block mb-1 font-semibold">Name</label>
                     <input
                         v-model="form.name"
                         type="text"
-                        placeholder="Enter cashier name"
                         class="input-field"
                         required
                     />
                 </div>
 
+                <!-- Email -->
                 <div>
                     <label class="block mb-1 font-semibold">Email</label>
                     <input
                         v-model="form.email"
                         type="email"
-                        placeholder="Enter cashier email"
                         class="input-field"
                         required
                     />
                 </div>
 
+                <!-- Status -->
                 <div>
                     <label class="block mb-1 font-semibold">Status</label>
-                    <select v-model="form.status" class="input-field">
+                    <select v-model="form.status" class="input-field" required>
                         <option value="active">Active</option>
                         <option value="inactive">Inactive</option>
                     </select>
                 </div>
 
+                <!-- Old Password -->
+                <div>
+                    <label class="block mb-1 font-semibold">Old Password</label>
+                    <input
+                        :type="showPassword ? 'text' : 'password'"
+                        v-model="form.old_password"
+                        placeholder="Enter old password"
+                        class="input-field"
+                        required
+                    />
+                </div>
+
+                <!-- New Password -->
+                <div>
+                    <label class="block mb-1 font-semibold">New Password</label>
+                    <input
+                        :type="showPassword ? 'text' : 'password'"
+                        v-model="form.new_password"
+                        placeholder="Enter new password"
+                        class="input-field"
+                        required
+                    />
+                </div>
+
+                <!-- Confirm Password -->
                 <div class="relative">
                     <label class="block mb-1 font-semibold"
-                        >Password (leave empty if not changing)</label
+                        >Confirm New Password</label
                     >
                     <input
                         :type="showPassword ? 'text' : 'password'"
-                        v-model="form.password"
-                        placeholder="Enter password"
+                        v-model="form.confirm_password"
+                        placeholder="Confirm new password"
                         class="input-field pr-10"
+                        required
                     />
                     <span
                         class="absolute pt-6 inset-y-0 right-3 flex items-center text-xl text-gray-500 hover:text-gray-700 transition"
@@ -89,7 +116,9 @@ interface Cashier {
     name: string;
     email: string;
     status: "active" | "inactive";
-    password?: string;
+    old_password: string;
+    new_password: string;
+    confirm_password: string;
 }
 
 export default defineComponent({
@@ -98,22 +127,70 @@ export default defineComponent({
         cashier: { type: Object as () => Cashier, required: true },
     },
     setup(props, { emit }) {
-        const form = reactive<Cashier>({ ...props.cashier });
+        const form = reactive<Cashier>({
+            ...props.cashier,
+            old_password: "",
+            new_password: "",
+            confirm_password: "",
+        });
+
         const showPassword = ref(false);
 
         watch(
             () => props.cashier,
-            (newVal) => Object.assign(form, newVal),
+            (newVal) => {
+                Object.assign(form, newVal);
+                form.old_password = "";
+                form.new_password = "";
+                form.confirm_password = "";
+            },
         );
 
         const updateCashier = async () => {
+            // Check if user wants to change password
+            const changePassword =
+                form.old_password || form.new_password || form.confirm_password;
+
+            if (changePassword) {
+                // Validate new password vs confirm password
+                if (form.new_password !== form.confirm_password) {
+                    return alert(
+                        "New password and confirm password do not match.",
+                    );
+                }
+
+                if (
+                    !form.old_password ||
+                    !form.new_password ||
+                    !form.confirm_password
+                ) {
+                    return alert("Please fill in all password fields.");
+                }
+            }
+
+            // Validate required fields
+            if (!form.name || !form.email || !form.status) {
+                return alert("Please fill in all required fields.");
+            }
+
             try {
-                await axios.put(`/admin/cashier/${form.id}`, form);
+                await axios.put(`/admin/cashier/${form.id}`, {
+                    name: form.name,
+                    email: form.email,
+                    status: form.status,
+                    old_password: form.old_password || undefined,
+                    new_password: form.new_password || undefined,
+                    new_password_confirmation:
+                        form.confirm_password || undefined,
+                });
+
                 emit("updated");
                 emit("close");
-            } catch (error) {
-                console.error(error);
-                alert("Failed to update cashier.");
+            } catch (error: any) {
+                alert(
+                    error.response?.data?.message ??
+                        "Failed to update cashier.",
+                );
             }
         };
 

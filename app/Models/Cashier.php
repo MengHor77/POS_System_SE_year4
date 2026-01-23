@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 
-class Cashier extends Model
+class Cashier extends Authenticatable
 {
-    use HasFactory;
+    use HasFactory, Notifiable;
 
     protected $fillable = [
         'name',
@@ -17,11 +18,21 @@ class Cashier extends Model
         'status',
     ];
 
-    protected $hidden = ['password'];
+    protected $hidden = [
+        'password',
+    ];
 
-    // Automatically hash password
+    // Automatically hash password when setting it
     public function setPasswordAttribute($value)
     {
-        $this->attributes['password'] = Hash::make($value);
+        if ($value) {
+            $this->attributes['password'] = bcrypt($value);
+        }
+    }
+
+    // Verify old password
+    public function checkPassword(string $password): bool
+    {
+        return Hash::check($password, $this->password);
     }
 }

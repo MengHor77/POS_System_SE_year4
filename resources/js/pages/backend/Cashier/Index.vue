@@ -28,6 +28,12 @@
                     />
                 </div>
             </div>
+            <FlassMessage
+                v-if="message"
+                :message="message"
+                :type="messageType"
+            />
+
             <Table :columns="columns" :data="cashiers">
                 <!-- Status column -->
                 <template #cell-status="{ row }">
@@ -76,13 +82,23 @@
             <CreateCashier
                 v-if="showCreateModal"
                 @close="showCreateModal = false"
-                @created="fetchCashiers(pagination.current_page)"
+                @created="
+                    () => {
+                        fetchCashiers(pagination.current_page);
+                        showMessage('Cashier created successfully', 'success');
+                    }
+                "
             />
             <EditCashier
                 v-if="editingCashier"
                 :cashier="editingCashier"
                 @close="editingCashier = null"
-                @updated="fetchCashiers(pagination.current_page)"
+                @updated="
+                    () => {
+                        fetchCashiers(pagination.current_page);
+                        showMessage('Cashier updated successfully', 'success');
+                    }
+                "
             />
         </div>
     </BackendLayout>
@@ -97,6 +113,7 @@ import EditCashier from "./Edit.vue";
 import Filter from "../../../components/Filter.vue";
 import axios from "axios";
 import Table from "../../../components/Table.vue";
+import FlassMessage from "../../../components/FlassMessage.vue";
 
 interface Cashier {
     id: number;
@@ -115,12 +132,28 @@ export default defineComponent({
         EditCashier,
         Filter,
         Table,
+        FlassMessage,
     },
     setup() {
         const cashiers = ref<Cashier[]>([]);
         const editingCashier = ref<(Cashier & { password?: string }) | null>(
             null,
         );
+        const message = ref("");
+        const messageType = ref<"success" | "error">("success");
+        const showMessage = (
+            msg: string,
+            type: "success" | "error" = "success",
+        ) => {
+            message.value = msg;
+            messageType.value = type;
+
+            // Optional: clear after 3 seconds (matches FlassMessage)
+            setTimeout(() => {
+                message.value = "";
+            }, 3000);
+        };
+
         const showCreateModal = ref(false);
         const search = ref("");
         const pagination = ref({
@@ -161,13 +194,27 @@ export default defineComponent({
 
         const deleteCashier = async (id: number) => {
             if (!confirm("Are you sure?")) return;
-            await axios.delete(`/admin/cashier/${id}`);
-            fetchCashiers(pagination.value.current_page);
+
+            try {
+                await axios.delete(`/admin/cashier/${id}`);
+                fetchCashiers(pagination.value.current_page);
+                showMessage("Cashier deleted successfully", "success");
+            } catch (error) {
+                showMessage("Failed to delete cashier", "error");
+            }
         };
 
         const toggleStatus = async (cashier: Cashier) => {
-            await axios.patch(`/admin/cashier/${cashier.id}/toggle-status`);
-            fetchCashiers(pagination.value.current_page);
+            try {
+                await axios.patch(`/admin/cashier/${cashier.id}/toggle-status`);
+                fetchCashiers(pagination.value.current_page);
+                showMessage(
+                    `Cashier status changed to ${cashier.status === "active" ? "inactive" : "active"}`,
+                    "success",
+                );
+            } catch (error) {
+                showMessage("Failed to update status", "error");
+            }
         };
 
         onMounted(() => fetchCashiers());
@@ -183,6 +230,9 @@ export default defineComponent({
             deleteCashier,
             toggleStatus,
             columns,
+            message,
+            messageType,
+            showMessage,
         };
     },
 });

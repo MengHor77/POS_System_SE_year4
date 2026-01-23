@@ -52,26 +52,43 @@ class CashierController extends Controller
     }
 
     // Update cashier
-    public function update(Request $request, $id)
-    {
-        $cashier = Cashier::findOrFail($id);
+public function update(Request $request, $id)
+{
+    $cashier = Cashier::findOrFail($id);
 
+    // Always validate name, email, status
+    $request->validate([
+        'name'  => 'required|string|max:255',
+        'email' => 'required|email|unique:cashiers,email,' . $id,
+        'status'=> 'required|in:active,inactive',
+    ]);
+
+    // Only validate password if user wants to change it
+    if ($request->old_password || $request->new_password || $request->new_password_confirmation) {
         $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|unique:cashiers,email,' . $id,
-            'password' => 'nullable|min:6',
-            'status'   => 'required|in:active,inactive',
+            'old_password' => 'required|string',
+            'new_password' => 'required|string|min:6|confirmed', // Laravel expects new_password_confirmation
         ]);
 
-        $data = $request->only(['name', 'email', 'status']);
-        if ($request->password) {
-            $data['password'] = bcrypt($request->password);
+        // Check old password
+        if (!$cashier->checkPassword($request->old_password)) {
+            return response()->json(['message' => 'Old password is incorrect.'], 422);
         }
 
-        $cashier->update($data);
-
-        return response()->json(['message' => 'Cashier updated']);
+        // Set new password (mutator will hash automatically)
+        $cashier->password = $request->new_password;
     }
+
+    // Update other fields
+    $cashier->name = $request->name;
+    $cashier->email = $request->email;
+    $cashier->status = $request->status;
+    $cashier->save();
+
+    return response()->json(['message' => 'Cashier updated successfully.']);
+}
+
+
 
     // Delete cashier
     public function destroy($id)
