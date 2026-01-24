@@ -1,6 +1,6 @@
 <template>
   <FrontendLayout>
-    <div class="flex flex-row gap-4 h-full bg-darkSoft p-4 relative">
+    <div class="flex flex-row gap-4 h-full bg-bgfrontend p-4 relative">
       
       <section class="flex-1 flex flex-col overflow-hidden no-print">
         <div class="flex justify-between items-center mb-4 px-2">

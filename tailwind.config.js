@@ -58,6 +58,7 @@ module.exports = {
         pending: "#facc15",      // Pending orders
         refund: "#8b5cf6",       // Refund / Return
         discount: "#ec4899",     // Discount / Offer
+        bgfrontend: "#83bee7",
 
          /* ===== Buttons ===== */
         bgBtnEdit: "#3b82f6",       // Blue Edit
