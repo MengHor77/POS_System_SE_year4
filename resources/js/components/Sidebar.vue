@@ -37,7 +37,7 @@
                     v-if="item.route"
                     :to="item.route"
                     class="flex items-center px-4 py-3 cursor-pointer hover:bg-darkSoft transition rounded-lg"
-                    active-class="font-bold text-primary"
+                    active-class="font-bold text-primary bg-infoSoft"
                     :class="collapsed ? 'justify-center' : 'gap-3'"
                 >
                     <i :class="item.icon + ' text-lg'"></i>
