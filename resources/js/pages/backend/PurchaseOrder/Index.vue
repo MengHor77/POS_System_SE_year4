@@ -125,7 +125,7 @@ export default defineComponent({
         const total = ref(0);
 
         const columns = [
-            { key: "no", label: "No" },
+            { key: "id", label: "ID" },
             { key: "supplier_name", label: "Supplier" },
             { key: "product", label: "Product" },
             { key: "quantity", label: "Qty" },
