@@ -17,7 +17,7 @@ import ProductIndex from "../pages/backend/Product/Index.vue";
 import SupplierIndex from '../pages/backend/ProductSuplyer/Index.vue';
 import CategoryIndex from '../pages/backend/Category/Index.vue'
 // Frontend Pages
-import Home from "../pages/frontend/Home.vue";
+import Home from "../pages/frontend/Index.vue";
 
 const routes = [
     // Supplier Page
