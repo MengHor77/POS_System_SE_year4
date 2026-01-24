@@ -1,59 +1,60 @@
 <template>
     <div
-        class="flex items-center justify-center min-h-screen bg-gradient-to-r from-primary/20 via-bgMain to-secondary/20"
+        class="flex items-center justify-center min-h-screen bg-bgMain bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-bgMain to-secondary/10"
     >
         <div
-            class="bg-bgCard shadow-xl rounded-2xl w-full max-w-lg p-10 border border-border"
+            class="bg-bgCard shadow-card rounded-xl2 w-full max-w-lg p-10 border border-border"
         >
-            <!-- Header -->
             <div class="text-center mb-8">
-                <h2 class="text-3xl font-extrabold text-dark mb-2">
+                <div
+                    class="inline-flex items-center justify-center w-16 h-16 bg-infoSoft rounded-full mb-4"
+                >
+                    <i class="fas fa-user-shield text-primary text-2xl"></i>
+                </div>
+                <h2 class="text-3xl font-black text-dark mb-2 tracking-tight">
                     Admin Login
                 </h2>
-                <p class="text-muted">
-                    Enter your credentials to access the POS system
+                <p class="text-muted font-medium">
+                    Enter your credentials to access the management panel
                 </p>
             </div>
 
-            <!-- Login Form -->
             <form method="POST" action="/admin/login" class="space-y-6">
-                <!-- CSRF -->
                 <input type="hidden" name="_token" :value="csrfToken" />
 
-                <!-- Email -->
                 <div>
-                    <label class="block text-dark font-medium mb-2">
-                        Email
+                    <label
+                        class="block text-dark font-bold text-sm uppercase tracking-wider mb-2"
+                    >
+                        Admin Email
                     </label>
                     <input
                         name="email"
                         type="email"
                         placeholder="admin@example.com"
-                        class="w-full border border-border rounded-lg py-3 px-4 bg-bgMain focus:outline-none focus:ring-2 focus:ring-primary"
+                        class="w-full border border-border rounded-xl py-4 px-5 bg-bgMain focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-sm"
                         required
                     />
                 </div>
 
-                <!-- Password -->
                 <div>
-                    <label class="block text-dark font-medium mb-2">
+                    <label
+                        class="block text-dark font-bold text-sm uppercase tracking-wider mb-2"
+                    >
                         Password
                     </label>
-
                     <div class="relative">
                         <input
                             :type="showPassword ? 'text' : 'password'"
                             name="password"
                             placeholder="********"
-                            class="w-full border border-border rounded-lg py-3 px-4 pr-12 bg-bgMain focus:outline-none focus:ring-2 focus:ring-primary"
+                            class="w-full border border-border rounded-xl py-4 px-5 pr-14 bg-bgMain focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-sm"
                             required
                         />
-
-                        <!-- Eye Icon -->
                         <button
                             type="button"
                             @click="togglePassword"
-                            class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center text-muted hover:text-primary transition focus:outline-none"
+                            class="absolute right-5 top-1/2 -translate-y-1/2 text-muted hover:text-primary transition-colors"
                         >
                             <i
                                 :class="
@@ -67,27 +68,39 @@
                     </div>
                 </div>
 
-                <!-- Error Message -->
-                <p
+                <div
                     v-if="error"
-                    class="text-danger text-center text-sm font-medium"
+                    class="bg-dangerSoft border border-danger/20 p-4 rounded-xl flex items-center gap-3"
                 >
-                    {{ error }}
-                </p>
+                    <i class="fas fa-exclamation-circle text-danger"></i>
+                    <p class="text-danger text-sm font-bold leading-none">
+                        {{ error }}
+                    </p>
+                </div>
 
-                <!-- Submit Button -->
                 <button
                     type="submit"
-                    class="w-full bg-primary hover:bg-primary/90 text-white py-3 rounded-lg font-semibold transition duration-300"
+                    class="w-full bg-dark hover:bg-darkSoft text-white py-4 rounded-xl font-bold text-lg shadow-soft transition-all active:scale-95 flex items-center justify-center gap-2"
                 >
-                    Login
+                    <i class="fas fa-lock"></i>
+                    Secure Login
                 </button>
             </form>
 
-            <!-- Footer -->
-            <div class="mt-6 text-center text-muted text-sm">
-                © {{ new Date().getFullYear() }} POS System. All rights
-                reserved.
+            <div class="mt-8 pt-6 border-t border-border text-center">
+                <a
+                    href="/"
+                    class="text-muted hover:text-primary font-bold text-sm transition-colors inline-flex items-center gap-2"
+                >
+                    <i class="fas fa-arrow-left"></i>
+                    Back to selection
+                </a>
+            </div>
+
+            <div
+                class="mt-6 text-center text-grayLight text-xs font-semibold uppercase tracking-widest"
+            >
+                © {{ new Date().getFullYear() }} POS System
             </div>
         </div>
     </div>
@@ -126,17 +139,8 @@ export default defineComponent({
 </script>
 
 <style scoped>
+/* Scoped styles kept minimal as we use Tailwind config classes */
 input:focus {
     transition: all 0.25s ease;
-}
-
-button i {
-    transition:
-        color 0.2s ease,
-        transform 0.2s ease;
-}
-
-button:hover i {
-    transform: scale(1.1);
 }
 </style>
