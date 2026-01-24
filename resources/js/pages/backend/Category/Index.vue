@@ -1,6 +1,6 @@
 <template>
     <BackendLayout>
-       <div class="p-6 bg-bgMain min-h-screen">
+        <div class="p-6 bg-bgMain min-h-screen">
             <h1 class="text-3xl font-bold mb-6 text-primary">
                 Category Management
             </h1>
@@ -121,7 +121,7 @@ export default defineComponent({
         ];
 
         const fetchCategories = async (page = 1) => {
-            const res = await axios.get("/admin/category", {
+            const res = await axios.get("/admin/category/data", {
                 params: { page, per_page: perPage, search: search.value },
             });
             categories.value = res.data;
