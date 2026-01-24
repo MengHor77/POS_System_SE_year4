@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Models\ProductSupplier;
 use App\Http\Controllers\Backend\AdminAuthController;
 use App\Http\Controllers\Backend\ProductController;
 use App\Http\Controllers\Backend\NotificationController;
@@ -31,7 +32,7 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
         '/product',
         '/product/create',
         '/product/{id}/edit',
-        'category',
+        '/category',
         '/notification',
         '/inventory',
         '/purchase-order',
@@ -56,7 +57,7 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
 
     // Needed for select dropdown
     Route::get('/product-supplier', function () {
-        return \App\Models\ProductSupplier::with('product')->get();
+       return ProductSupplier::with('product')->get();
     });
 
     
@@ -82,7 +83,8 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::put('/product/{id}', [ProductController::class, 'update']);
     Route::delete('/product/{id}', [ProductController::class, 'destroy']);
 
-    Route::get('/category/data', [CategoryController::class, 'index']);    Route::get('/category/{id}', [CategoryController::class, 'show']);     
+    Route::get('/category/data', [CategoryController::class, 'index']);  
+    Route::get('/category/{id}', [CategoryController::class, 'show']);     
     Route::post('/category', [CategoryController::class, 'store']);      
     Route::put('/category/{id}', [CategoryController::class, 'update']);   
     Route::delete('/category/{id}', [CategoryController::class, 'destroy']);
