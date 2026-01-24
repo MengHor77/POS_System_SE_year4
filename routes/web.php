@@ -13,6 +13,8 @@ use App\Http\Controllers\Backend\ProfileController;
 use App\Http\Controllers\Backend\ProductSupplierController;
 use App\Http\Controllers\Backend\PurchaseOrderController;
 use App\Http\Controllers\Backend\CategoryController;
+use App\Http\Controllers\Frontend\GetStartController;
+use App\Http\Controllers\Frontend\CashierLoginController;
 
 // ----------------------
 // Admin Authentication
@@ -115,4 +117,24 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
 // ----------------------
 // Frontend catch-all for Vue SPA
 // ----------------------
+
+
+
 Route::get('/{any}', fn() => view('app'))->where('any', '^(?!admin).*$');
+
+
+
+Route::get('/', [GetStartController::class, 'index']);
+
+// Specific login paths for Vue
+Route::get('/login/cashier', fn() => view('app'));
+Route::get('/login/admin', fn() => view('app'));
+
+Route::get('/pos', function () {
+    return view('app'); 
+})->middleware('auth:web');
+
+// Cashier Auth Routes
+Route::get('/cashier/login', [CashierLoginController::class, 'showLogin'])->name('cashier.login');
+Route::post('/cashier/login', [CashierLoginController::class, 'login']);
+Route::post('/cashier/logout', [CashierLoginController::class, 'logout'])->name('cashier.logout');

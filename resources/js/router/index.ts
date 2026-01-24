@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 
 // Backend Pages
-import AdminLogin from "../pages/backend/AdminLogin.vue";
+import AdminLogin from "../pages/backend/AdminLogin/AdminLogin.vue";
 import AdminDashboard from "../pages/backend/Dashboard/Index.vue";
 import Notification from "../pages/backend/Notification/index.vue";
 import Inventory from "../pages/backend/Inventory/Index.vue";
@@ -18,16 +18,39 @@ import SupplierIndex from '../pages/backend/ProductSuplyer/Index.vue';
 import CategoryIndex from '../pages/backend/Category/Index.vue'
 // Frontend Pages
 import Home from "../pages/frontend/Index.vue";
+import GetStartPage from "../pages/frontend/GetStartPage/Index.vue";
+import PosStore from "../pages/frontend/Index.vue";
+import CashierLogin from "../pages/frontend/CashierLogin/CashierLogin.vue";
+
 
 const routes = [
     // Supplier Page
 
     { path: '/admin/supplier', name: 'supplier.Index', component: SupplierIndex },
 
-
-    { path: "/", name: "home", component: Home },
+    {
+        path: "/login/cashier",
+        name: "cashier-pos",
+        component: PosStore
+    },
+    {
+        path: "/pos",        
+        name: "pos.index",
+        component: Home       
+    },
+    {
+        path: "/",
+        name: "get-start",
+        component: GetStartPage
+    },
+    { path: "/cashier/login", name: "cashier-login", component: CashierLogin },
 
     { path: "/admin/login", name: "admin-login", component: AdminLogin },
+    // { 
+    //     path: "/login/admin", 
+    //     name: "admin-login", 
+    //     component: AdminLogin 
+    // },
     {
         path: "/admin/dashboard",
         name: "admin-dashboard",
@@ -40,10 +63,11 @@ const routes = [
         name: "product.index",
         component: ProductIndex,
     },
-    { 
+    {
         path: "/admin/category",
         name: "category.index",
-        component: CategoryIndex },
+        component: CategoryIndex
+    },
 
     {
         path: "/admin/notification",

@@ -30,7 +30,7 @@ export default defineComponent({
     setup() {
         const logout = () => {
             // redirect to backend logout route
-            window.location.href = "/admin/login";
+            window.location.href = "/";
         };
 
         return { logout };

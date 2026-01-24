@@ -29,7 +29,7 @@ return [
     'guards' => [
         'web' => [
             'driver' => 'session',
-            'provider' => 'users',
+           'provider' => 'cashiers',
         ],
 
         'admin' => [
@@ -47,17 +47,16 @@ return [
     |
     */
 
-    'providers' => [
-        'users' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\User::class,
-        ],
-
-        'admins' => [
+  'providers' => [
+    'cashiers' => [ // Rename or add this provider
+        'driver' => 'eloquent',
+        'model' => App\Models\Cashier::class,
+    ],
+    'admins' => [
             'driver' => 'eloquent',
             'model' => App\Models\Admin::class,
         ],
-    ],
+],
 
     /*
     |--------------------------------------------------------------------------
