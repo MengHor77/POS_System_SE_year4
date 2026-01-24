@@ -25,7 +25,6 @@ class ProductSupplierController extends Controller
         }
 
         $suppliers = $query->paginate($perPage);
-
         return response()->json($suppliers);
     }
 
@@ -36,11 +35,10 @@ class ProductSupplierController extends Controller
             'product_id' => 'required|exists:products,id',
             'supplier_name' => 'required|string',
             'quantity' => 'required|integer|min:0',
-            'price' => 'nullable|numeric|min:0',
+            'price' => 'required|numeric|min:0',
         ]);
 
         ProductSupplier::create($data);
-
         return response()->json(['message' => 'Supplier created']);
     }
 
@@ -53,12 +51,10 @@ class ProductSupplierController extends Controller
         'product_id' => 'required|exists:products,id',
         'supplier_name' => 'required|string',
         'quantity' => 'required|integer|min:0',
-        'price' => 'nullable|numeric|min:0',
+       'price' => 'required|numeric|min:0',
     ]);
 
     $supplier->update($data);
-
-    // 🔥 VERY IMPORTANT
     $supplier->load('product');
 
     return response()->json([
@@ -67,8 +63,6 @@ class ProductSupplierController extends Controller
     ]);
 }
 
-
-    // Delete supplier
     public function destroy($id)
     {
         ProductSupplier::findOrFail($id)->delete();

@@ -54,6 +54,7 @@
                         class="input-field"
                         min="0"
                         step="0.01"
+                        required
                     />
                 </div>
 
@@ -93,7 +94,7 @@ export default defineComponent({
             product_id: null as number | null,
             supplier_name: "",
             quantity: 0,
-            price: null as number | null,
+            price: 0,
         });
 
         const products = ref<Product[]>([]);
