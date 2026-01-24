@@ -10,14 +10,15 @@ class Product extends Model
     use HasFactory;
 
     // Fillable fields for mass assignment
-    protected $fillable = [
-        'name',
-        'Catagory',    // old column
-        'category_id', // new foreign key
-        'barcode',
-        'price',
-        'stock',
-    ];
+  protected $fillable = [
+    'name',
+    'category',    // category name
+    'category_id', // foreign key
+    'barcode',
+    'price',
+    'stock',
+];
+
 
     // Optional: cast fields
     protected $casts = [
@@ -30,7 +31,7 @@ class Product extends Model
      */
     public function category()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(Category::class, 'category_id');
     }
 
     /**

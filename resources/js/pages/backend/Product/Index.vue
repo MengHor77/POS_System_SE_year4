@@ -31,6 +31,11 @@
 
             <!-- Products Table -->
             <Table :columns="columns" :data="products">
+                <!-- Category column -->
+                <template #cell-category="{ row }">
+                    {{ row.category?.name || "N/A" }}
+                </template>
+
                 <!-- Actions column -->
                 <template #cell-actions="{ row }">
                     <div class="flex gap-2">
@@ -107,8 +112,8 @@ import Table from "../../../components/Table.vue";
 interface Product {
     id: number;
     name: string;
-    category: string;       
-    category_id: number; 
+    category: string;
+    category_id: number;
     barcode: number;
     price: number;
     stock: number;
@@ -134,7 +139,7 @@ export default defineComponent({
         const columns = [
             { key: "id", label: "ID" },
             { key: "name", label: "Name" },
-            { key: "Catagory", label: "Catagory" },
+            { key: "catagory", label: "Catagory" },
             { key: "barcode", label: "Barcode" },
             { key: "price", label: "Price" },
             { key: "stock", label: "Stock" },

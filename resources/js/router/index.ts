@@ -15,7 +15,7 @@ import SaleIndex from "../pages/backend/Sale/Index.vue";
 // Product Pages
 import ProductIndex from "../pages/backend/Product/Index.vue";
 import SupplierIndex from '../pages/backend/ProductSuplyer/Index.vue';
-
+import CategoryIndex from '../pages/backend/Category/Index.vue'
 // Frontend Pages
 import Home from "../pages/frontend/Home.vue";
 
@@ -33,14 +33,18 @@ const routes = [
         name: "admin-dashboard",
         component: AdminDashboard,
     },
-    
+
     // Product routes
     {
         path: "/admin/product",
         name: "product.index",
         component: ProductIndex,
-        // no child routes for create/edit, will use modals
     },
+    { 
+        path: "/admin/category",
+        name: "category.index",
+        component: CategoryIndex },
+
     {
         path: "/admin/notification",
         name: "notification",

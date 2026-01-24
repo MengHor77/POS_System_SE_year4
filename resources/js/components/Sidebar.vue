@@ -101,11 +101,17 @@ export default defineComponent({
                 label: "Dashboard",
                 route: "/admin/dashboard",
             },
+             {
+                icon: "fas fa-folder",
+                label: "Category",
+                route: "/admin/category",
+            },
             {
                 icon: "fas fa-box-open",
                 label: "Products",
                 route: "/admin/product",
             },
+            
             {
                 icon: "fas fa-bell",
                 label: "Notification",

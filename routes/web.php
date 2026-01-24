@@ -11,7 +11,7 @@ use App\Http\Controllers\Backend\CashierController;
 use App\Http\Controllers\Backend\ProfileController;
 use App\Http\Controllers\Backend\ProductSupplierController;
 use App\Http\Controllers\Backend\PurchaseOrderController;
-
+use App\Http\Controllers\Backend\CategoryController;
 
 // ----------------------
 // Admin Authentication
@@ -31,6 +31,7 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
         '/product',
         '/product/create',
         '/product/{id}/edit',
+        'category',
         '/notification',
         '/inventory',
         '/purchase-order',
@@ -39,7 +40,7 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
         '/cashier',
         '/sale',      
         '/profile',
-        '/profile/edit/{id}', // ✅ add edit page
+        '/profile/edit/{id}', 
 
     ];
 
@@ -80,6 +81,12 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::get('/product/{id}', [ProductController::class, 'show']);
     Route::put('/product/{id}', [ProductController::class, 'update']);
     Route::delete('/product/{id}', [ProductController::class, 'destroy']);
+
+    Route::get('/category', [CategoryController::class, 'index']);         
+    Route::get('/category/{id}', [CategoryController::class, 'show']);     
+    Route::post('/category', [CategoryController::class, 'store']);      
+    Route::put('/category/{id}', [CategoryController::class, 'update']);   
+    Route::delete('/category/{id}', [CategoryController::class, 'destroy']);
 
      // Product Supplier CRUD SPA endpoints
     Route::get('/supplier/data', [ProductSupplierController::class, 'index']);
