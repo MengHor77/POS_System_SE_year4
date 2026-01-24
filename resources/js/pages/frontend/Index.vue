@@ -8,11 +8,11 @@
         </div>
 
         <div class="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-          <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            <div v-for="n in 8" :key="n" class="h-64 bg-white/20 animate-pulse rounded-[30px]"></div>
+          <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div v-for="n in 6" :key="n" class="h-64 bg-white/20 animate-pulse rounded-[30px]"></div>
           </div>
 
-          <div v-else-if="products.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div v-else-if="products.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <CardProduct 
               v-for="item in products" 
               :key="item.id" 
@@ -107,6 +107,7 @@ export default defineComponent({
         const response = await axios.get("/admin/product/data", {
           params: { search: search.value, per_page: 20 },
         });
+        // Check if data is nested under 'data' (Laravel Pagination) or is a direct array
         products.value = response.data.data || response.data;
       } catch (error) {
         console.error("Error fetching products:", error);
