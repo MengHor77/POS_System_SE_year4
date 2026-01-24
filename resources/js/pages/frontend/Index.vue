@@ -1,6 +1,7 @@
 <template>
   <FrontendLayout>
     <div class="flex flex-row gap-4 h-full bg-darkSoft p-4 relative">
+      
       <section class="flex-1 flex flex-col overflow-hidden no-print">
         <div class="flex justify-between items-center mb-4 px-2">
           <h2 class="text-2xl font-bold text-white tracking-tight">Available Phones</h2>
@@ -9,51 +10,22 @@
 
         <div class="flex-1 overflow-y-auto pr-2 custom-scrollbar">
           <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div v-for="n in 6" :key="n" class="h-64 bg-white/20 animate-pulse rounded-[30px]"></div>
+            <div v-for="n in 6" :key="n" class="h-64 bg-white/5 animate-pulse rounded-[30px]"></div>
           </div>
-
           <div v-else-if="products.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <CardProduct v-for="item in products" :key="item.id" :product="item" @add-to-cart="addToCart" />
-          </div>
-
-          <div v-else class="flex flex-col items-center justify-center py-20 text-white/50">
-            <i class="fas fa-box-open text-6xl mb-4"></i>
-            <p class="text-xl font-medium">No products found.</p>
           </div>
         </div>
       </section>
 
-      <aside class="w-[400px] bg-white rounded-[30px] shadow-lg flex flex-col overflow-hidden my-2 no-print">
-        <div class="p-6 border-b flex justify-between items-center">
-          <h2 class="text-xl font-bold text-gray-900 uppercase tracking-tight">Current Items</h2>
-          <span class="bg-primary/10 text-primary text-xs font-bold px-2 py-1 rounded-full">{{ cart.length }} Items</span>
-        </div>
-        
-        <div class="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
-          <div v-if="cart.length === 0" class="flex flex-col items-center justify-center h-full text-gray-400">
-            <i class="fas fa-shopping-cart text-5xl mb-4 opacity-20"></i>
-            <p class="font-medium">Your cart is empty</p>
-          </div>
-          
-          <CardItem v-for="item in cart" :key="item.id" :item="item" @increase="increaseQty" @decrease="decreaseQty" @remove="removeFromCart" />
-        </div>
-
-        <div class="p-6 border-t bg-white">
-          <div class="flex justify-between items-end mb-6">
-            <span class="text-gray-500 font-bold uppercase text-xs tracking-widest">Total Amount</span>
-            <span class="text-4xl font-black text-gray-900 tracking-tighter">
-              ${{ cartTotal.toLocaleString(undefined, { minimumFractionDigits: 2 }) }}
-            </span>
-          </div>
-          <button 
-            @click="showPaymentModal = true" 
-            :disabled="cart.length === 0" 
-            class="w-full bg-[#0a0a14] text-white py-5 rounded-2xl font-bold text-xl hover:bg-primary transition-all active:scale-95 disabled:bg-gray-200"
-          >
-            Submit
-          </button>
-        </div>
-      </aside>
+      <CartSidebar 
+        :cart="cart" 
+        :total="cartTotal"
+        @increase="increaseQty"
+        @decrease="decreaseQty"
+        @remove="removeFromCart"
+        @submit="showPaymentModal = true"
+      />
 
       <PaymentModal 
         v-if="showPaymentModal" 
@@ -76,13 +48,13 @@ import axios from "axios";
 import FrontendLayout from "../../layouts/FrontendLayout.vue";
 import CardProduct from "../../components/Frontend/CardProduct.vue";
 import SearchProduct from "../../components/Frontend/SearchProduct.vue";
-import CardItem from "../../components/Frontend/CardItem.vue";
 import PaymentModal from "../../components/Frontend/PaymentModal.vue";
 import Receipt from "../../components/Frontend/Receipt.vue";
+import CartSidebar from "../../components/Frontend/CardSidebar.vue"; // New Import
 
 export default defineComponent({
   name: "Home",
-  components: { FrontendLayout, CardProduct, SearchProduct, CardItem, PaymentModal, Receipt },
+  components: { FrontendLayout, CardProduct, SearchProduct, PaymentModal, Receipt, CartSidebar },
   setup() {
     const products = ref<any[]>([]);
     const cart = ref<any[]>([]);
@@ -95,7 +67,7 @@ export default defineComponent({
       try {
         const response = await axios.get("/admin/product/data", { params: { search: search.value, per_page: 20 } });
         products.value = response.data.data || response.data;
-      } catch (error) { console.error(error); } finally { loading.value = false; }
+      } finally { loading.value = false; }
     };
 
     const addToCart = (product: any) => {
@@ -104,23 +76,23 @@ export default defineComponent({
       if (existing) { existing.qty++; } else { cart.value.push({ ...product, qty: 1 }); }
     };
 
-    const increaseQty = (id: number) => { const item = cart.value.find(i => i.id === id); if (item) item.qty++; };
-    const decreaseQty = (id: number) => { 
-        const item = cart.value.find(i => i.id === id); 
-        if (item && item.qty > 1) item.qty--; else removeFromCart(id); 
+    const increaseQty = (id: number) => { 
+      const item = cart.value.find(i => i.id === id); 
+      if (item) item.qty++; 
     };
-    const removeFromCart = (id: number) => { cart.value = cart.value.filter(i => i.id !== id); };
 
-    // Checkout and Print Logic
+    const decreaseQty = (id: number) => { 
+      const item = cart.value.find(i => i.id === id); 
+      if (item && item.qty > 1) item.qty--; else removeFromCart(id); 
+    };
+
+    const removeFromCart = (id: number) => { 
+      cart.value = cart.value.filter(i => i.id !== id); 
+    };
+
     const handleCheckout = async () => {
-      // 1. Give Vue a millisecond to ensure the Receipt component is updated
       await nextTick();
-      
-      // 2. Open printer dialog
       window.print();
-
-      // 3. Clear data and close modal
-      alert("Order processed and receipt sent to printer.");
       cart.value = [];
       showPaymentModal.value = false;
     };
@@ -129,38 +101,20 @@ export default defineComponent({
 
     onMounted(fetchProducts);
 
-    return {
-      products, cart, search, loading, showPaymentModal,
-      fetchProducts, addToCart, cartTotal,
-      increaseQty, decreaseQty, removeFromCart, handleCheckout
-    };
+    return { products, cart, search, loading, showPaymentModal, fetchProducts, addToCart, cartTotal, increaseQty, decreaseQty, removeFromCart, handleCheckout };
   },
 });
 </script>
 
 <style scoped>
+/* Scoped styles to keep scrollbars looking consistent */
 .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
-aside .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.05); }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.05); border-radius: 10px; }
 
-/* Print Specific Styles */
 @media print {
-  .no-print {
-    display: none !important;
-  }
-  /* Ensure only the print-section is visible */
-  body * {
-    visibility: hidden;
-  }
-  #print-section, #print-section * {
-    visibility: visible;
-  }
-  #print-section {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-  }
+  .no-print { display: none !important; }
+  body * { visibility: hidden; }
+  #print-section, #print-section * { visibility: visible; }
+  #print-section { position: absolute; left: 0; top: 0; width: 100%; }
 }
 </style>
