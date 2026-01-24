@@ -70,22 +70,22 @@ module.exports = {
         bgBtnCancelHover: "#4b5563",// Darker Gray on hover
 
          /* ===== Purchase Order Status ===== */
-    poPending: "#facc15",
-    poApproved: "#22c55e",
-    poRejected: "#ef4444",
+        poPending: "#facc15",
+        poApproved: "#22c55e",
+        poRejected: "#ef4444",
 
-    poPendingSoft: "#fef9c3",
-    poApprovedSoft: "#dcfce7",
-    poRejectedSoft: "#fee2e2",
+        poPendingSoft: "#fef9c3",
+        poApprovedSoft: "#dcfce7",
+        poRejectedSoft: "#fee2e2",
 
-    /* ===== Table ===== */
-    tableHeader: "#f1f5f9",
-    tableRowHover: "#f8fafc",
+        /* ===== Table ===== */
+        tableHeader: "#f1f5f9",
+        tableRowHover: "#f8fafc",
 
-    /* ===== Icons ===== */
-    iconView: "#0ea5e9",
-    iconEdit: "#3b82f6",
-    iconDelete: "#ef4444",
+        /* ===== Icons ===== */
+        iconView: "#0ea5e9",
+        iconEdit: "#3b82f6",
+        iconDelete: "#ef4444",
       },
     },
   },
