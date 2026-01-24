@@ -39,15 +39,11 @@
             <p>Your cart is empty</p>
           </div>
           
-          <div v-for="item in cart" :key="item.id" class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl border border-gray-100">
-            <div class="flex flex-col">
-              <span class="font-bold text-gray-800 text-lg">{{ item.name }}</span>
-              <span class="text-sm text-gray-500 font-medium">Qty: {{ item.qty }}</span>
-            </div>
-            <span class="font-bold text-info text-xl">
-              ${{ (Number(item.price) * item.qty).toFixed(2) }}
-            </span>
-          </div>
+          <CardItem 
+            v-for="item in cart" 
+            :key="item.id" 
+            :item="item" 
+          />
         </div>
 
         <div class="p-6 border-t bg-white">
@@ -76,6 +72,7 @@ import axios from "axios";
 import FrontendLayout from "../../layouts/FrontendLayout.vue";
 import CardProduct from "../../components/Frontend/CardProduct.vue";
 import SearchProduct from "../../components/Frontend/SearchProduct.vue";
+import CardItem from "../../components/Frontend/CardItem.vue";  
 
 interface Product {
   id: number;
@@ -87,16 +84,21 @@ interface Product {
   stock: number;
 }
 
-interface CartItem extends Product {
+interface CartProduct extends Product {
   qty: number;
 }
 
 export default defineComponent({
   name: "Home",
-  components: { FrontendLayout, CardProduct, SearchProduct },
+  components: { 
+    FrontendLayout, 
+    CardProduct, 
+    SearchProduct, 
+    CardItem // Register component
+  },
   setup() {
     const products = ref<Product[]>([]);
-    const cart = ref<CartItem[]>([]);
+    const cart = ref<CartProduct[]>([]);
     const search = ref("");
     const loading = ref(true);
     const showPaymentModal = ref(false);
@@ -107,7 +109,6 @@ export default defineComponent({
         const response = await axios.get("/admin/product/data", {
           params: { search: search.value, per_page: 20 },
         });
-        // Check if data is nested under 'data' (Laravel Pagination) or is a direct array
         products.value = response.data.data || response.data;
       } catch (error) {
         console.error("Error fetching products:", error);
