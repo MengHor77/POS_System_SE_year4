@@ -1,9 +1,9 @@
 <template>
     <BackendLayout>
-        <div class="p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-bold">Categories</h2>
-            </div>
+       <div class="p-6 bg-bgMain min-h-screen">
+            <h1 class="text-3xl font-bold mb-6 text-primary">
+                Category Management
+            </h1>
 
             <div class="flex flex-row gap-3 w-full pb-6">
                 <div class="w-50">
