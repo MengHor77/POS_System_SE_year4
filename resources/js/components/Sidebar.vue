@@ -87,11 +87,24 @@ import axios from "axios";
 export default defineComponent({
     name: "Sidebar",
     setup() {
-        // Internal collapse state
-        const collapsed = ref(false);
+        /**
+         * 1. PERSISTENCE LOGIC
+         * Check LocalStorage for a saved state.
+         * We compare the string "true" because LocalStorage only stores strings.
+         */
+        const savedState = localStorage.getItem("sidebar-collapsed") === "true";
+        const collapsed = ref(savedState);
 
+        /**
+         * 2. TOGGLE LOGIC
+         * Update both the reactive ref and the LocalStorage record.
+         */
         const toggleSidebar = () => {
             collapsed.value = !collapsed.value;
+            localStorage.setItem(
+                "sidebar-collapsed",
+                collapsed.value.toString(),
+            );
         };
 
         // Menu items with routes
@@ -101,7 +114,7 @@ export default defineComponent({
                 label: "Dashboard",
                 route: "/admin/dashboard",
             },
-             {
+            {
                 icon: "fas fa-folder",
                 label: "Category",
                 route: "/admin/category",
@@ -111,7 +124,6 @@ export default defineComponent({
                 label: "Products",
                 route: "/admin/product",
             },
-            
             {
                 icon: "fas fa-bell",
                 label: "Notification",
@@ -148,17 +160,25 @@ export default defineComponent({
                 label: "Sales",
                 route: "/admin/sale",
             },
-            { icon: "fas fa-user", label: "Profile", route: "/admin/profile" },
+            {
+                icon: "fas fa-user",
+                label: "Profile",
+                route: "/admin/profile",
+            },
         ]);
 
         // Fetch low-stock notification count
         const fetchNotificationCount = async () => {
             try {
+                // Adjust this URL if you changed your API routes in web.php
                 const res = await axios.get("/admin/notification/count");
                 const notification = menuItems.find(
                     (i) => i.label === "Notification",
                 );
-                if (notification) notification.count = res.data.total;
+                if (notification) {
+                    // Ensure we access the count from your specific API response structure
+                    notification.count = res.data.total || 0;
+                }
             } catch (error) {
                 console.error("Failed to fetch notification count:", error);
             }
@@ -166,14 +186,18 @@ export default defineComponent({
 
         onMounted(() => {
             fetchNotificationCount();
-            setInterval(fetchNotificationCount, 30000); // refresh every 30 seconds
+            // Refresh every 30 seconds
+            const interval = setInterval(fetchNotificationCount, 30000);
+
+            // Clean up interval if the component is unmounted
+            return () => clearInterval(interval);
         });
 
-        return { menuItems, collapsed, toggleSidebar };
+        return {
+            menuItems,
+            collapsed,
+            toggleSidebar,
+        };
     },
 });
 </script>
-
-<style scoped>
-/* Optional: smooth hover effect or custom colors */
-</style>
