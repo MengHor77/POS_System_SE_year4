@@ -11,7 +11,7 @@
                 <div class="w-50">
                     <button
                         @click="showCreate = true"
-                        class="px-4 py-2 rounded-lg bg-dark text-white hover:bg-darkSoft transition shadow-soft"
+                        class="px-4 py-2 rounded bg-dark text-white hover:bg-darkSoft transition shadow-soft"
                     >
                         New Purchase Order
                     </button>
