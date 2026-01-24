@@ -40,7 +40,7 @@
                         <option
                             v-for="cat in categories"
                             :key="cat.id"
-                            :value="cat.id"
+                            :value="Number(cat.id)"
                         >
                             {{ cat.name }}
                         </option>
@@ -114,10 +114,10 @@ export default defineComponent({
     setup(_, { emit }) {
         const form = reactive({
             name: "",
-            category_id: 0,
-            barcode: 0,
-            price: 0,
-            stock: 0,
+            category_id: null,
+            barcode: null,
+            price: null,
+            stock: null,
         });
 
         const categories = ref<any[]>([]);

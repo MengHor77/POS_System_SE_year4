@@ -10,8 +10,13 @@
         </div>
 
         <div>
-          <label class="block mb-1 font-semibold">Brand</label>
-          <input v-model="form.brand" placeholder="Enter brand" class="input-field" required />
+          <label class="block mb-1 font-semibold">Category</label>
+          <select v-model="form.category_id" class="input-field" required>
+            <option value="" disabled>Select category</option>
+            <option v-for="cat in categories" :key="cat.id" :value="cat.id">
+              {{ cat.name }}
+            </option>
+          </select>
         </div>
 
         <div>
@@ -39,7 +44,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, watch } from "vue";
+import { defineComponent, reactive, watch, ref, onMounted } from "vue";
 import axios from "axios";
 
 export default defineComponent({
@@ -49,6 +54,14 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const form = reactive({ ...props.product });
+    const categories = ref<any[]>([]);
+
+    // Fetch categories
+    const fetchCategories = async () => {
+      const res = await axios.get("/admin/category");
+      categories.value = res.data.data || res.data;
+    };
+    onMounted(fetchCategories);
 
     // Watch for prop changes (when user clicks another product)
     watch(
@@ -59,15 +72,15 @@ export default defineComponent({
     const updateProduct = async () => {
       try {
         await axios.put(`/admin/product/${form.id}`, form);
-        emit("updated"); // notify parent
-        emit("close"); // close modal
+        emit("updated");
+        emit("close");
       } catch (error) {
         console.error(error);
         alert("Failed to update product.");
       }
     };
 
-    return { form, updateProduct };
+    return { form, categories, updateProduct };
   },
 });
 </script>
