@@ -121,6 +121,9 @@ interface Cashier {
     email: string;
     status: "active" | "inactive";
     password?: string;
+    old_password?: string;
+    new_password?: string;
+    confirm_password?: string;
 }
 
 export default defineComponent({
@@ -136,26 +139,13 @@ export default defineComponent({
     },
     setup() {
         const cashiers = ref<Cashier[]>([]);
-        const editingCashier = ref<(Cashier & { password?: string }) | null>(
-            null,
-        );
-        const message = ref("");
-        const messageType = ref<"success" | "error">("success");
-        const showMessage = (
-            msg: string,
-            type: "success" | "error" = "success",
-        ) => {
-            message.value = msg;
-            messageType.value = type;
-
-            // Optional: clear after 3 seconds (matches FlassMessage)
-            setTimeout(() => {
-                message.value = "";
-            }, 3000);
-        };
-
+        const editingCashier = ref<Cashier | null>(null);
         const showCreateModal = ref(false);
         const search = ref("");
+
+        const message = ref("");
+        const messageType = ref<"success" | "error">("success");
+
         const pagination = ref({
             current_page: 1,
             last_page: 1,
@@ -171,30 +161,49 @@ export default defineComponent({
             { key: "actions", label: "Actions" },
         ];
 
+        const showMessage = (
+            msg: string,
+            type: "success" | "error" = "success",
+        ) => {
+            message.value = msg;
+            messageType.value = type;
+            setTimeout(() => {
+                message.value = "";
+            }, 3000);
+        };
+
         const fetchCashiers = async (page = 1) => {
-            const res = await axios.get("/admin/cashier/data", {
-                params: {
-                    page,
-                    per_page: pagination.value.per_page,
-                    search: search.value,
-                },
-            });
-            cashiers.value = res.data.data;
-            pagination.value = {
-                current_page: res.data.current_page,
-                last_page: res.data.last_page,
-                per_page: res.data.per_page,
-                total: res.data.total,
-            };
+            try {
+                const res = await axios.get("/admin/cashier/data", {
+                    params: {
+                        page,
+                        per_page: pagination.value.per_page,
+                        search: search.value,
+                    },
+                });
+                cashiers.value = res.data.data;
+                pagination.value = {
+                    current_page: res.data.current_page,
+                    last_page: res.data.last_page,
+                    per_page: res.data.per_page,
+                    total: res.data.total,
+                };
+            } catch (error) {
+                showMessage("Failed to load cashiers", "error");
+            }
         };
 
         const openEditModal = (cashier: Cashier) => {
-            editingCashier.value = { ...cashier, password: "" };
+            editingCashier.value = {
+                ...cashier,
+                old_password: "",
+                new_password: "",
+                confirm_password: "",
+            };
         };
 
         const deleteCashier = async (id: number) => {
             if (!confirm("Are you sure?")) return;
-
             try {
                 await axios.delete(`/admin/cashier/${id}`);
                 fetchCashiers(pagination.value.current_page);
@@ -208,10 +217,7 @@ export default defineComponent({
             try {
                 await axios.patch(`/admin/cashier/${cashier.id}/toggle-status`);
                 fetchCashiers(pagination.value.current_page);
-                showMessage(
-                    `Cashier status changed to ${cashier.status === "active" ? "inactive" : "active"}`,
-                    "success",
-                );
+                showMessage("Status updated", "success");
             } catch (error) {
                 showMessage("Failed to update status", "error");
             }

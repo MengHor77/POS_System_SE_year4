@@ -1,44 +1,23 @@
 <template>
-  <div
-    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-  >
-    <div
-      class="bg-bgCard p-6 rounded-2xl shadow-md w-full max-w-lg relative"
-    >
-      <!-- Close Button -->
-      <button
-        @click="$emit('close')"
-        class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold"
-      >
+  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-bgCard p-6 rounded-2xl shadow-md w-full max-w-lg relative">
+      <button @click="$emit('close')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold">
         &times;
       </button>
 
       <h2 class="text-2xl font-bold mb-4 text-primary">Edit Cashier</h2>
 
       <form @submit.prevent="updateCashier" class="space-y-4">
-        <!-- Name -->
         <div>
           <label class="block mb-1 font-semibold">Name</label>
-          <input
-            v-model="form.name"
-            type="text"
-            class="input-field"
-            required
-          />
+          <input v-model="form.name" type="text" class="input-field" required />
         </div>
 
-        <!-- Email -->
         <div>
           <label class="block mb-1 font-semibold">Email</label>
-          <input
-            v-model="form.email"
-            type="email"
-            class="input-field"
-            required
-          />
+          <input v-model="form.email" type="email" class="input-field" required />
         </div>
 
-        <!-- Status -->
         <div>
           <label class="block mb-1 font-semibold">Status</label>
           <select v-model="form.status" class="input-field" required>
@@ -47,61 +26,30 @@
           </select>
         </div>
 
-        <!-- Old Password -->
+        <hr class="border-gray-200 my-4" />
+        <p class="text-sm text-gray-500 mb-2">Leave password fields empty if you don't want to change it.</p>
+
         <div>
           <label class="block mb-1 font-semibold">Old Password</label>
-          <input
-            :type="showPassword ? 'text' : 'password'"
-            v-model="form.old_password"
-            placeholder="Enter old password (required if changing)"
-            class="input-field"
-          />
+          <input :type="showPassword ? 'text' : 'password'" v-model="form.old_password" class="input-field" />
         </div>
 
-        <!-- New Password -->
         <div>
           <label class="block mb-1 font-semibold">New Password</label>
-          <input
-            :type="showPassword ? 'text' : 'password'"
-            v-model="form.new_password"
-            placeholder="Enter new password"
-            class="input-field"
-          />
+          <input :type="showPassword ? 'text' : 'password'" v-model="form.new_password" class="input-field" />
         </div>
 
-        <!-- Confirm New Password -->
         <div class="relative">
           <label class="block mb-1 font-semibold">Confirm New Password</label>
-          <input
-            :type="showPassword ? 'text' : 'password'"
-            v-model="form.confirm_password"
-            placeholder="Confirm new password"
-            class="input-field pr-10"
-          />
-          <span
-            class="absolute pt-6 inset-y-0 right-3 flex items-center text-xl text-gray-500 hover:text-gray-700 transition"
-            @click="showPassword = !showPassword"
-          >
-            <i
-              :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"
-            ></i>
+          <input :type="showPassword ? 'text' : 'password'" v-model="form.confirm_password" class="input-field pr-10" />
+          <span class="absolute pt-6 inset-y-0 right-3 flex items-center text-xl text-gray-500 cursor-pointer" @click="showPassword = !showPassword">
+            <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
           </span>
         </div>
 
         <div class="flex justify-end gap-4 mt-6">
-          <button
-            type="button"
-            @click="$emit('close')"
-            class="px-4 py-2 rounded bg-bgBtnCancel hover:bg-bgBtnCancelHover text-white"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            class="px-4 py-2 rounded bg-bgBtnSave hover:bg-bgBtnSaveHover text-white"
-          >
-            Update
-          </button>
+          <button type="button" @click="$emit('close')" class="px-4 py-2 rounded bg-bgBtnCancel hover:bg-bgBtnCancelHover text-white">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded bg-bgBtnSave hover:bg-bgBtnSaveHover text-white">Update</button>
         </div>
       </form>
     </div>
@@ -109,27 +57,33 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, watch, ref } from "vue";
+import { defineComponent, reactive, watch, ref, PropType } from "vue";
 import axios from "axios";
 
+// FIXED: Added "?" to make password fields optional
 interface Cashier {
   id: number;
   name: string;
   email: string;
   status: "active" | "inactive";
-  old_password: string;
-  new_password: string;
-  confirm_password: string;
+  old_password?: string;
+  new_password?: string;
+  confirm_password?: string;
 }
 
 export default defineComponent({
   name: "EditCashier",
   props: {
-    cashier: { type: Object as () => Cashier, required: true },
+    // Use PropType to correctly map the interface
+    cashier: { type: Object as PropType<Cashier>, required: true },
   },
   setup(props, { emit }) {
-    const form = reactive<Cashier>({
-      ...props.cashier,
+    // Initialize form with prop values + empty password strings
+    const form = reactive({
+      id: props.cashier.id,
+      name: props.cashier.name,
+      email: props.cashier.email,
+      status: props.cashier.status,
       old_password: "",
       new_password: "",
       confirm_password: "",
@@ -137,32 +91,26 @@ export default defineComponent({
 
     const showPassword = ref(false);
 
-    watch(
-      () => props.cashier,
-      (newVal) => {
-        Object.assign(form, newVal);
-        form.old_password = "";
-        form.new_password = "";
-        form.confirm_password = "";
-      }
-    );
+    watch(() => props.cashier, (newVal) => {
+      form.id = newVal.id;
+      form.name = newVal.name;
+      form.email = newVal.email;
+      form.status = newVal.status;
+      form.old_password = "";
+      form.new_password = "";
+      form.confirm_password = "";
+    }, { deep: true });
 
     const updateCashier = async () => {
-      // Only validate password if user wants to change
-      const changePassword =
-        form.old_password || form.new_password || form.confirm_password;
+      const isChangingPassword = !!(form.old_password || form.new_password || form.confirm_password);
 
-      if (changePassword) {
+      if (isChangingPassword) {
         if (!form.old_password || !form.new_password || !form.confirm_password) {
           return alert("Please fill all password fields to change password.");
         }
         if (form.new_password !== form.confirm_password) {
           return alert("New password and confirm password do not match.");
         }
-      }
-
-      if (!form.name || !form.email || !form.status) {
-        return alert("Please fill in all required fields.");
       }
 
       try {
@@ -178,7 +126,7 @@ export default defineComponent({
         emit("updated");
         emit("close");
       } catch (error: any) {
-        alert(error.response?.data?.message ?? "Failed to update cashier.");
+        alert(error.response?.data?.message ?? "Failed to update.");
       }
     };
 
@@ -194,7 +142,6 @@ export default defineComponent({
   border: 1px solid #ccc;
   border-radius: 0.5rem;
   outline: none;
-  transition: border 0.2s;
 }
 .input-field:focus {
   border-color: #3b82f6;
