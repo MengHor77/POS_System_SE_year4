@@ -107,7 +107,8 @@ import Table from "../../../components/Table.vue";
 interface Product {
     id: number;
     name: string;
-    brand: string;
+    category: string;       
+    category_id: number; 
     barcode: number;
     price: number;
     stock: number;
@@ -133,7 +134,7 @@ export default defineComponent({
         const columns = [
             { key: "id", label: "ID" },
             { key: "name", label: "Name" },
-            { key: "brand", label: "Brand" },
+            { key: "Catagory", label: "Catagory" },
             { key: "barcode", label: "Barcode" },
             { key: "price", label: "Price" },
             { key: "stock", label: "Stock" },
