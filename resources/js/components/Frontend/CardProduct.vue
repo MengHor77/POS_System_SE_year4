@@ -1,7 +1,7 @@
 <template>
   <div 
     @click="product.stock > 0 && $emit('add-to-cart', product)"
-    class="bg-bgCard rounded-[30px] border border-border p-6 shadow-card hover:shadow-soft transition-all cursor-pointer group flex flex-col items-center text-center relative overflow-hidden"
+    class="bg-bgCard rounded-[20px] border border-border p-6 shadow-card hover:shadow-soft transition-all cursor-pointer group flex flex-col items-center text-center relative overflow-hidden"
   >
     <div 
       v-if="product.stock <= 5"
@@ -35,7 +35,7 @@
       Stock: {{ product.stock }}
     </div>
 
-    <span class="mt-3 text-xxs text-grayLight font-mono">
+    <span class="mt-3 text-lg  font-mono">
       Code: {{ product.barcode }}
     </span>
   </div>
@@ -43,8 +43,6 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
-
-// Local Interface to ensure data consistency
 interface Product {
   id: number;
   name: string;
@@ -65,10 +63,7 @@ export default defineComponent({
   },
   emits: ['add-to-cart'],
   setup() {
-    /**
-     * Formats the price for display. 
-     * Shows as integer if no decimals, or fixed 2 if it has them.
-     */
+   
     const formatPrice = (value: number | string) => {
       const num = Number(value);
       if (isNaN(num)) return '0';
