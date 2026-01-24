@@ -4,24 +4,26 @@ namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
-use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
 
 class ProductController extends Controller
 {
-    // List all products with search & pagination
+    // List all products
     public function index(Request $request)
     {
         $perPage = $request->get('per_page', 5);
-        $search = $request->get('search'); 
+        $search = $request->get('search');
 
-        $query = Product::query();
+        // Start query and eager load category
+        $query = Product::with('category');
 
         if ($search) {
             $query->where('name', 'like', "%{$search}%")
-                  ->orWhere('category', 'like', "%{$search}%")
-                  ->orWhere('barcode', 'like', "%{$search}%");
+                  ->orWhere('barcode', 'like', "%{$search}%")
+                  ->orWhereHas('category', function ($q) use ($search) {
+                      $q->where('name', 'like', "%{$search}%");
+                  });
         }
 
         $products = $query->orderBy('id', 'desc')->paginate($perPage);
@@ -29,10 +31,9 @@ class ProductController extends Controller
         return response()->json($products);
     }
 
-    // Show single product
     public function show($id)
     {
-        $product = Product::findOrFail($id);
+        $product = Product::with('category')->findOrFail($id);
         return response()->json($product);
     }
 
@@ -41,20 +42,16 @@ class ProductController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'category_id' => 'required|exists:categories,id', 
+            'category_id' => 'required|integer|exists:categories,id', 
             'barcode' => 'required|integer|unique:products,barcode',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
         ]);
 
         try {
-            // Get category name from category_id
-            $categoryName = Category::findOrFail($request->category_id)->name;
-
             $product = Product::create([
                 'name' => $request->name,
                 'category_id' => $request->category_id,
-                'category' => $categoryName,
                 'barcode' => $request->barcode,
                 'price' => $request->price,
                 'stock' => $request->stock,
@@ -62,9 +59,8 @@ class ProductController extends Controller
 
             return response()->json([
                 'message' => 'Product created successfully',
-                'product' => $product,
+                'product' => $product->load('category'), // include category in response
             ]);
-
         } catch (QueryException $e) {
             if ($e->errorInfo[1] == 1062) {
                 return response()->json([
@@ -75,30 +71,24 @@ class ProductController extends Controller
         }
     }
 
-    // Update existing product
+    // Update product
     public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id);
 
         $request->validate([
             'name' => 'sometimes|required|string|max:255',
-            'category_id' => 'sometimes|required|exists:categories,id',
+            'category_id' => 'sometimes|required|integer|exists:categories,id',
             'barcode' => 'sometimes|required|integer|unique:products,barcode,' . $id,
-            'price' => 'sometimes|required|numeric|min:0',
-            'stock' => 'sometimes|required|integer|min:0',
+            'price' => 'sometimes|required|numeric',
+            'stock' => 'sometimes|required|integer',
         ]);
 
-        // If category_id is changed, update category name too
-        if ($request->has('category_id')) {
-            $request->merge([
-                'category' => Category::findOrFail($request->category_id)->name
-            ]);
-        }
-
-        $product->update($request->all());
+        $product->update($request->only(['name', 'category_id', 'barcode', 'price', 'stock']));
 
         return response()->json([
-            'message' => 'Product updated successfully'
+            'message' => 'Product updated successfully',
+            'product' => $product->load('category'), // include category in response
         ]);
     }
 
