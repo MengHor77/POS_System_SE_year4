@@ -135,8 +135,9 @@ export default {
         // Single filter input
         const filterText = ref("");
         const columns = [
+            { key: "id", label: "ID" },
             { key: "product", label: "Product" },
-            { key: "supplier_name", label: "Supplier" },
+            { key: "supplier_name", label: "Supplier Name" },
             { key: "quantity", label: "Quantity" },
             { key: "price", label: "Price" },
             { key: "actions", label: "Actions" },
