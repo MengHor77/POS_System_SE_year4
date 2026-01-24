@@ -21,7 +21,7 @@ class ProductController extends Controller
     // Apply search filter if exists
     if ($search) {
         $query->where('name', 'like', "%{$search}%")
-              ->orWhere('brand', 'like', "%{$search}%")
+              ->orWhere('Catagory', 'like', "%{$search}%")
               ->orWhere('barcode', 'like', "%{$search}%");
     }
 
@@ -43,7 +43,7 @@ class ProductController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'brand' => 'required|string|max:255',
+            'Catagory' => 'required|string|max:255', 
             'barcode' => 'required|integer|unique:products,barcode',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
@@ -73,8 +73,8 @@ class ProductController extends Controller
 
         $request->validate([
             'name'    => 'sometimes|required|string|max:255',
-            'brand'   => 'sometimes|required|string|max:255',
-            'barcode' => 'sometimes|required|integer|unique:products,barcode,' . $id,
+             'Catagory' => 'sometimes|required|string|max:255',
+             'barcode' => 'sometimes|required|integer|unique:products,barcode,' . $id,
             'price'   => 'sometimes|required|numeric',
             'stock'   => 'sometimes|required|integer',
         ]);

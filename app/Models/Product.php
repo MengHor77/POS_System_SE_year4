@@ -12,7 +12,8 @@ class Product extends Model
     // Fillable fields for mass assignment
     protected $fillable = [
         'name',
-        'brand',
+        'Catagory',    // old column
+        'category_id', // new foreign key
         'barcode',
         'price',
         'stock',
@@ -24,7 +25,17 @@ class Product extends Model
         'stock' => 'integer',
     ];
 
-    // Relation to Inventory (if you want pivot tracking)
+    /**
+     * Relationship: Product belongs to a Category
+     */
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * Relation to Inventory (optional pivot tracking)
+     */
     public function inventories()
     {
         return $this->hasMany(Inventory::class);
