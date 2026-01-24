@@ -58,7 +58,7 @@ export default defineComponent({
 
     // Fetch categories
     const fetchCategories = async () => {
-      const res = await axios.get("/admin/category");
+      const res = await axios.get("/admin/category/data");
       categories.value = res.data.data || res.data;
     };
     onMounted(fetchCategories);

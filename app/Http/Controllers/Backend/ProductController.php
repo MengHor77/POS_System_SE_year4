@@ -87,25 +87,33 @@ class ProductController extends Controller
     }
 
     // Update product
-    public function update(Request $request, $id)
-    {
-        $product = Product::findOrFail($id);
+   public function update(Request $request, $id)
+{
+    $product = Product::findOrFail($id);
 
-        $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'category_id' => 'sometimes|required|integer|exists:categories,id',
-            'barcode' => 'sometimes|required|integer|unique:products,barcode,' . $id,
-            'price' => 'sometimes|required|numeric',
-            'stock' => 'sometimes|required|integer',
-        ]);
+    $request->validate([
+        'name' => 'sometimes|required|string|max:255',
+        'category_id' => 'sometimes|required|integer|exists:categories,id',
+        'barcode' => 'sometimes|required|integer|unique:products,barcode,' . $id,
+        'price' => 'sometimes|required|numeric',
+        'stock' => 'sometimes|required|integer',
+    ]);
 
-        $product->update($request->only(['name', 'category_id', 'barcode', 'price', 'stock']));
+    $data = $request->only(['name', 'category_id', 'barcode', 'price', 'stock']);
 
-        return response()->json([
-            'message' => 'Product updated successfully',
-            'product' => $product->load('category'), // include category in response
-        ]);
+    // If category_id is changing, update the 'category' string column too
+    if ($request->has('category_id')) {
+        $categoryModel = Category::find($request->category_id);
+        $data['category'] = $categoryModel->name;
     }
+
+    $product->update($data);
+
+    return response()->json([
+        'message' => 'Product updated successfully',
+        'product' => $product->load('category'),
+    ]);
+}
 
     // Delete product
     public function destroy($id)
