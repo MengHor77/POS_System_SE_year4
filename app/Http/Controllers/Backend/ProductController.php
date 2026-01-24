@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
 
@@ -38,8 +39,10 @@ class ProductController extends Controller
     }
 
     // Store a new product
+// Store a new product
     public function store(Request $request)
     {
+        // 1. Validation
         $request->validate([
             'name' => 'required|string|max:255',
             'category_id' => 'required|integer|exists:categories,id', 
@@ -49,25 +52,37 @@ class ProductController extends Controller
         ]);
 
         try {
+            // 2. Fetch the category name to satisfy the 'category' string column in migration
+            $categoryModel = Category::findOrFail($request->category_id);
+            // 3. Create the product
             $product = Product::create([
-                'name' => $request->name,
+                'name'        => $request->name,
                 'category_id' => $request->category_id,
-                'barcode' => $request->barcode,
-                'price' => $request->price,
-                'stock' => $request->stock,
+                'category'    => $categoryModel->name, // <--- This fixes the "Save Fail"
+                'barcode'     => $request->barcode,
+                'price'       => $request->price,
+                'stock'       => $request->stock,
             ]);
 
             return response()->json([
                 'message' => 'Product created successfully',
-                'product' => $product->load('category'), // include category in response
+                'product' => $product->load('category'), 
             ]);
+
         } catch (QueryException $e) {
+            // Handle Duplicate Barcode (SQL Error 1062)
             if ($e->errorInfo[1] == 1062) {
                 return response()->json([
                     'message' => 'This barcode already exists. Please enter a new barcode.'
                 ], 409); 
             }
-            return response()->json(['message' => 'Failed to save product.'], 500);
+            
+            // Log other errors for debugging
+            \Log::error($e->getMessage());
+            
+            return response()->json([
+                'message' => 'Database error: ' . $e->getMessage()
+            ], 500);
         }
     }
 

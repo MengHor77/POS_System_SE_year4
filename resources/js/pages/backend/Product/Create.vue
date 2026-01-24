@@ -1,47 +1,23 @@
 <template>
-    <div
-        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-    >
-        <div
-            class="bg-bgCard p-6 rounded-2xl shadow-md w-full max-w-lg relative"
-        >
-            <!-- Close Button -->
-            <button
-                @click="$emit('close')"
-                class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold"
-            >
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-bgCard p-6 rounded-2xl shadow-md w-full max-w-lg relative">
+            <button @click="$emit('close')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold">
                 &times;
             </button>
 
-            <h2 class="text-2xl font-bold mb-4 text-primary">
-                Add New Product
-            </h2>
+            <h2 class="text-2xl font-bold mb-4 text-primary">Add New Product</h2>
 
             <form @submit.prevent="saveProduct" class="space-y-4">
                 <div>
                     <label class="block mb-1 font-semibold">Product Name</label>
-                    <input
-                        v-model="form.name"
-                        type="text"
-                        placeholder="Enter product name"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                        required
-                    />
+                    <input v-model="form.name" type="text" placeholder="Enter product name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" required />
                 </div>
 
                 <div>
                     <label class="block mb-1 font-semibold">Category</label>
-                    <select
-                        v-model="form.category_id"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                        required
-                    >
+                    <select v-model="form.category_id" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" required>
                         <option value="" disabled>Select category</option>
-                        <option
-                            v-for="cat in categories"
-                            :key="cat.id"
-                            :value="Number(cat.id)"
-                        >
+                        <option v-for="cat in categories" :key="cat.id" :value="cat.id">
                             {{ cat.name }}
                         </option>
                     </select>
@@ -49,54 +25,24 @@
 
                 <div>
                     <label class="block mb-1 font-semibold">Barcode</label>
-                    <input
-                        v-model.number="form.barcode"
-                        type="number"
-                        min="0"
-                        placeholder="Enter barcode"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                        required
-                    />
+                    <input v-model.number="form.barcode" type="number" min="0" placeholder="Enter barcode" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" required />
                 </div>
 
                 <div>
                     <label class="block mb-1 font-semibold">Price</label>
-                    <input
-                        v-model.number="form.price"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        placeholder="Enter price"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                        required
-                    />
+                    <input v-model.number="form.price" type="number" min="0" step="0.01" placeholder="Enter price" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" required />
                 </div>
 
                 <div>
                     <label class="block mb-1 font-semibold">Stock</label>
-                    <input
-                        v-model.number="form.stock"
-                        type="number"
-                        min="0"
-                        placeholder="Enter stock quantity"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                        required
-                    />
+                    <input v-model.number="form.stock" type="number" min="0" placeholder="Enter stock quantity" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" required />
                 </div>
 
                 <div class="flex justify-end gap-4 mt-4">
-                    <button
-                        type="button"
-                        @click="$emit('close')"
-                        class="px-4 py-2 rounded-lg bg-bgBtnCancel text-white hover:bg-bgBtnCancelHover"
-                    >
+                    <button type="button" @click="$emit('close')" class="px-4 py-2 rounded-lg bg-bgBtnCancel text-white hover:bg-bgBtnCancelHover">
                         Cancel
                     </button>
-
-                    <button
-                        type="submit"
-                        class="px-4 py-2 rounded-lg bg-bgBtnSave text-white hover:bg-bgBtnSaveHover"
-                    >
+                    <button type="submit" class="px-4 py-2 rounded-lg bg-bgBtnSave text-white hover:bg-bgBtnSaveHover">
                         Save
                     </button>
                 </div>
@@ -114,7 +60,7 @@ export default defineComponent({
     setup(_, { emit }) {
         const form = reactive({
             name: "",
-            category_id: null,
+            category_id: "", // Fixed: use empty string for the select dropdown
             barcode: null,
             price: null,
             stock: null,
@@ -123,7 +69,7 @@ export default defineComponent({
         const categories = ref<any[]>([]);
 
         const fetchCategories = async () => {
-            const res = await axios.get("/admin/category"); // API to get all categories
+            const res = await axios.get("/admin/category");
             categories.value = res.data.data || res.data;
         };
 
@@ -131,12 +77,22 @@ export default defineComponent({
 
         const saveProduct = async () => {
             try {
-                await axios.post("/admin/product", form);
+                // Prepare data: Ensure category_id is a number before sending
+                const payload = {
+                    ...form,
+                    category_id: Number(form.category_id)
+                };
+                
+                await axios.post("/admin/product", payload);
                 emit("created");
                 emit("close");
             } catch (error: any) {
                 if (error.response && error.response.status === 409) {
                     emit("error", error.response.data.message);
+                } else if (error.response && error.response.data.errors) {
+                    // This catches Laravel validation errors
+                    const validationMsgs = Object.values(error.response.data.errors).flat().join(" ");
+                    emit("error", validationMsgs);
                 } else {
                     emit("error", "Failed to save product.");
                 }
