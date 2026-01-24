@@ -1,46 +1,17 @@
 <template>
     <BackendLayout>
         <template #default>
-            <div class="container mx-auto">
-                <h1 class="text-2xl font-bold mb-4 text-primary">Sales Management</h1>
+            <div class="container mx-auto p-6">
+                <h1 class="text-2xl font-bold mb-4 text-primary">
+                    Sales Management
+                </h1>
 
-                <table class="min-w-full bg-white rounded-lg shadow">
-                    <thead>
-                        <tr>
-                            <th class="px-4 py-2 border">Product</th>
-                            <th class="px-4 py-2 border">Quantity</th>
-                            <th class="px-4 py-2 border">Total Amount</th>
-                            <th class="px-4 py-2 border">Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Show sales if exist -->
-                        <tr v-for="sale in sales" :key="sale.id">
-                            <td class="px-4 py-2 border">
-                                {{ sale.product_name }}
-                            </td>
-                            <td class="px-4 py-2 border">
-                                {{ sale.quantity }}
-                            </td>
-                            <td class="px-4 py-2 border">
-                                ${{ sale.total_amount }}
-                            </td>
-                            <td class="px-4 py-2 border">
-                                {{ sale.created_at }}
-                            </td>
-                        </tr>
-
-                        <!-- Show message if no sales -->
-                        <tr v-if="sales.length === 0">
-                            <td
-                                class="px-4 py-4 border text-center text-gray-500"
-                                colspan="4"
-                            >
-                                No sales to display.
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <Table :columns="columns" :data="sales" row-key="id">
+                    <!-- Optional: customize a cell with a slot -->
+                    <template #cell-total_amount="{ row }">
+                        ${{ row.total_amount }}
+                    </template>
+                </Table>
             </div>
         </template>
     </BackendLayout>
@@ -50,6 +21,7 @@
 import { defineComponent, ref, onMounted } from "vue";
 import BackendLayout from "../../../layouts/BackendLayout.vue";
 import axios from "axios";
+import Table from "../../../components/Table.vue";
 
 interface Sale {
     id: number;
@@ -61,9 +33,17 @@ interface Sale {
 
 export default defineComponent({
     name: "SaleIndex",
-    components: { BackendLayout },
+    components: { BackendLayout, Table },
     setup() {
         const sales = ref<Sale[]>([]);
+
+        const columns = [
+            { key: "id", label: "ID" },
+            { key: "product_name", label: "Product" },
+            { key: "quantity", label: "Quantity" },
+            { key: "total_amount", label: "Total Amount" },
+            { key: "created_at", label: "Date" },
+        ];
 
         const fetchSales = async () => {
             try {
@@ -71,13 +51,16 @@ export default defineComponent({
                 sales.value = res.data;
             } catch (error) {
                 console.error(error);
-                sales.value = []; // fallback
+                sales.value = [];
             }
         };
 
         onMounted(() => fetchSales());
 
-        return { sales };
+        return {
+            sales,
+            columns,
+        };
     },
 });
 </script>
