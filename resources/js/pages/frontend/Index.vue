@@ -1,7 +1,7 @@
 <template>
   <FrontendLayout>
-    <div class="flex flex-row gap-4 h-full bg-darkSoft p-4">
-      <section class="flex-1 flex flex-col overflow-hidden">
+    <div class="flex flex-row gap-4 h-full bg-darkSoft p-4 relative">
+      <section class="flex-1 flex flex-col overflow-hidden no-print">
         <div class="flex justify-between items-center mb-4 px-2">
           <h2 class="text-2xl font-bold text-white tracking-tight">Available Phones</h2>
           <SearchProduct v-model="search" @search="fetchProducts" />
@@ -13,12 +13,7 @@
           </div>
 
           <div v-else-if="products.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <CardProduct 
-              v-for="item in products" 
-              :key="item.id" 
-              :product="item" 
-              @add-to-cart="addToCart" 
-            />
+            <CardProduct v-for="item in products" :key="item.id" :product="item" @add-to-cart="addToCart" />
           </div>
 
           <div v-else class="flex flex-col items-center justify-center py-20 text-white/50">
@@ -28,12 +23,10 @@
         </div>
       </section>
 
-      <aside class="w-[400px] bg-white rounded-[30px] shadow-lg flex flex-col overflow-hidden my-2">
+      <aside class="w-[400px] bg-white rounded-[30px] shadow-lg flex flex-col overflow-hidden my-2 no-print">
         <div class="p-6 border-b flex justify-between items-center">
-          <h2 class="text-xl font-bold text-gray-900 uppercase tracking-tight">Current Order</h2>
-          <span class="bg-primary/10 text-primary text-xs font-bold px-2 py-1 rounded-full">
-            {{ cart.length }} Items
-          </span>
+          <h2 class="text-xl font-bold text-gray-900 uppercase tracking-tight">Current Items</h2>
+          <span class="bg-primary/10 text-primary text-xs font-bold px-2 py-1 rounded-full">{{ cart.length }} Items</span>
         </div>
         
         <div class="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
@@ -42,14 +35,7 @@
             <p class="font-medium">Your cart is empty</p>
           </div>
           
-          <CardItem 
-            v-for="item in cart" 
-            :key="item.id" 
-            :item="item" 
-            @increase="increaseQty"
-            @decrease="decreaseQty"
-            @remove="removeFromCart"
-          />
+          <CardItem v-for="item in cart" :key="item.id" :item="item" @increase="increaseQty" @decrease="decreaseQty" @remove="removeFromCart" />
         </div>
 
         <div class="p-6 border-t bg-white">
@@ -60,46 +46,46 @@
             </span>
           </div>
           <button 
-            @click="showPaymentModal = true"
-            :disabled="cart.length === 0"
-            class="w-full bg-[#0a0a14] text-white py-5 rounded-2xl font-bold text-xl hover:bg-primary transition-all active:scale-95 disabled:bg-gray-200 disabled:cursor-not-allowed"
+            @click="showPaymentModal = true" 
+            :disabled="cart.length === 0" 
+            class="w-full bg-[#0a0a14] text-white py-5 rounded-2xl font-bold text-xl hover:bg-primary transition-all active:scale-95 disabled:bg-gray-200"
           >
-            Place Order
+            Submit
           </button>
         </div>
       </aside>
+
+      <PaymentModal 
+        v-if="showPaymentModal" 
+        :total="cartTotal" 
+        :cartItems="cart"
+        @close="showPaymentModal = false"
+        @confirm="handleCheckout"
+      />
+
+      <div id="print-section">
+        <Receipt :items="cart" :total="cartTotal" />
+      </div>
     </div>
   </FrontendLayout>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, computed } from "vue";
+import { defineComponent, ref, onMounted, computed, nextTick } from "vue";
 import axios from "axios";
 import FrontendLayout from "../../layouts/FrontendLayout.vue";
 import CardProduct from "../../components/Frontend/CardProduct.vue";
 import SearchProduct from "../../components/Frontend/SearchProduct.vue";
 import CardItem from "../../components/Frontend/CardItem.vue";
-
-interface Product {
-  id: number;
-  name: string;
-  category: any;
-  category_id: number;
-  barcode: number;
-  price: number | string;
-  stock: number;
-}
-
-interface CartProduct extends Product {
-  qty: number;
-}
+import PaymentModal from "../../components/Frontend/PaymentModal.vue";
+import Receipt from "../../components/Frontend/Receipt.vue";
 
 export default defineComponent({
   name: "Home",
-  components: { FrontendLayout, CardProduct, SearchProduct, CardItem },
+  components: { FrontendLayout, CardProduct, SearchProduct, CardItem, PaymentModal, Receipt },
   setup() {
-    const products = ref<Product[]>([]);
-    const cart = ref<CartProduct[]>([]);
+    const products = ref<any[]>([]);
+    const cart = ref<any[]>([]);
     const search = ref("");
     const loading = ref(true);
     const showPaymentModal = ref(false);
@@ -107,56 +93,46 @@ export default defineComponent({
     const fetchProducts = async () => {
       loading.value = true;
       try {
-        const response = await axios.get("/admin/product/data", {
-          params: { search: search.value, per_page: 20 },
-        });
+        const response = await axios.get("/admin/product/data", { params: { search: search.value, per_page: 20 } });
         products.value = response.data.data || response.data;
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      } finally {
-        loading.value = false;
-      }
+      } catch (error) { console.error(error); } finally { loading.value = false; }
     };
 
-    const addToCart = (product: Product) => {
+    const addToCart = (product: any) => {
       if (product.stock <= 0) return;
       const existing = cart.value.find((item) => item.id === product.id);
-      if (existing) {
-        existing.qty++;
-      } else {
-        cart.value.push({ ...product, qty: 1 });
-      }
+      if (existing) { existing.qty++; } else { cart.value.push({ ...product, qty: 1 }); }
     };
 
-    // --- Cart Actions ---
-    const increaseQty = (id: number) => {
-      const item = cart.value.find(i => i.id === id);
-      if (item) item.qty++;
+    const increaseQty = (id: number) => { const item = cart.value.find(i => i.id === id); if (item) item.qty++; };
+    const decreaseQty = (id: number) => { 
+        const item = cart.value.find(i => i.id === id); 
+        if (item && item.qty > 1) item.qty--; else removeFromCart(id); 
+    };
+    const removeFromCart = (id: number) => { cart.value = cart.value.filter(i => i.id !== id); };
+
+    // Checkout and Print Logic
+    const handleCheckout = async () => {
+      // 1. Give Vue a millisecond to ensure the Receipt component is updated
+      await nextTick();
+      
+      // 2. Open printer dialog
+      window.print();
+
+      // 3. Clear data and close modal
+      alert("Order processed and receipt sent to printer.");
+      cart.value = [];
+      showPaymentModal.value = false;
     };
 
-    const decreaseQty = (id: number) => {
-      const item = cart.value.find(i => i.id === id);
-      if (item && item.qty > 1) {
-        item.qty--;
-      } else {
-        removeFromCart(id);
-      }
-    };
-
-    const removeFromCart = (id: number) => {
-      cart.value = cart.value.filter(i => i.id !== id);
-    };
-
-    const cartTotal = computed(() => {
-      return cart.value.reduce((acc, item) => acc + (Number(item.price) * item.qty), 0);
-    });
+    const cartTotal = computed(() => cart.value.reduce((acc, item) => acc + (Number(item.price) * item.qty), 0));
 
     onMounted(fetchProducts);
 
     return {
       products, cart, search, loading, showPaymentModal,
       fetchProducts, addToCart, cartTotal,
-      increaseQty, decreaseQty, removeFromCart
+      increaseQty, decreaseQty, removeFromCart, handleCheckout
     };
   },
 });
@@ -167,4 +143,24 @@ export default defineComponent({
 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
 .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
 aside .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.05); }
+
+/* Print Specific Styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  /* Ensure only the print-section is visible */
+  body * {
+    visibility: hidden;
+  }
+  #print-section, #print-section * {
+    visibility: visible;
+  }
+  #print-section {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}
 </style>
