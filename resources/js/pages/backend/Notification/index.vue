@@ -126,8 +126,8 @@ import { defineComponent, ref, onMounted } from "vue";
 import BackendLayout from "../../../layouts/BackendLayout.vue";
 import axios from "axios";
 import EditProduct from "./Edit.vue";
-import Pigination from "../../../components/Pigination.vue";
-import Filter from "../../../components/Filter.vue";
+import Pigination from "../../../components/Backend/Pigination.vue";
+import Filter from "../../../components/Backend/Filter.vue";
 
 interface Product {
     id: number;

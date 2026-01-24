@@ -101,13 +101,13 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from "vue";
 import BackendLayout from "../../../layouts/BackendLayout.vue";
-import Pigination from "../../../components/Pigination.vue";
+import Pigination from "../../../components/Backend/Pigination.vue";
 import CreateProduct from "./Create.vue";
 import EditProduct from "./Edit.vue";
 import axios from "axios";
-import Filter from "../../../components/Filter.vue";
-import FlassMessage from "../../../components/FlassMessage.vue";
-import Table from "../../../components/Table.vue";
+import Filter from "../../../components/Backend/Filter.vue";
+import FlassMessage from "../../../components/Backend/FlassMessage.vue";
+import Table from "../../../components/Backend/Table.vue";
 
 interface Product {
     id: number;

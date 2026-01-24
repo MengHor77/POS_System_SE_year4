@@ -27,8 +27,8 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, onUnmounted } from "vue";
-import Header from "../components/Header.vue";
-import Sidebar from "../components/Sidebar.vue";
+import Header from "../components/Backend/Header.vue";
+import Sidebar from "../components/Backend/Sidebar.vue";
 
 export default defineComponent({
     name: "BackendLayout",

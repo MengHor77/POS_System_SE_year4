@@ -91,10 +91,10 @@ import axios from "axios";
 import BackendLayout from "../../../layouts/BackendLayout.vue";
 import CreateSupplier from "./Create.vue";
 import EditSupplier from "./Edit.vue";
-import Pigination from "../../../components/Pigination.vue";
-import Filter from "../../../components/Filter.vue";
-import FlassMessage from "../../../components/FlassMessage.vue";
-import Table from "../../../components/Table.vue";
+import Pigination from "../../../components/Backend/Pigination.vue";
+import Filter from "../../../components/Backend/Filter.vue";
+import FlassMessage from "../../../components/Backend/FlassMessage.vue";
+import Table from "../../../components/Backend/Table.vue";
 
 interface Product {
     id: number;

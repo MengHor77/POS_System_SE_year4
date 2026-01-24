@@ -21,7 +21,7 @@
 import { defineComponent, ref, onMounted } from "vue";
 import BackendLayout from "../../../layouts/BackendLayout.vue";
 import axios from "axios";
-import Table from "../../../components/Table.vue";
+import Table from "../../../components/Backend/Table.vue";
 
 interface Sale {
     id: number;

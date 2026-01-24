@@ -97,10 +97,10 @@ import axios from "axios";
 import BackendLayout from "../../../layouts/BackendLayout.vue";
 import PurchaseOrderCreate from "./Create.vue";
 import PurchaseOrderEdit from "./Edit.vue";
-import Filter from "../../../components/Filter.vue";
-import Pigination from "../../../components/Pigination.vue";
-import FlashMessage from "../../../components/FlassMessage.vue";
-import Table from "../../../components/Table.vue";
+import Filter from "../../../components/Backend/Filter.vue";
+import Pigination from "../../../components/Backend/Pigination.vue";
+import FlashMessage from "../../../components/Backend/FlassMessage.vue";
+import Table from "../../../components/Backend/Table.vue";
 
 export default defineComponent({
     components: {

@@ -85,10 +85,10 @@
 import { defineComponent, ref, onMounted, watch } from "vue";
 import axios from "axios";
 import BackendLayout from "../../../layouts/BackendLayout.vue";
-import Table from "../../../components/Table.vue";
-import Pigination from "../../../components/Pigination.vue";
-import FlassMessage from "../../../components/FlassMessage.vue";
-import Filter from "../../../components/Filter.vue";
+import Table from "../../../components/Backend/Table.vue";
+import Pigination from "../../../components/Backend/Pigination.vue";
+import FlassMessage from "../../../components/Backend/FlassMessage.vue";
+import Filter from "../../../components/Backend/Filter.vue";
 import CreateCategory from "./Create.vue";
 import EditCategory from "./Edit.vue";
 

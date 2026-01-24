@@ -107,13 +107,13 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from "vue";
 import BackendLayout from "../../../layouts/BackendLayout.vue";
-import Pigination from "../../../components/Pigination.vue";
+import Pigination from "../../../components/Backend/Pigination.vue";
 import CreateCashier from "./Create.vue";
 import EditCashier from "./Edit.vue";
-import Filter from "../../../components/Filter.vue";
+import Filter from "../../../components/Backend/Filter.vue";
 import axios from "axios";
-import Table from "../../../components/Table.vue";
-import FlassMessage from "../../../components/FlassMessage.vue";
+import Table from "../../../components/Backend/Table.vue";
+import FlassMessage from "../../../components/Backend/FlassMessage.vue";
 
 interface Cashier {
     id: number;

@@ -156,7 +156,7 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from "vue";
 import axios from "axios";
-import CardDashboard from "../../../components/CardDashboard.vue";
+import CardDashboard from "../../../components/Backend/CardDashboard.vue";
 import BackendLayout from "../../../layouts/BackendLayout.vue";
 
 interface BestSellingProduct {
