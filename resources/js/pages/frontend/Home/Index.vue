@@ -142,11 +142,37 @@ export default defineComponent({
             cart.value = cart.value.filter((i) => i.id !== id);
         };
 
+        // Inside your Index.vue (where you handle <PaymentModal @confirm="handleCheckout" />)
+
         const handleCheckout = async () => {
-            await nextTick();
-            window.print();
-            cart.value = [];
-            showPaymentModal.value = false;
+            if (cart.value.length === 0) return;
+
+            try {
+                // 1. Save to Database
+                await axios.post("/pos/sale", {
+                    items: cart.value.map((item) => ({
+                        id: item.id,
+                        qty: item.qty,
+                        price: item.price,
+                    })),
+                });
+
+                // 2. Trigger Print
+                await nextTick();
+                window.print();
+
+                // 3. Reset UI
+                cart.value = [];
+                showPaymentModal.value = false;
+
+                // 4. Refresh products to show new stock levels
+                fetchProducts();
+
+                alert("Transaction Successful!");
+            } catch (err: any) {
+                console.error(err);
+                alert(err.response?.data?.message || "Failed to save sale");
+            }
         };
 
         const cartTotal = computed(() => {

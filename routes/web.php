@@ -36,6 +36,8 @@ Route::get('/pos', fn() => view('app'))->middleware('auth:web');
 // -------------------------------------------------------------------------
 Route::middleware(['auth:admin,web'])->group(function () {
     Route::get('/pos/product', [ProductController::class, 'index']);
+    Route::post('/pos/sale', [SaleController::class, 'store']);
+
 });
 
 // 5. Admin SPA Pages & API (Protected by auth:admin)
