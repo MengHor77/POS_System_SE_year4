@@ -11,6 +11,7 @@ class Sale extends Model
 
     protected $fillable = [
         'product_id',
+        'category_id',
         'cashier_id',
         'cashier_name',
         'cashier_email',
@@ -26,5 +27,10 @@ class Sale extends Model
     public function cashier()
     {
         return $this->belongsTo(Cashier::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 }
