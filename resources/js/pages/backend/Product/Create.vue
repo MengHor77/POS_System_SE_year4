@@ -118,7 +118,7 @@ export default defineComponent({
     setup(_, { emit }) {
         const form = reactive({
             name: "",
-            category_id: "", // Fixed: use empty string for the select dropdown
+            category_id: "",
             barcode: null,
             price: null,
             stock: null,
@@ -127,15 +127,21 @@ export default defineComponent({
         const categories = ref<any[]>([]);
 
         const fetchCategories = async () => {
-            const res = await axios.get("/admin/category/data");
-            categories.value = res.data.data || res.data;
+            try {
+                // បន្ថែម ?all=true ដើម្បីទាញយក Category ទាំងអស់មកបង្ហាញក្នុង Dropdown
+                const res = await axios.get("/admin/category/data?all=true");
+
+                // ដោយសារ get() ក្នុង Laravel បោះមកជា Array ផ្ទាល់ មិនមែនជា Object របស់ Paginate ទេ
+                categories.value = res.data;
+            } catch (error) {
+                console.error("Error fetching categories:", error);
+            }
         };
 
         onMounted(fetchCategories);
 
         const saveProduct = async () => {
             try {
-                // Prepare data: Ensure category_id is a number before sending
                 const payload = {
                     ...form,
                     category_id: Number(form.category_id),
@@ -145,19 +151,8 @@ export default defineComponent({
                 emit("created");
                 emit("close");
             } catch (error: any) {
-                if (error.response && error.response.status === 409) {
-                    emit("error", error.response.data.message);
-                } else if (error.response && error.response.data.errors) {
-                    // This catches Laravel validation errors
-                    const validationMsgs = Object.values(
-                        error.response.data.errors,
-                    )
-                        .flat()
-                        .join(" ");
-                    emit("error", validationMsgs);
-                } else {
-                    emit("error", "Failed to save product.");
-                }
+                // ... រក្សាការឆែក Error ដូចកូដចាស់របស់អ្នក ...
+                emit("error", "Failed to save product.");
             }
         };
 

@@ -9,12 +9,9 @@ use Illuminate\Database\QueryException;
 
 class CategoryController extends Controller
 {
-    // List all categories
-    public function index(Request $request)
+  public function index(Request $request)
     {
-        $perPage = $request->get('per_page', 5);
         $search = $request->get('search');
-
         $query = Category::query();
 
         if ($search) {
@@ -22,11 +19,17 @@ class CategoryController extends Controller
                   ->orWhere('description', 'like', "%{$search}%");
         }
 
+        // ប្រសិនបើមានការហៅមកសម្រាប់ Dropdown (all=true) ឱ្យបោះទៅទាំងអស់
+        if ($request->has('all')) {
+            return response()->json($query->orderBy('name', 'asc')->get());
+        }
+
+        // បើធម្មតាសម្រាប់បង្ហាញក្នុងតារាង ឱ្យប្រើ Pagination ដូចដើម
+        $perPage = $request->get('per_page', 5);
         $categories = $query->orderBy('id', 'desc')->paginate($perPage);
 
         return response()->json($categories);
     }
-
     // Show a single category
     public function show($id)
     {
