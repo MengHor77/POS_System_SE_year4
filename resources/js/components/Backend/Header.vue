@@ -17,7 +17,7 @@
                 </div>
                 <div class="flex flex-col items-start leading-tight">
                     <span class="font-bold text-gray-900 text-sm capitalize">
-                        {{ adminName || "Loading..." }}
+                        {{ adminName }}
                     </span>
                     <span
                         class="text-[10px] font-bold text-gray-500 uppercase tracking-widest"
@@ -44,15 +44,21 @@ import axios from "axios";
 
 export default defineComponent({
     setup() {
-        const adminName = ref("");
+        // ១. ចាប់យកឈ្មោះពី LocalStorage មកដាក់ក្នុង ref ភ្លាមៗ
+        const adminName = ref(
+            localStorage.getItem("admin_name") || "Admin User",
+        );
 
         const fetchAdminProfile = async () => {
             try {
                 const response = await axios.get("/admin/me");
-                adminName.value = response.data.name;
+                if (response.data && response.data.name) {
+                    // ២. រក្សាទុកក្នុង ref និង LocalStorage សម្រាប់លើកក្រោយ
+                    adminName.value = response.data.name;
+                    localStorage.setItem("admin_name", response.data.name);
+                }
             } catch (error) {
                 console.error("Failed to fetch admin profile", error);
-                adminName.value = "Admin User";
             }
         };
 
@@ -60,8 +66,11 @@ export default defineComponent({
             if (!confirm("Are you sure you want to logout?")) return;
             try {
                 await axios.post("/admin/logout");
+                // ៣. លុបទិន្នន័យចេញពី LocalStorage ពេល Logout
+                localStorage.removeItem("admin_name");
                 window.location.href = "/admin/login";
             } catch (error) {
+                localStorage.removeItem("admin_name");
                 window.location.href = "/admin/login";
             }
         };
@@ -79,7 +88,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-/* បន្ថែម Font បើចាំបាច់ */
 .tracking-widest {
     letter-spacing: 0.1em;
 }
