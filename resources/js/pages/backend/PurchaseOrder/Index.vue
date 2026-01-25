@@ -7,85 +7,79 @@
                 </h1>
             </div>
 
-            <div class="flex flex-row gap-3 w-full pb-6">
+            <div class="flex flex-row gap-3 w-full pb-6 items-center">
                 <div class="w-50">
                     <button
                         @click="showCreate = true"
-                        class="px-4 py-2 rounded bg-dark text-white hover:bg-darkSoft transition shadow-soft"
+                        class="px-4 py-2 rounded-xl bg-dark text-white hover:bg-darkSoft transition shadow-md flex items-center gap-2"
                     >
-                        New Purchase Order
+                        <i class="fas fa-plus"></i> New Purchase Order
                     </button>
                 </div>
-                <!-- Filter -->
+
                 <div class="w-80">
                     <Filter
                         v-model="filterText"
-                        placeholder="Search by Product or Supplier"
-                        @filter="fetch(1)"
-                        containerClass="px-2 flex gap-2 w-full"
-                        inputClass="border p-2 rounded flex-1"
-                        buttonClass="bg-dark hover:bg-darkSoft text-white px-4 py-2 rounded"
+                        placeholder="Search ID, Product or Supplier..."
+                        @search="fetch(1)"
                     />
                 </div>
             </div>
-            <div>
-                <FlashMessage
-                    v-if="flash"
-                    :message="flash.message"
-                    :type="flash.type"
-                />
-            </div>
-            <!-- Table -->
-            <Table :columns="columns" :data="purchaseOrders">
-                <!-- No column -->
-                <template #cell-no="{ index }">
-                    {{ (currentPage - 1) * perPage + index + 1 }}
-                </template>
 
-                <!-- Product column -->
-                <template #cell-product="{ row }">
-                    {{ row.product?.name }}
-                </template>
-
-                <!-- Actions column -->
-                <template #cell-actions="{ row }">
-                    <div class="flex gap-2">
-                        <button
-                            @click="openEdit(row)"
-                            class="px-3 py-1 rounded-lg bg-blue-100 text-bgBtnEdit hover:bg-bgBtnEdit hover:text-white transition"
-                        >
-                            <i class="fas fa-pen"></i>
-                        </button>
-                        <button
-                            @click="deletePO(row.id)"
-                            class="px-3 py-1 rounded-lg bg-dangerSoft text-danger hover:bg-bgBtnDelete hover:text-white transition"
-                        >
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </template>
-
-                <!-- Empty state -->
-                <template #empty>
-                    <tr>
-                        <td colspan="6" class="text-center py-8 text-muted">
-                            No purchase orders found
-                        </td>
-                    </tr>
-                </template>
-            </Table>
-
-            <!-- Modals -->
-            <PurchaseOrderCreate
-                v-if="showCreate"
-                @close="showCreate = false"
-                @saved="onCreated"
+            <FlashMessage
+                v-if="flash"
+                :message="flash.message"
+                :type="flash.type"
             />
-            <PurchaseOrderEdit
-                v-if="showEdit"
-                :orderId="editId!"
-                @close="closeEditModal"
-                @updated="onUpdated"
+
+            <div class="bg-white rounded-2xl shadow-sm overflow-hidden mt-2">
+                <Table :columns="columns" :data="purchaseOrders">
+                    <template #cell-product="{ row }">
+                        <span class="font-medium text-gray-700">{{
+                            row.product?.name
+                        }}</span>
+                    </template>
+
+                    <template #cell-status="{ row }">
+                        <span
+                            :class="
+                                row.status === 'completed'
+                                    ? 'text-green-600'
+                                    : 'text-orange-600'
+                            "
+                            class="capitalize"
+                        >
+                            {{ row.status || "Pending" }}
+                        </span>
+                    </template>
+
+                    <template #cell-actions="{ row }">
+                        <div class="flex gap-2">
+                            <button
+                                @click="openEdit(row)"
+                                class="px-3 py-1 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-600 hover:text-white transition"
+                            >
+                                <i class="fas fa-pen text-sm"></i>
+                            </button>
+                            <button
+                                @click="deletePO(row.id)"
+                                class="px-3 py-1 rounded-lg bg-red-100 text-red-600 hover:bg-red-600 hover:text-white transition"
+                            >
+                                <i class="fas fa-trash text-sm"></i>
+                            </button>
+                        </div>
+                    </template>
+                </Table>
+            </div>
+
+            <Pigination
+                v-if="total > perPage"
+                class="mt-6"
+                :current-page="currentPage"
+                :last-page="lastPage"
+                :total="total"
+                :per-page="perPage"
+                @page-change="fetch"
             />
         </div>
     </BackendLayout>
@@ -143,21 +137,27 @@ export default defineComponent({
             type: "success" | "error" = "success",
         ) => {
             flash.value = { message, type };
+            setTimeout(() => {
+                flash.value = null;
+            }, 3000);
         };
 
         const fetch = async (page = 1) => {
-            currentPage.value = page;
-            const res = await axios.get("/admin/purchase-order/data", {
-                params: {
-                    search: filterText.value,
-                    page,
-                    per_page: perPage.value,
-                },
-            });
-            purchaseOrders.value = res.data.data;
-            lastPage.value = res.data.last_page;
-            perPage.value = res.data.per_page;
-            total.value = res.data.total;
+            try {
+                const res = await axios.get("/admin/purchase-order/data", {
+                    params: {
+                        search: filterText.value,
+                        page,
+                        per_page: perPage.value,
+                    },
+                });
+                purchaseOrders.value = res.data.data;
+                currentPage.value = res.data.current_page;
+                lastPage.value = res.data.last_page;
+                total.value = res.data.total;
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
         };
 
         const openEdit = (po: any) => {
@@ -165,31 +165,26 @@ export default defineComponent({
             showEdit.value = true;
         };
 
-        const closeEditModal = () => {
-            showEdit.value = false;
-            editId.value = null;
-        };
-
         const deletePO = async (id: number) => {
-            if (!confirm("Delete this purchase order?")) return;
+            if (!confirm("Are you sure you want to delete this order?")) return;
             try {
                 await axios.delete(`/admin/purchase-order/${id}`);
-                showFlash("Purchase order deleted!", "success");
+                showFlash("Order deleted successfully!");
                 fetch(currentPage.value);
             } catch {
-                showFlash("Failed to delete purchase order.", "error");
+                showFlash("Delete failed!", "error");
             }
         };
 
         const onCreated = () => {
             showCreate.value = false;
-            showFlash("Purchase order created!", "success");
-            fetch(currentPage.value);
+            showFlash("Order created!");
+            fetch(1); // ត្រឡប់ទៅទំព័រទី១ ដើម្បីឃើញទិន្នន័យថ្មី
         };
 
         const onUpdated = () => {
             showEdit.value = false;
-            showFlash("Purchase order updated!", "success");
+            showFlash("Order updated!");
             fetch(currentPage.value);
         };
 
@@ -207,12 +202,10 @@ export default defineComponent({
             total,
             fetch,
             openEdit,
-            closeEditModal,
             deletePO,
             onCreated,
             onUpdated,
             flash,
-            showFlash,
             columns,
         };
     },
