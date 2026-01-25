@@ -3,7 +3,7 @@
         <template #default>
             <div class="container mx-auto p-6 bg-bgMain min-h-screen">
                 <div
-                    class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4"
+                    class="flex flex-col md:flex-row flex-row-gap-3 items-start md:items-center mb-6 gap-4"
                 >
                     <h1 class="text-2xl font-bold text-primary">
                         Sales Management
