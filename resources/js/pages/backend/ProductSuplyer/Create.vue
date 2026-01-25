@@ -12,7 +12,9 @@
                 &times;
             </button>
 
-            <h2 class="text-2xl font-bold mb-4 text-primary">Add product Supplier</h2>
+            <h2 class="text-2xl font-bold mb-4 text-primary">
+                Add product Supplier
+            </h2>
 
             <form @submit.prevent="save" class="space-y-4">
                 <div>
@@ -100,14 +102,25 @@ export default defineComponent({
         const products = ref<Product[]>([]);
 
         const fetchProducts = async () => {
-            const res = await axios.get("/admin/product/data");
-            products.value = res.data.data;
+            try {
+                // ១. បន្ថែម ?all=true ដើម្បីបានផលិតផលទាំងអស់
+                const res = await axios.get("/admin/product/data?all=true");
+
+                // ២. កែពី res.data.data មក res.data ព្រោះវាជា Array ផ្ទាល់
+                products.value = res.data;
+            } catch (error) {
+                console.error("Failed to fetch products:", error);
+            }
         };
 
         const save = async () => {
-            await axios.post("/admin/supplier", form);
-            emit("created");
-            emit("close");
+            try {
+                await axios.post("/admin/supplier", form);
+                emit("created");
+                emit("close");
+            } catch (error) {
+                alert("Failed to save supplier info.");
+            }
         };
 
         onMounted(fetchProducts);
@@ -116,7 +129,6 @@ export default defineComponent({
     },
 });
 </script>
-
 <style scoped>
 .input-field {
     width: 100%;

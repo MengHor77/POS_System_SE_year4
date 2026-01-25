@@ -10,36 +10,38 @@ use Illuminate\Database\QueryException;
 
 class ProductController extends Controller
 {
-    // List all products
+  
+
     public function index(Request $request)
     {
-        $perPage = $request->get('per_page', 5);
         $search = $request->get('search');
-
-        // Start query and eager load category
         $query = Product::with('category');
 
         if ($search) {
             $query->where('name', 'like', "%{$search}%")
-                  ->orWhere('barcode', 'like', "%{$search}%")
-                  ->orWhereHas('category', function ($q) use ($search) {
-                      $q->where('name', 'like', "%{$search}%");
-                  });
+                ->orWhere('barcode', 'like', "%{$search}%")
+                ->orWhereHas('category', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                });
         }
 
+        // ប្រសិនបើមាន Parameter ?all=true ឱ្យបោះទិន្នន័យទាំងអស់ (សម្រាប់ Dropdown)
+        if ($request->has('all')) {
+            return response()->json($query->orderBy('name', 'asc')->get());
+        }
+
+        // សម្រាប់បង្ហាញក្នុងតារាង (Table) ប្រើ Pagination ដូចដើម
+        $perPage = $request->get('per_page', 5);
         $products = $query->orderBy('id', 'desc')->paginate($perPage);
 
         return response()->json($products);
     }
-
     public function show($id)
     {
         $product = Product::with('category')->findOrFail($id);
         return response()->json($product);
     }
 
-    // Store a new product
-// Store a new product
     public function store(Request $request)
     {
         // 1. Validation

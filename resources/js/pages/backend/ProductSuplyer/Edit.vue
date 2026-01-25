@@ -5,7 +5,6 @@
         <div
             class="bg-bgCard p-6 rounded-2xl shadow-md w-full max-w-lg relative"
         >
-            <!-- Close Button -->
             <button
                 @click="$emit('close')"
                 class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold"
@@ -14,7 +13,7 @@
             </button>
 
             <h2 class="text-2xl font-bold mb-4 text-primary">
-                Edit product Supplier
+                Edit Product Supplier
             </h2>
 
             <form @submit.prevent="updateSupplier" class="space-y-4">
@@ -25,6 +24,13 @@
                         class="input-field"
                         required
                     >
+                        <option value="" disabled>
+                            {{
+                                products.length
+                                    ? "Select product"
+                                    : "Loading products..."
+                            }}
+                        </option>
                         <option v-for="p in products" :key="p.id" :value="p.id">
                             {{ p.name }}
                         </option>
@@ -79,8 +85,9 @@
                     <button
                         type="submit"
                         class="px-4 py-2 rounded bg-bgBtnSave hover:bg-bgBtnSaveHover text-white"
+                        :disabled="loading"
                     >
-                        Save
+                        {{ loading ? "Saving..." : "Save Changes" }}
                     </button>
                 </div>
             </form>
@@ -116,21 +123,22 @@ export default defineComponent({
         const loading = ref(false);
 
         const fetchProducts = async () => {
-            if (products.value.length) return;
-            const res = await axios.get("/admin/product/data");
-            products.value = res.data.data;
+            try {
+                //  បន្ថែម ?all=true ដើម្បីទាញយកផលិតផលទាំងអស់
+                const res = await axios.get("/admin/product/data?all=true");
+
+                //  កែសម្រួលការចាប់យកទិន្នន័យ (res.data ជា Array ផ្ទាល់ មិនមែន res.data.data ទេ)
+                products.value = res.data;
+            } catch (error) {
+                console.error("Error fetching products:", error);
+            }
         };
 
         watch(
             () => props.supplier,
             async (val) => {
                 if (!val) return;
-
-                // wait until products are loaded
-                if (products.value.length === 0) {
-                    await fetchProducts();
-                }
-
+                // បញ្ចូលទិន្នន័យថ្មីទៅក្នុង form ពេល props ផ្លាស់ប្តូរ
                 Object.assign(form, val);
             },
             { immediate: true },
@@ -139,10 +147,7 @@ export default defineComponent({
         const updateSupplier = async () => {
             try {
                 loading.value = true;
-
                 const res = await axios.put(`/admin/supplier/${form.id}`, form);
-
-                // 🔥 SEND UPDATED SUPPLIER BACK
                 emit("updated", res.data.data);
                 emit("close");
             } catch (e) {
@@ -152,7 +157,9 @@ export default defineComponent({
             }
         };
 
-        onMounted(fetchProducts);
+        onMounted(() => {
+            fetchProducts();
+        });
 
         return { form, products, updateSupplier, loading };
     },
