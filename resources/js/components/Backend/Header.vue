@@ -68,10 +68,10 @@ export default defineComponent({
                 await axios.post("/admin/logout");
                 // ៣. លុបទិន្នន័យចេញពី LocalStorage ពេល Logout
                 localStorage.removeItem("admin_name");
-                window.location.href = "/admin/login";
+                window.location.href = "/";
             } catch (error) {
                 localStorage.removeItem("admin_name");
-                window.location.href = "/admin/login";
+                window.location.href = "/";
             }
         };
 
