@@ -5,72 +5,69 @@
                 Cashiers Management
             </h1>
 
-            <div class="flex flex-row gap-3 w-full pb-6">
+            <div class="flex flex-row gap-3 w-full pb-6 items-center">
                 <div class="w-50">
-                    <!-- Add New Cashier -->
                     <button
                         @click="showCreateModal = true"
-                        class="mb-4 bg-dark text-white px-4 py-2 rounded hover:bg-darkSoft"
+                        class="bg-dark text-white px-4 py-2 rounded-xl hover:bg-darkSoft transition shadow-md flex items-center gap-2"
                     >
-                        Add New Cashier
+                        <i class="fas fa-plus"></i> Add New Cashier
                     </button>
                 </div>
 
                 <div class="w-80">
-                    <!-- Search -->
                     <SearchInput
                         v-model="search"
-                        placeholder="Filter by name or email"
-                        @filter="fetchCashiers(1)"
-                        containerClass="px-2 flex gap-2 w-full"
-                        inputClass="border p-2 rounded flex-1"
-                        buttonClass="bg-dark hover:bg-darkSoft text-white px-4 py-2 rounded"
+                        placeholder="Search by ID, Name or Email..."
+                        @search="fetchCashiers(1)"
                     />
                 </div>
             </div>
-            <FlassMessage
+
+            <FlashMessage
                 v-if="message"
                 :message="message"
                 :type="messageType"
             />
 
-            <Table :columns="columns" :data="cashiers">
-                <!-- Status column -->
-                <template #cell-status="{ row }">
-                    <span
-                        @click="toggleStatus(row)"
-                        :class="[
-                            'cursor-pointer px-2 py-1 text-xs rounded-full text-white',
-                            row.status === 'active'
-                                ? 'bg-green-500'
-                                : 'bg-red-500',
-                        ]"
-                    >
-                        {{ row.status }}
-                    </span>
-                </template>
-
-                <!-- Actions column -->
-                <template #cell-actions="{ row }">
-                    <div class="flex gap-2">
-                        <button
-                            @click="openEditModal(row)"
-                            class="px-3 py-1 rounded-lg bg-blue-100 text-bgBtnEdit hover:bg-bgBtnEdit hover:text-white transition"
+            <div class="bg-white rounded-2xl shadow-sm overflow-hidden mt-2">
+                <Table :columns="columns" :data="cashiers">
+                    <template #cell-status="{ row }">
+                        <span
+                            @click="toggleStatus(row)"
+                            :class="[
+                                'cursor-pointer px-3 py-1 text-xs rounded-full text-white capitalize font-medium',
+                                row.status === 'active'
+                                    ? 'bg-green-500'
+                                    : 'bg-red-500',
+                            ]"
                         >
-                            <i class="fas fa-pen"></i>
-                        </button>
-                        <button
-                            @click="deleteCashier(row.id)"
-                            class="px-3 py-1 rounded-lg bg-dangerSoft text-danger hover:bg-bgBtnDelete hover:text-white transition"
-                        >
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </template>
-            </Table>
+                            {{ row.status }}
+                        </span>
+                    </template>
 
-            <!-- Pagination -->
-            <Pigination
+                    <template #cell-actions="{ row }">
+                        <div class="flex gap-2">
+                            <button
+                                @click="openEditModal(row)"
+                                class="px-3 py-1 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-600 hover:text-white transition"
+                            >
+                                <i class="fas fa-pen text-sm"></i>
+                            </button>
+                            <button
+                                @click="deleteCashier(row.id)"
+                                class="px-3 py-1 rounded-lg bg-red-100 text-red-600 hover:bg-red-600 hover:text-white transition"
+                            >
+                                <i class="fas fa-trash text-sm"></i>
+                            </button>
+                        </div>
+                    </template>
+                </Table>
+            </div>
+
+            <Pagination
+                v-if="pagination.total > pagination.per_page"
+                class="mt-6"
                 :current-page="pagination.current_page"
                 :last-page="pagination.last_page"
                 :total="pagination.total"
@@ -78,27 +75,17 @@
                 @page-change="fetchCashiers"
             />
 
-            <!-- Modals -->
             <CreateCashier
                 v-if="showCreateModal"
                 @close="showCreateModal = false"
-                @created="
-                    () => {
-                        fetchCashiers(pagination.current_page);
-                        showMessage('Cashier created successfully', 'success');
-                    }
-                "
+                @created="onCreated"
             />
+
             <EditCashier
                 v-if="editingCashier"
                 :cashier="editingCashier"
                 @close="editingCashier = null"
-                @updated="
-                    () => {
-                        fetchCashiers(pagination.current_page);
-                        showMessage('Cashier updated successfully', 'success');
-                    }
-                "
+                @updated="onUpdated"
             />
         </div>
     </BackendLayout>
@@ -107,20 +94,19 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from "vue";
 import BackendLayout from "../../../layouts/BackendLayout.vue";
-import Pigination from "../../../components/Backend/Pigination.vue";
+import Pagination from "../../../components/Backend/Pigination.vue"; // Keep path, fixed name
 import CreateCashier from "./Create.vue";
 import EditCashier from "./Edit.vue";
 import SearchInput from "../../../components/Backend/SearchInput.vue";
 import axios from "axios";
 import Table from "../../../components/Backend/Table.vue";
-import FlassMessage from "../../../components/Backend/FlassMessage.vue";
+import FlashMessage from "../../../components/Backend/FlassMessage.vue"; // Keep path, fixed name
 
 interface Cashier {
     id: number;
     name: string;
     email: string;
     status: "active" | "inactive";
-    password?: string;
     old_password?: string;
     new_password?: string;
     confirm_password?: string;
@@ -130,12 +116,12 @@ export default defineComponent({
     name: "CashierIndex",
     components: {
         BackendLayout,
-        Pigination,
+        Pagination,
         CreateCashier,
         EditCashier,
         SearchInput,
         Table,
-        FlassMessage,
+        FlashMessage,
     },
     setup() {
         const cashiers = ref<Cashier[]>([]);
@@ -178,7 +164,7 @@ export default defineComponent({
                     params: {
                         page,
                         per_page: pagination.value.per_page,
-                        search: search.value,
+                        search: search.value, // This works for ID, Name, and Email now
                     },
                 });
                 cashiers.value = res.data.data;
@@ -203,11 +189,12 @@ export default defineComponent({
         };
 
         const deleteCashier = async (id: number) => {
-            if (!confirm("Are you sure?")) return;
+            if (!confirm("Are you sure you want to delete this cashier?"))
+                return;
             try {
                 await axios.delete(`/admin/cashier/${id}`);
                 fetchCashiers(pagination.value.current_page);
-                showMessage("Cashier deleted successfully", "success");
+                showMessage("Cashier deleted successfully");
             } catch (error) {
                 showMessage("Failed to delete cashier", "error");
             }
@@ -217,10 +204,22 @@ export default defineComponent({
             try {
                 await axios.patch(`/admin/cashier/${cashier.id}/toggle-status`);
                 fetchCashiers(pagination.value.current_page);
-                showMessage("Status updated", "success");
+                showMessage("Status updated");
             } catch (error) {
                 showMessage("Failed to update status", "error");
             }
+        };
+
+        const onCreated = () => {
+            showCreateModal.value = false;
+            fetchCashiers(1);
+            showMessage("Cashier created successfully");
+        };
+
+        const onUpdated = () => {
+            editingCashier.value = null;
+            fetchCashiers(pagination.value.current_page);
+            showMessage("Cashier updated successfully");
         };
 
         onMounted(() => fetchCashiers());
@@ -239,6 +238,8 @@ export default defineComponent({
             message,
             messageType,
             showMessage,
+            onCreated,
+            onUpdated,
         };
     },
 });

@@ -49,7 +49,7 @@ class CashierController extends Controller
     }
 
     // ==========================================
-    //  MANAGEMENT ( CashierController)
+    //  MANAGEMENT (CashierController)
     // ==========================================
 
     public function index(Request $request)
@@ -60,8 +60,12 @@ class CashierController extends Controller
         $query = Cashier::query();
 
         if ($search) {
-            $query->where('name', 'like', "%$search%")
-                  ->orWhere('email', 'like', "%$search%");
+            // This group handles searching by ID, Name, or Email
+            $query->where(function ($q) use ($search) {
+                $q->where('id', $search) // Exact match for ID
+                  ->orWhere('name', 'like', "%$search%") // Partial match for Name
+                  ->orWhere('email', 'like', "%$search%"); // Partial match for Email
+            });
         }
 
         $cashiers = $query->orderBy('id', 'desc')->paginate($perPage);
@@ -86,7 +90,7 @@ class CashierController extends Controller
         $cashier = Cashier::create([
             'name'     => $request->name,
             'email'    => $request->email,
-            'password' => $request->password,
+            'password' => $request->password, // Ensure your Model hashes this or use Hash::make()
             'status'   => 'active',
         ]);
 
