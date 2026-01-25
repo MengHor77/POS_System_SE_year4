@@ -35,7 +35,7 @@
       Stock: {{ product.stock }}
     </div>
 
-    <span class="mt-3 text-lg  font-mono">
+    <span class="mt-3 text-sm font-mono">
       Code: {{ product.barcode }}
     </span>
   </div>

@@ -181,7 +181,7 @@ export default defineComponent({
     width: 6px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.05);
+    background: rgba(128, 132, 131, 0.582);
     border-radius: 10px;
 }
 

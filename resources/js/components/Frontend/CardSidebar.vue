@@ -25,7 +25,7 @@
 
     <div class="p-6 border-t bg-white">
       <div class="flex justify-between items-end mb-6">
-        <span class="text-gray-500 font-bold uppercase text-xs tracking-widest">Total Amount</span>
+        <span class="text-gray-500 uppercase text-xs tracking-widest">Total Amount</span>
         <span class="text-4xl font-black text-gray-900 tracking-tighter">
           ${{ total.toLocaleString(undefined, { minimumFractionDigits: 2 }) }}
         </span>
@@ -55,3 +55,16 @@ export default defineComponent({
   emits: ["increase", "decrease", "remove", "submit"]
 });
 </script>
+<style scoped>
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(128, 132, 131, 0.582);
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+</style>

@@ -9,7 +9,7 @@
                 >
                     {{ item.name }}
                 </span>
-                <span class="text-xs text-gray-400 font-medium mt-1">
+                <span class="text-xs text-gray-600 font-medium mt-1">
                     ${{ Number(item.price).toFixed(2) }} / unit
                 </span>
             </div>
