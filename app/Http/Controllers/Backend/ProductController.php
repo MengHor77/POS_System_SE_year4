@@ -32,7 +32,7 @@ class ProductController extends Controller
         return response()->json($query->orderBy('name', 'asc')->get());
     }
 
-    $perPage = $request->get('per_page', 10);
+    $perPage = $request->get('per_page', 5);
     $products = $query->orderBy('id', 'desc')->paginate($perPage);
 
     return response()->json($products);
@@ -61,7 +61,7 @@ class ProductController extends Controller
             $product = Product::create([
                 'name'        => $request->name,
                 'category_id' => $request->category_id,
-                'category'    => $categoryModel->name, // <--- This fixes the "Save Fail"
+                'category'    => $categoryModel->name, 
                 'barcode'     => $request->barcode,
                 'price'       => $request->price,
                 'stock'       => $request->stock,
