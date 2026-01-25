@@ -9,25 +9,27 @@ use Illuminate\Http\Request;
 class ProductSupplierController extends Controller
 {
     public function index(Request $request)
-    {
-        $perPage = $request->per_page ?? 5;
-        $search = $request->search;
+{
+    $perPage = $request->per_page ?? 5;
+    $search = $request->search;
 
-        $query = ProductSupplier::with('product');
+    $query = ProductSupplier::with('product');
 
-        if ($search) {
-            $query->where(function($q) use ($search) {
-                $q->where('supplier_name', 'like', "%{$search}%")
-                ->orWhereHas('product', function($q2) use ($search) {
-                    $q2->where('name', 'like', "%{$search}%");
-                });
+    if ($search) {
+        $query->where(function($q) use ($search) {
+            $q->where('id', 'like', "%{$search}%")
+            ->orWhere('supplier_name', 'like', "%{$search}%")
+            ->orWhereHas('product', function($q2) use ($search) {
+                $q2->where('name', 'like', "%{$search}%");
             });
-        }
-
-        $suppliers = $query->paginate($perPage);
-        return response()->json($suppliers);
+        });
     }
 
+    // តម្រៀបតាម ID ពីធំមកតូច ដើម្បីឱ្យទិន្នន័យថ្មីនៅខាងលើ
+    $suppliers = $query->orderBy('id', 'desc')->paginate($perPage);
+    
+    return response()->json($suppliers);
+}
     // Store new supplier
     public function store(Request $request)
     {

@@ -2,71 +2,71 @@
     <BackendLayout>
         <div class="p-6 bg-bgMain min-h-screen">
             <h1 class="text-3xl font-bold mb-6 text-primary">
-                Product Suppliers management
+                Product Suppliers Management
             </h1>
 
             <FlassMessage :message="flashMessage" :type="flashType" />
 
-            <!-- Add Supplier Button -->
-            <div class="flex flex-row gap-3 w-full pb-6">
+            <div class="flex flex-row gap-3 w-full pb-6 items-center">
                 <div class="w-50">
                     <button
                         @click="showCreate = true"
-                        class="bg-dark text-white px-4 py-2 rounded hover:bg-darkSoft"
+                        class="bg-dark text-white px-4 py-2 rounded-xl hover:bg-darkSoft shadow-md transition-all flex items-center gap-2"
                     >
-                        Add new product Supplier
+                        <i class="fas fa-plus"></i> Add New Supplier
                     </button>
                 </div>
-                <!-- Single Filter -->
                 <div class="w-80">
-                    <Filter
+                    <SearchInput
                         v-model="filterText"
-                        placeholder="Search by Product or Supplier"
-                        @filter="() => fetch(1)"
-                        containerClass="px-2 flex gap-2 w-full"
-                        inputClass="border p-2 rounded flex-1"
-                        buttonClass="bg-dark hover:bg-darkSoft text-white px-4 py-2 rounded"
+                        placeholder="Search ID, Product, or Supplier..."
+                        @search="fetch(1)"
                     />
                 </div>
             </div>
 
-            <!-- Suppliers Table -->
-            <Table :columns="columns" :data="suppliers">
-                <!-- Product column -->
-                <template #cell-product="{ row }">
-                    {{ row.product?.name || "Unknown" }}
-                </template>
+            <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+                <Table :columns="columns" :data="suppliers">
+                    <template #cell-product="{ row }">
+                        <span class="font-medium text-gray-800">
+                            {{ row.product?.name || "Unknown" }}
+                        </span>
+                    </template>
 
-                <!-- Actions column -->
-                <template #cell-actions="{ row }">
-                    <div class="flex gap-2">
-                        <button
-                            @click="edit(row)"
-                            class="px-3 py-1 rounded-lg bg-blue-100 text-bgBtnEdit hover:bg-bgBtnEdit hover:text-white transition"
+                    <template #cell-price="{ row }">
+                        <span class="font-bold text-gray-700"
+                            >${{ row.price }}</span
                         >
-                            <i class="fas fa-pen"></i>
-                        </button>
-                        <button
-                            @click="remove(row.id)"
-                            class="px-3 py-1 rounded-lg bg-dangerSoft text-danger hover:bg-bgBtnDelete hover:text-white transition"
-                        >
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </template>
-            </Table>
+                    </template>
 
-            <!-- Pagination -->
+                    <template #cell-actions="{ row }">
+                        <div class="flex gap-2">
+                            <button
+                                @click="edit(row)"
+                                class="px-3 py-1 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-600 hover:text-white transition"
+                            >
+                                <i class="fas fa-pen text-sm"></i>
+                            </button>
+                            <button
+                                @click="remove(row.id)"
+                                class="px-3 py-1 rounded-lg bg-red-100 text-red-600 hover:bg-red-600 hover:text-white transition"
+                            >
+                                <i class="fas fa-trash text-sm"></i>
+                            </button>
+                        </div>
+                    </template>
+                </Table>
+            </div>
+
             <Pigination
+                class="mt-6"
                 :current-page="pagination.current_page"
                 :last-page="pagination.last_page"
                 :total="pagination.total"
                 :per-page="pagination.per_page"
                 @page-change="fetch"
-                class="mt-4"
             />
 
-            <!-- Modals -->
             <CreateSupplier
                 v-if="showCreate"
                 @close="showCreate = false"
@@ -92,7 +92,7 @@ import BackendLayout from "../../../layouts/BackendLayout.vue";
 import CreateSupplier from "./Create.vue";
 import EditSupplier from "./Edit.vue";
 import Pigination from "../../../components/Backend/Pigination.vue";
-import Filter from "../../../components/Backend/SearchInput.vue";
+import SearchInput from "../../../components/Backend/SearchInput.vue";
 import FlassMessage from "../../../components/Backend/FlassMessage.vue";
 import Table from "../../../components/Backend/Table.vue";
 
@@ -123,7 +123,7 @@ export default {
         CreateSupplier,
         EditSupplier,
         Pigination,
-        Filter,
+        SearchInput,
         FlassMessage,
         Table,
     },
@@ -131,19 +131,19 @@ export default {
         const suppliers = ref<Supplier[]>([]);
         const showCreate = ref(false);
         const editing = ref<Supplier | null>(null);
-
-        // Single filter input
         const filterText = ref("");
+        const flashMessage = ref("");
+        const flashType = ref<"success" | "error">("success");
+
         const columns = [
             { key: "id", label: "ID" },
-            { key: "product", label: "Product" },
-            { key: "supplier_name", label: "Supplier Name" },
-            { key: "quantity", label: "Quantity" },
-            { key: "price", label: "Price" },
+            { key: "product", label: "Product Name" },
+            { key: "supplier_name", label: "Supplier" },
+            { key: "quantity", label: "Qty" },
+            { key: "price", label: "Unit Price" },
             { key: "actions", label: "Actions" },
         ];
 
-        // Pagination reactive object
         const pagination = reactive<Pagination>({
             current_page: 1,
             last_page: 1,
@@ -151,9 +151,6 @@ export default {
             per_page: 5,
         });
 
-        // Flash message
-        const flashMessage = ref("");
-        const flashType = ref<"success" | "error">("success");
         const showFlashMessage = (
             message: string,
             type: "success" | "error" = "success",
@@ -163,79 +160,53 @@ export default {
             setTimeout(() => (flashMessage.value = ""), 3000);
         };
 
-        // Fetch suppliers with single search filter
         const fetch = async (page = 1) => {
             try {
                 const res = await axios.get("/admin/supplier/data", {
                     params: {
                         page,
                         per_page: pagination.per_page,
-                        search: filterText.value, // single filter for Product or Supplier
+                        search: filterText.value,
                     },
                 });
 
-                suppliers.value = res.data.data.map((s: any) => ({
-                    id: s.id,
-                    supplier_name: s.supplier_name,
-                    quantity: s.quantity,
-                    price: s.price,
-                    product: s.product ?? { id: 0, name: "Unknown" },
-                    product_id: s.product_id,
-                }));
+                suppliers.value = res.data.data;
 
-                // Update pagination
+                // Sync Pagination
                 pagination.current_page = res.data.current_page;
                 pagination.last_page = res.data.last_page;
                 pagination.total = res.data.total;
                 pagination.per_page = res.data.per_page;
             } catch (err) {
-                console.error(err);
                 showFlashMessage("Failed to fetch suppliers.", "error");
             }
         };
 
-        // Edit supplier
         const edit = (item: Supplier) => {
             editing.value = { ...item };
         };
 
-        // Delete supplier
         const remove = async (id: number) => {
             if (!confirm("Are you sure you want to delete this supplier?"))
                 return;
             try {
                 await axios.delete(`/admin/supplier/${id}`);
-                showFlashMessage(
-                    "product Supplier deleted successfully!",
-                    "success",
-                );
+                showFlashMessage("Supplier deleted successfully!");
                 fetch(pagination.current_page);
             } catch (err) {
-                console.error(err);
                 showFlashMessage("Failed to delete supplier.", "error");
             }
         };
 
-        // Event handlers for Create/Edit
         const handleCreated = () => {
             fetch(1);
-            showFlashMessage(
-                "created product Supplier  successfully!",
-                "success",
-            );
+            showFlashMessage("Supplier created successfully!");
             showCreate.value = false;
         };
 
-        const handleUpdated = (updatedSupplier: Supplier) => {
-            const index = suppliers.value.findIndex(
-                (s) => s.id === updatedSupplier.id,
-            );
-
-            if (index !== -1) {
-                suppliers.value[index] = updatedSupplier;
-            }
-
-            showFlashMessage("Supplier updated successfully!", "success");
+        const handleUpdated = () => {
+            fetch(pagination.current_page);
+            showFlashMessage("Supplier updated successfully!");
             editing.value = null;
         };
 
@@ -256,7 +227,6 @@ export default {
             remove,
             flashMessage,
             flashType,
-            showFlashMessage,
             handleCreated,
             handleUpdated,
             handleError,
