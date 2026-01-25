@@ -4,14 +4,15 @@
             <h1 class="text-2xl font-bold mb-6 text-primary">
                 Inventory Management
             </h1>
-            <div class="w-96 py-6">
+            <div class="w-80 py-6">
                 <SearchInput
                     v-model="search"
-                    placeholder="Search products name or alert low stock "
-                    @filter="fetchProducts(1)"
-                    containerClass="flex gap-2 w-full "
-                    inputClass="border p-2 rounded flex-1 w-full"
-                    buttonClass="bg-dark hover:bg-darkSoft text-white px-4 py-2 rounded"
+                    placeholder="Search product name..."
+                    @input="handleSearch"
+                    @filter="handleSearch"
+                    containerClass="flex items-center bg-white border border-primary rounded-full px-4 py-1.5 focus-within:ring-2 focus-within:ring-primary/20 transition-all"
+                    inputClass="flex-1 outline-none bg-transparent text-sm ml-2"
+                    buttonClass="text-gray-400 hover:text-primary transition-colors"
                 />
             </div>
 
@@ -127,22 +128,32 @@ export default defineComponent({
         });
 
         const fetchProducts = async (page = 1) => {
-            const res = await axios.get("/admin/inventory/data", {
-                params: {
-                    page,
-                    per_page: pagination.value.per_page,
-                    search: search.value,
-                },
-            });
+            try {
+                const res = await axios.get("/admin/inventory/data", {
+                    params: {
+                        page: page,
+                        per_page: pagination.value.per_page,
+                        search: search.value, // This sends the search string to Laravel
+                    },
+                });
 
-            products.value = res.data.data;
+                products.value = res.data.data;
 
-            pagination.value = {
-                current_page: res.data.current_page,
-                last_page: res.data.last_page,
-                total: res.data.total,
-                per_page: res.data.per_page,
-            };
+                pagination.value = {
+                    current_page: res.data.current_page,
+                    last_page: res.data.last_page,
+                    total: res.data.total,
+                    per_page: res.data.per_page,
+                };
+            } catch (err) {
+                console.error("Search failed", err);
+            }
+        };
+
+        // This handles the @filter or @input event from your SearchInput component
+        const handleSearch = () => {
+            pagination.value.current_page = 1; // Reset to page 1 on new search
+            fetchProducts(1);
         };
 
         const openStockIn = (product: Product) => {
@@ -170,6 +181,7 @@ export default defineComponent({
             openStockOut,
             search,
             pagination,
+            handleSearch,
         };
     },
 });

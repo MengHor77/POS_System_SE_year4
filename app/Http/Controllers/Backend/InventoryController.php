@@ -9,27 +9,30 @@ use Illuminate\Support\Facades\DB;
 
 class InventoryController extends Controller
 {
-    /**
-     * Display inventory list (current stock levels)
-     */
+
     public function index(Request $request)
     {
         $search = $request->get('search');
+        $perPage = $request->get('per_page', 4);
 
-        $products = Product::when($search, function ($query) use ($search) {
-                $query->where('name', 'like', "%{$search}%")
-                      ->orWhere('barcode', 'like', "%{$search}%");
+        $products = Product::query()
+            ->when($search, function ($query) use ($search) {
+                $query->where(function($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('barcode', 'like', "%{$search}%");
+                    
+                    // Optional: If user types "low", show items under threshold
+                    if (strtolower($search) === 'low') {
+                        $q->orWhere('stock', '<=', 5);
+                    }
+                });
             })
-            ->orderBy('stock', 'asc')
-            ->paginate(4);
+            ->orderBy('stock', 'asc') // Keeps low stock at the top
+            ->paginate($perPage);
 
         return response()->json($products);
     }
 
-    /**
-     * Stock In (manual increase)
-     * Used when products arrive from suppliers
-     */
     public function stockIn(Request $request, $id)
     {
         $request->validate([
@@ -43,14 +46,7 @@ class InventoryController extends Controller
             // Increase stock
             $product->increment('stock', $request->qty);
 
-            // OPTIONAL: inventory log table (recommended)
-            // DB::table('inventory_logs')->insert([
-            //     'product_id' => $product->id,
-            //     'type' => 'IN',
-            //     'qty' => $request->qty,
-            //     'note' => $request->note,
-            //     'created_at' => now(),
-            // ]);
+             
         });
 
         return response()->json([
