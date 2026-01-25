@@ -26,28 +26,28 @@ return [
     |
     */
 
-    'guards' => [
-        'web' => [
-            'driver' => 'session',
-           'provider' => 'cashiers',
-        ],
-
-        'admin' => [
-            'driver' => 'session',
-            'provider' => 'admins',
-        ],
+'guards' => [
+    'web' => [
+        'driver' => 'session',
+       'provider' => 'cashiers',
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | User Providers
-    |--------------------------------------------------------------------------
-    |
-    | Defines how users and admins are retrieved from database.
-    |
-    */
+    'admin' => [
+        'driver' => 'session',
+        'provider' => 'admins',
+    ],
+],
 
-  'providers' => [
+/*
+|--------------------------------------------------------------------------
+| User Providers
+|--------------------------------------------------------------------------
+|
+| Defines how users and admins are retrieved from database.
+|
+*/
+
+'providers' => [
     'cashiers' => [ // Rename or add this provider
         'driver' => 'eloquent',
         'model' => App\Models\Cashier::class,

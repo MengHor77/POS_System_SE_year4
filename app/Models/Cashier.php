@@ -25,11 +25,11 @@ class Cashier extends Authenticatable
     /**
      * Automatically hash the password when setting it
      */
-   public function setPasswordAttribute($value)
+    public function setPasswordAttribute($value)
     {
-        // Only hash the value if it's not already hashed
-        // This prevents double-hashing if you accidentally hash in the controller too
-        $this->attributes['password'] = \Hash::needsRehash($value) ? bcrypt($value) : $value;
+        if (!empty($value)) {
+         $this->attributes['password'] = \Hash::needsRehash($value) ? bcrypt($value) : $value;
+        }
     }
 
     /**

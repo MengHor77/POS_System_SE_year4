@@ -5,10 +5,53 @@ namespace App\Http\Controllers\Backend;
 use App\Http\Controllers\Controller;
 use App\Models\Cashier;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CashierController extends Controller
 {
-    // List cashiers
+    // ==========================================
+    //  AUTHENTICATION (Login Controller)
+    // ==========================================
+
+    public function showLogin()
+    {
+        if (Auth::guard('web')->check()) {
+            return redirect('/pos');
+        }
+        return view('app'); 
+    }
+
+    public function login(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        if (Auth::guard('web')->attempt([
+            'email' => $credentials['email'], 
+            'password' => $credentials['password'],
+            'status' => 'active'
+        ])) {
+            $request->session()->regenerate();
+            return redirect()->intended('/pos');
+        }
+
+        return back()->with('error', 'Invalid credentials or inactive account.');
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect('/');
+    }
+
+    // ==========================================
+    //  MANAGEMENT ( CashierController)
+    // ==========================================
+
     public function index(Request $request)
     {
         $perPage = $request->per_page ?? 5;
@@ -32,13 +75,12 @@ class CashierController extends Controller
         ]);
     }
 
-    // Create cashier
     public function store(Request $request)
     {
         $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:cashiers,email',
-            'password' => 'required|min:6|confirmed', // requires password_confirmation
+            'password' => 'required|min:6|confirmed',
         ]);
 
         $cashier = Cashier::create([
@@ -51,7 +93,6 @@ class CashierController extends Controller
         return response()->json(['message' => 'Cashier created', 'cashier' => $cashier]);
     }
 
-    // Update cashier
     public function update(Request $request, $id)
     {
         $cashier = Cashier::findOrFail($id);
@@ -62,7 +103,6 @@ class CashierController extends Controller
             'status' => 'required|in:active,inactive',
         ];
 
-        // Only validate password if user wants to change it
         if ($request->old_password || $request->new_password || $request->new_password_confirmation) {
             $rules['old_password'] = 'required|string';
             $rules['new_password'] = 'required|string|min:6|confirmed';
@@ -74,7 +114,7 @@ class CashierController extends Controller
             if (!$cashier->checkPassword($request->old_password)) {
                 return response()->json(['message' => 'Old password is incorrect.'], 422);
             }
-            $cashier->password = $request->new_password; // automatically hashed
+            $cashier->password = $request->new_password;
         }
 
         $cashier->name = $request->name;
@@ -85,14 +125,12 @@ class CashierController extends Controller
         return response()->json(['message' => 'Cashier updated successfully.']);
     }
 
-    // Delete cashier
     public function destroy($id)
     {
         Cashier::findOrFail($id)->delete();
         return response()->json(['message' => 'Cashier deleted']);
     }
 
-    // Toggle status
     public function toggleStatus($id)
     {
         $cashier = Cashier::findOrFail($id);

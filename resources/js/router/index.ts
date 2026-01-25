@@ -17,9 +17,8 @@ import ProductIndex from "../pages/backend/Product/Index.vue";
 import SupplierIndex from '../pages/backend/ProductSuplyer/Index.vue';
 import CategoryIndex from '../pages/backend/Category/Index.vue'
 // Frontend Pages
-import Home from "../pages/frontend/Index.vue";
+import HomePos from "../pages/frontend/Home/Index.vue";
 import GetStartPage from "../pages/frontend/GetStartPage/Index.vue";
-import PosStore from "../pages/frontend/Index.vue";
 import CashierLogin from "../pages/frontend/CashierLogin/CashierLogin.vue";
 
 
@@ -31,12 +30,12 @@ const routes = [
     {
         path: "/login/cashier",
         name: "cashier-pos",
-        component: PosStore
+        component: HomePos
     },
     {
         path: "/pos",        
         name: "pos.index",
-        component: Home       
+        component: HomePos       
     },
     {
         path: "/",
@@ -46,11 +45,7 @@ const routes = [
     { path: "/cashier/login", name: "cashier-login", component: CashierLogin },
 
     { path: "/admin/login", name: "admin-login", component: AdminLogin },
-    // { 
-    //     path: "/login/admin", 
-    //     name: "admin-login", 
-    //     component: AdminLogin 
-    // },
+   
     {
         path: "/admin/dashboard",
         name: "admin-dashboard",

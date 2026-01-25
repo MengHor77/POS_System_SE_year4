@@ -14,61 +14,65 @@ use App\Http\Controllers\Backend\ProductSupplierController;
 use App\Http\Controllers\Backend\PurchaseOrderController;
 use App\Http\Controllers\Backend\CategoryController;
 use App\Http\Controllers\Frontend\GetStartController;
-use App\Http\Controllers\Frontend\CashierLoginController;
 
-// ----------------------
-// Admin Authentication
-// ----------------------
+// 1. Static Pages (ទំព័រដើម)
+Route::get('/', [GetStartController::class, 'index']);
+
+// 2. Admin Authentication (Login/Logout)
 Route::get('/admin/login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
 Route::post('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login.post');
 Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
 
-// ----------------------
-// Admin SPA Pages (Vue)
-// ----------------------
+// 3. Cashier Authentication (ប្រើ CashierController តែមួយ)
+Route::get('/cashier/login', [CashierController::class, 'showLogin'])->name('cashier.login');
+Route::post('/cashier/login', [CashierController::class, 'login']);
+Route::post('/cashier/logout', [CashierController::class, 'logout'])->name('cashier.logout');
+
+// 4. POS Route (សម្រាប់ Cashier ចូលទៅកាន់ទំព័រលក់)
+Route::get('/pos', fn() => view('app'))->middleware('auth:web');
+
+// -------------------------------------------------------------------------
+// 🔥 SHARED API: ដាក់នៅខាងក្រៅ prefix('admin') ដើម្បីឱ្យ Cashier (auth:web) ប្រើបាន
+// -------------------------------------------------------------------------
+Route::middleware(['auth:admin,web'])->group(function () {
+    Route::get('/pos/product', [ProductController::class, 'index']);
+});
+
+// 5. Admin SPA Pages & API (Protected by auth:admin)
 Route::prefix('admin')->middleware('auth:admin')->group(function () {
     
-    // Vue SPA routes (return the same app view)
+    // Vue SPA View Routes (ត្រឡប់ទៅកាន់ view('app') ដូចគ្នាទាំងអស់)
     $spaRoutes = [
-        '/dashboard',
-        '/product',
+        '/dashboard', 
+        '/product', 
         '/product/create',
         '/product/{id}/edit',
-        '/category',
+        '/category', 
         '/notification',
         '/inventory',
         '/purchase-order',
         '/report',
-        '/supplier',
+        '/supplier', 
         '/cashier',
-        '/sale',      
-        '/profile',
-        '/profile/edit/{id}', 
-
+        '/sale',
+        '/profile', 
+        '/profile/edit/{id}',
     ];
-
     foreach ($spaRoutes as $route) {
         Route::get($route, fn() => view('app'));
     }
 
-          // CRUD API (all under /admin/purchase-order)
+    // Purchase Order API
     Route::get('/purchase-order/data', [PurchaseOrderController::class, 'index']);
     Route::post('/purchase-order', [PurchaseOrderController::class, 'store']);
     Route::put('/purchase-order/{id}', [PurchaseOrderController::class, 'update']);
     Route::delete('/purchase-order/{id}', [PurchaseOrderController::class, 'destroy']);
 
-    // Needed for select dropdown
-    Route::get('/product-supplier', function () {
-       return ProductSupplier::with('product')->get();
-    });
-
-    
-  // Admin Profile Table
+    // Admin Profile API
     Route::get('/profile/data', [ProfileController::class, 'list']);
-    
-    // Single Admin for Edit
     Route::get('/profile/{id}', [ProfileController::class, 'show']);
     Route::post('/profile/{id}', [ProfileController::class, 'update']);
+
     // Dashboard Data API
     Route::get('/dashboard/data', [DashboardController::class, 'index']);
 
@@ -85,13 +89,14 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::put('/product/{id}', [ProductController::class, 'update']);
     Route::delete('/product/{id}', [ProductController::class, 'destroy']);
 
+    // Category API
     Route::get('/category/data', [CategoryController::class, 'index']);  
     Route::get('/category/{id}', [CategoryController::class, 'show']);     
     Route::post('/category', [CategoryController::class, 'store']);      
     Route::put('/category/{id}', [CategoryController::class, 'update']);   
     Route::delete('/category/{id}', [CategoryController::class, 'destroy']);
 
-     // Product Supplier CRUD SPA endpoints
+    // Supplier API
     Route::get('/supplier/data', [ProductSupplierController::class, 'index']);
     Route::post('/supplier', [ProductSupplierController::class, 'store']);
     Route::put('/supplier/{id}', [ProductSupplierController::class, 'update']);
@@ -103,7 +108,7 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::post('/inventory/{id}/stock-out', [InventoryController::class, 'stockOut']);
     Route::get('/inventory/low-stock', [InventoryController::class, 'lowStock']);
 
-    // Cashier API
+    // Cashier Management API
     Route::get('/cashier/data', [CashierController::class, 'index']);
     Route::post('/cashier', [CashierController::class, 'store']);
     Route::put('/cashier/{id}', [CashierController::class, 'update']);
@@ -111,30 +116,14 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::patch('/cashier/{id}/status', [CashierController::class, 'toggleStatus']);
 
     // Sale API
-    Route::get('/sale/data', [SaleController::class, 'index']); // <- API endpoint for Vue
+    Route::get('/sale/data', [SaleController::class, 'index']);
+
+    // Extra Helper Routes
+    Route::get('/product-supplier', function () {
+        return ProductSupplier::with('product')->get();
+    });
 });
 
-// ----------------------
-// Frontend catch-all for Vue SPA
-// ----------------------
-
-
-
+// 6. Catch-all Route for Vue SPA (ត្រូវនៅក្រោមគេបំផុតជានិច្ច)
+// ចំណាំ៖ ប្រើ regex ដើម្បីកុំឱ្យវាចាប់យក route /admin មកធ្វើ SPA នៅខាងក្រៅ
 Route::get('/{any}', fn() => view('app'))->where('any', '^(?!admin).*$');
-
-
-
-Route::get('/', [GetStartController::class, 'index']);
-
-// Specific login paths for Vue
-Route::get('/login/cashier', fn() => view('app'));
-Route::get('/login/admin', fn() => view('app'));
-
-Route::get('/pos', function () {
-    return view('app'); 
-})->middleware('auth:web');
-
-// Cashier Auth Routes
-Route::get('/cashier/login', [CashierLoginController::class, 'showLogin'])->name('cashier.login');
-Route::post('/cashier/login', [CashierLoginController::class, 'login']);
-Route::post('/cashier/logout', [CashierLoginController::class, 'logout'])->name('cashier.logout');
