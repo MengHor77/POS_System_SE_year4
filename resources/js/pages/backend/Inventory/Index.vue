@@ -5,7 +5,7 @@
                 Inventory Management
             </h1>
             <div class="w-96 py-6">
-                <Filter
+                <SearchInput
                     v-model="search"
                     placeholder="Search products name or alert low stock "
                     @filter="fetchProducts(1)"
@@ -85,7 +85,7 @@ import BackendLayout from "../../../layouts/BackendLayout.vue";
 import CardInventory from "../../../components//Backend/CardInventory.vue";
 import CardStockAlert from "../../../components/Backend/CardStockAlert.vue";
 import FlassMessage from "../../../components/Backend/FlassMessage.vue";
-import Filter from "../../../components/Backend/SearchInput.vue";
+import SearchInput from "../../../components/Backend/SearchInput.vue";
 import Pigination from "../../../components/Backend/Pigination.vue";
 import Create from "./Create.vue";
 import Edit from "./Edit.vue";
@@ -107,7 +107,7 @@ export default defineComponent({
         Edit,
         CardStockAlert,
         Pigination,
-        Filter,
+        SearchInput,
         FlassMessage,
     },
 

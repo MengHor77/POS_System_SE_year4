@@ -7,7 +7,7 @@
             </h1>
 
             <!-- Barcode Filter -->
-            <Filter
+            <SearchInput
                 v-if="products.length > 0"
                 v-model="barcode"
                 placeholder="Filter by barcode or name"
@@ -127,7 +127,7 @@ import BackendLayout from "../../../layouts/BackendLayout.vue";
 import axios from "axios";
 import EditProduct from "./Edit.vue";
 import Pigination from "../../../components/Backend/Pigination.vue";
-import Filter from "../../../components/Backend/SearchInput.vue";
+import SearchInput from "../../../components/Backend/SearchInput.vue";
 
 interface Product {
     id: number;
@@ -140,7 +140,7 @@ interface Product {
 
 export default defineComponent({
     name: "Notification",
-    components: { BackendLayout, EditProduct, Pigination, Filter },
+    components: { BackendLayout, EditProduct, Pigination, SearchInput },
     setup() {
         const products = ref<Product[]>([]);
         const barcode = ref("");

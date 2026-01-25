@@ -18,7 +18,7 @@
                 </div>
 
                 <div class="w-80">
-                    <Filter
+                    <SearchInput
                         v-model="filterText"
                         placeholder="Search ID, Product or Supplier..."
                         @search="fetch(1)"
@@ -81,6 +81,18 @@
                 :per-page="perPage"
                 @page-change="fetch"
             />
+            <PurchaseOrderCreate
+                v-if="showCreate"
+                @close="showCreate = false"
+                @saved="onCreated"
+            />
+
+            <PurchaseOrderEdit
+                v-if="showEdit && editId !== null"
+                :order-id="editId"
+                @close="showEdit = false"
+                @updated="onUpdated"
+            />
         </div>
     </BackendLayout>
 </template>
@@ -91,17 +103,17 @@ import axios from "axios";
 import BackendLayout from "../../../layouts/BackendLayout.vue";
 import PurchaseOrderCreate from "./Create.vue";
 import PurchaseOrderEdit from "./Edit.vue";
-import Filter from "../../../components/Backend/SearchInput.vue";
 import Pigination from "../../../components/Backend/Pigination.vue";
 import FlashMessage from "../../../components/Backend/FlassMessage.vue";
 import Table from "../../../components/Backend/Table.vue";
+import SearchInput from "../../../components/Backend/SearchInput.vue";
 
 export default defineComponent({
     components: {
         BackendLayout,
         PurchaseOrderCreate,
         PurchaseOrderEdit,
-        Filter,
+        SearchInput,
         Pigination,
         FlashMessage,
         Table,

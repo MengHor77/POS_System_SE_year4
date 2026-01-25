@@ -23,7 +23,7 @@
                     <select
                         v-model.number="form.product_supplier_id"
                         @change="onProductChange"
-                        class="w-full px-3 py-2 border rounded-lg "
+                        class="w-full px-3 py-2 border rounded-lg"
                         required
                     >
                         <option :value="null">-- Select Product --</option>
@@ -103,26 +103,25 @@ export default defineComponent({
         };
 
         const loadOrder = async () => {
-            const res = await axios.get("/admin/purchase-order/data", {
-                params: { id: props.orderId },
-            });
+            try {
+                const res = await axios.get("/admin/purchase-order/data", {
+                    params: { search: props.orderId },
+                });
 
-            const order = res.data.data.find(
-                (o: any) => o.id === props.orderId,
-            );
-            if (!order) return;
+                // The API returns { data: [...] }. Find the order in that array.
+                const order = res.data.data.find(
+                    (o: any) => o.id === props.orderId,
+                );
 
-            // set product_supplier_id as number
-            form.value.product_supplier_id = Number(order.product_supplier_id);
-            form.value.quantity = order.quantity;
-
-            // set supplier_name
-            const selected = products.value.find(
-                (p) => p.id === form.value.product_supplier_id,
-            );
-            form.value.supplier_name = selected ? selected.supplier_name : "";
+                if (order) {
+                    form.value.product_supplier_id = order.product_supplier_id;
+                    form.value.quantity = order.quantity;
+                    form.value.supplier_name = order.supplier_name;
+                }
+            } catch (error) {
+                console.error("Failed to load order", error);
+            }
         };
-
         const onProductChange = () => {
             const selected = products.value.find(
                 (p) => p.id === form.value.product_supplier_id,
