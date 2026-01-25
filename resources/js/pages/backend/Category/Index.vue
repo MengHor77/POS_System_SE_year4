@@ -18,7 +18,7 @@
                 <div class="w-80">
                     <SearchInput
                         v-model="search"
-                        placeholder="Search categories..."
+                        placeholder="Search categories name..."
                         @filter="fetchCategories(1)"
                         containerClass="px-2 flex gap-2 w-full"
                         inputClass="border p-2 rounded flex-1"
