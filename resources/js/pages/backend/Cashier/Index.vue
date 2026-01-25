@@ -110,7 +110,7 @@ import BackendLayout from "../../../layouts/BackendLayout.vue";
 import Pigination from "../../../components/Backend/Pigination.vue";
 import CreateCashier from "./Create.vue";
 import EditCashier from "./Edit.vue";
-import Filter from "../../../components/Backend/Filter.vue";
+import Filter from "../../../components/Backend/SearchInput.vue";
 import axios from "axios";
 import Table from "../../../components/Backend/Table.vue";
 import FlassMessage from "../../../components/Backend/FlassMessage.vue";

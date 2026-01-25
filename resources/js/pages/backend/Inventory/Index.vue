@@ -85,7 +85,7 @@ import BackendLayout from "../../../layouts/BackendLayout.vue";
 import CardInventory from "../../../components//Backend/CardInventory.vue";
 import CardStockAlert from "../../../components/Backend/CardStockAlert.vue";
 import FlassMessage from "../../../components/Backend/FlassMessage.vue";
-import Filter from "../../../components/Backend/Filter.vue";
+import Filter from "../../../components/Backend/SearchInput.vue";
 import Pigination from "../../../components/Backend/Pigination.vue";
 import Create from "./Create.vue";
 import Edit from "./Edit.vue";

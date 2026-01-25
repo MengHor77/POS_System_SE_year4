@@ -88,7 +88,7 @@ import BackendLayout from "../../../layouts/BackendLayout.vue";
 import Table from "../../../components/Backend/Table.vue";
 import Pigination from "../../../components/Backend/Pigination.vue";
 import FlassMessage from "../../../components/Backend/FlassMessage.vue";
-import Filter from "../../../components/Backend/Filter.vue";
+import Filter from "../../../components/Backend/SearchInput.vue";
 import CreateCategory from "./Create.vue";
 import EditCategory from "./Edit.vue";
 

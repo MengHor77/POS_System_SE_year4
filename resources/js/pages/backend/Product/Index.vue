@@ -5,58 +5,60 @@
                 Products Management
             </h1>
 
-            <!-- Add New Product Button -->
-            <div class="flex flex-row gap-3 w-full pb-6">
-                <div class="w-50">
-                    <button
-                        @click="openCreateModal"
-                        class="mb-4 bg-dark text-white px-4 py-2 rounded hover:bg-darkSoft"
-                    >
-                        Add New Product
-                    </button>
-                </div>
-                <div class="w-80">
-                    <!-- Filter Component -->
-                    <Filter
-                        v-model="search"
-                        placeholder="Filter by barcode or name"
-                        @filter="fetchProducts(1)"
-                        containerClass="px-2 flex gap-2 w-full"
-                        inputClass="border p-2 rounded flex-1"
-                        buttonClass="bg-dark hover:bg-darkSoft text-white px-4 py-2 rounded"
-                    />
-                </div>
+            <div class="flex justify-between items-center mb-6">
+                <button
+                    @click="openCreateModal"
+                    class="bg-dark text-white px-6 py-2 rounded-xl hover:bg-darkSoft shadow-md transition-all flex items-center gap-2"
+                >
+                    <i class="fas fa-plus"></i> Add New Product
+                </button>
+
+                <SearchInput
+                    v-model="search"
+                    @search="fetchProducts(1)"
+                    placeholder="Search ID, Name, Barcode, category..."
+                />
             </div>
+
             <FlassMessage :message="flashMessage" :type="flashType" />
 
-            <!-- Products Table -->
-            <Table :columns="columns" :data="products">
-                <!-- Category column -->
-                <template #cell-category="{ row }">
-                    {{ row.category?.name || "N/A" }}
-                </template>
-
-                <!-- Actions column -->
-                <template #cell-actions="{ row }">
-                    <div class="flex gap-2">
-                        <button
-                            @click="openEditModal(row)"
-                            class="px-3 py-1 rounded-lg bg-blue-100 text-bgBtnEdit hover:bg-bgBtnEdit hover:text-white transition"
+            <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+                <Table :columns="columns" :data="products">
+                    <template #cell-category="{ row }">
+                        <span
+                            class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm font-medium"
                         >
-                            <i class="fas fa-pen"></i>
-                        </button>
-                        <button
-                            @click="deleteProduct(row.id)"
-                            class="px-3 py-1 rounded-lg bg-dangerSoft text-danger hover:bg-bgBtnDelete hover:text-white transition"
-                        >
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </template>
-            </Table>
+                            {{ row.category?.name || "N/A" }}
+                        </span>
+                    </template>
 
-            <!-- Pagination -->
+                    <template #cell-price="{ row }">
+                        <span class="font-bold text-gray-700"
+                            >${{ row.price }}</span
+                        >
+                    </template>
+
+                    <template #cell-actions="{ row }">
+                        <div class="flex gap-2">
+                            <button
+                                @click="openEditModal(row)"
+                                class="px-3 py-1 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-600 hover:text-white transition"
+                            >
+                                <i class="fas fa-pen text-sm"></i>
+                            </button>
+                            <button
+                                @click="deleteProduct(row.id)"
+                                class="px-3 py-1 rounded-lg bg-red-100 text-red-600 hover:bg-red-600 hover:text-white transition"
+                            >
+                                <i class="fas fa-trash text-sm"></i>
+                            </button>
+                        </div>
+                    </template>
+                </Table>
+            </div>
+
             <Pigination
+                class="mt-6"
                 :current-page="pagination.current_page"
                 :last-page="pagination.last_page"
                 :total="pagination.total"
@@ -64,35 +66,16 @@
                 @page-change="fetchProducts"
             />
 
-            <!-- Modals -->
             <CreateProduct
                 v-if="showCreateModal"
                 @close="showCreateModal = false"
-                @created="
-                    () => {
-                        fetchProducts(pagination.current_page);
-                        showFlashMessage(
-                            'Product created successfully!',
-                            'success',
-                        );
-                    }
-                "
-                @error="(msg: string) => showFlashMessage(msg, 'error')"
+                @created="onSuccess('created')"
             />
             <EditProduct
                 v-if="editingProduct"
                 :product="editingProduct"
                 @close="editingProduct = null"
-                @updated="
-                    () => {
-                        fetchProducts(pagination.current_page);
-                        showFlashMessage(
-                            'Product updated successfully!',
-                            'success',
-                        );
-                    }
-                "
-                @error="(msg: string) => showFlashMessage(msg, 'error')"
+                @updated="onSuccess('updated')"
             />
         </div>
     </BackendLayout>
@@ -102,44 +85,33 @@
 import { defineComponent, ref, onMounted } from "vue";
 import BackendLayout from "../../../layouts/BackendLayout.vue";
 import Pigination from "../../../components/Backend/Pigination.vue";
+import SearchInput from "../../../components/Backend/SearchInput.vue";
 import CreateProduct from "./Create.vue";
 import EditProduct from "./Edit.vue";
-import axios from "axios";
-import Filter from "../../../components/Backend/Filter.vue";
-import FlassMessage from "../../../components/Backend/FlassMessage.vue";
 import Table from "../../../components/Backend/Table.vue";
-
-interface Product {
-    id: number;
-    name: string;
-    category_id: number;
-    barcode: number;
-    price: number;
-    stock: number;
-    category?: { id: number; name: string };  
-}
-
+import FlassMessage from "../../../components/Backend/FlassMessage.vue";
+import axios from "axios";
 
 export default defineComponent({
-    name: "ProductIndex",
     components: {
         BackendLayout,
         Pigination,
+        SearchInput,
         CreateProduct,
         EditProduct,
-        Filter,
-        FlassMessage,
         Table,
+        FlassMessage,
     },
     setup() {
-        const products = ref<Product[]>([]);
-        const editingProduct = ref<Product | null>(null);
-        const showCreateModal = ref(false);
+        const products = ref([]);
         const search = ref("");
-
+        const showCreateModal = ref(false);
+        const editingProduct = ref(null);
+        const flashMessage = ref("");
+        const flashType = ref<"success" | "error">("success");
         const columns = [
             { key: "id", label: "ID" },
-            { key: "name", label: "Name" },
+            { key: "name", label: "Product Name" },
             { key: "category", label: "Category" },
             { key: "barcode", label: "Barcode" },
             { key: "price", label: "Price" },
@@ -150,33 +122,14 @@ export default defineComponent({
         const pagination = ref({
             current_page: 1,
             last_page: 1,
-            per_page: 5,
+            per_page: 10,
             total: 0,
         });
 
-        // Flash message
-        const flashMessage = ref("");
-        const flashType = ref<"success" | "error">("success");
-        const showFlashMessage = (
-            message: string,
-            type: "success" | "error" = "success",
-        ) => {
-            flashMessage.value = message;
-            flashType.value = type;
-            setTimeout(() => {
-                flashMessage.value = "";
-            }, 3000);
-        };
-
         const fetchProducts = async (page = 1) => {
             const res = await axios.get("/admin/product/data", {
-                params: {
-                    page,
-                    per_page: pagination.value.per_page,
-                    search: search.value,
-                },
+                params: { page, search: search.value },
             });
-
             products.value = res.data.data;
             pagination.value = {
                 current_page: res.data.current_page,
@@ -186,38 +139,36 @@ export default defineComponent({
             };
         };
 
-        const openCreateModal = () => {
-            showCreateModal.value = true;
-        };
-
-        const openEditModal = (product: Product) => {
-            editingProduct.value = { ...product };
+        const onSuccess = (action: string) => {
+            fetchProducts(pagination.value.current_page);
+            flashMessage.value = `Product ${action} successfully!`;
+            flashType.value = "success";
+            setTimeout(() => (flashMessage.value = ""), 3000);
         };
 
         const deleteProduct = async (id: number) => {
-            if (!confirm("Are you sure you want to delete this product?"))
-                return;
-            await axios.delete(`/admin/product/${id}`);
-            fetchProducts(pagination.value.current_page);
-            showFlashMessage("Product deleted successfully!", "success");
+            if (confirm("Delete this product?")) {
+                await axios.delete(`/admin/product/${id}`);
+                fetchProducts();
+            }
         };
 
         onMounted(() => fetchProducts());
 
         return {
             products,
-            editingProduct,
-            showCreateModal,
-            pagination,
             search,
+            columns,
+            pagination,
             fetchProducts,
-            openCreateModal,
-            openEditModal,
+            showCreateModal,
+            editingProduct,
+            openCreateModal: () => (showCreateModal.value = true),
+            openEditModal: (p: any) => (editingProduct.value = p),
             deleteProduct,
             flashMessage,
             flashType,
-            showFlashMessage,
-            columns,
+            onSuccess,
         };
     },
 });

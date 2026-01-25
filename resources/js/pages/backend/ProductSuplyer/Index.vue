@@ -92,7 +92,7 @@ import BackendLayout from "../../../layouts/BackendLayout.vue";
 import CreateSupplier from "./Create.vue";
 import EditSupplier from "./Edit.vue";
 import Pigination from "../../../components/Backend/Pigination.vue";
-import Filter from "../../../components/Backend/Filter.vue";
+import Filter from "../../../components/Backend/SearchInput.vue";
 import FlassMessage from "../../../components/Backend/FlassMessage.vue";
 import Table from "../../../components/Backend/Table.vue";
 

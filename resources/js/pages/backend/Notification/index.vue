@@ -127,7 +127,7 @@ import BackendLayout from "../../../layouts/BackendLayout.vue";
 import axios from "axios";
 import EditProduct from "./Edit.vue";
 import Pigination from "../../../components/Backend/Pigination.vue";
-import Filter from "../../../components/Backend/Filter.vue";
+import Filter from "../../../components/Backend/SearchInput.vue";
 
 interface Product {
     id: number;
