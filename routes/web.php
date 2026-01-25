@@ -32,7 +32,7 @@ Route::post('/cashier/logout', [CashierController::class, 'logout'])->name('cash
 Route::get('/pos', fn() => view('app'))->middleware('auth:web');
 
 // -------------------------------------------------------------------------
-// 🔥 SHARED API: ដាក់នៅខាងក្រៅ prefix('admin') ដើម្បីឱ្យ Cashier (auth:web) ប្រើបាន
+// SHARED API: ដាក់នៅខាងក្រៅ prefix('admin') ដើម្បីឱ្យ Cashier (auth:web) ប្រើបាន
 // -------------------------------------------------------------------------
 Route::middleware(['auth:admin,web'])->group(function () {
     Route::get('/pos/product', [ProductController::class, 'index']);
@@ -40,7 +40,8 @@ Route::middleware(['auth:admin,web'])->group(function () {
 
 // 5. Admin SPA Pages & API (Protected by auth:admin)
 Route::prefix('admin')->middleware('auth:admin')->group(function () {
-    
+
+    Route::get('/me', [AdminAuthController::class, 'me']);
     // Vue SPA View Routes (ត្រឡប់ទៅកាន់ view('app') ដូចគ្នាទាំងអស់)
     $spaRoutes = [
         '/dashboard', 
@@ -125,5 +126,4 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
 });
 
 // 6. Catch-all Route for Vue SPA (ត្រូវនៅក្រោមគេបំផុតជានិច្ច)
-// ចំណាំ៖ ប្រើ regex ដើម្បីកុំឱ្យវាចាប់យក route /admin មកធ្វើ SPA នៅខាងក្រៅ
 Route::get('/{any}', fn() => view('app'))->where('any', '^(?!admin).*$');
