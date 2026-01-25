@@ -138,7 +138,7 @@ export default {
         const columns = [
             { key: "id", label: "ID" },
             { key: "product", label: "Product Name" },
-            { key: "supplier_name", label: "Supplier" },
+            { key: "supplier_name", label: "Supplier Name" },
             { key: "quantity", label: "Qty" },
             { key: "price", label: "Unit Price" },
             { key: "actions", label: "Actions" },

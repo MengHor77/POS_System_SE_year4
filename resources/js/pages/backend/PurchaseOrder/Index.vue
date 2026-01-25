@@ -132,7 +132,7 @@ export default defineComponent({
 
         const columns = [
             { key: "id", label: "ID" },
-            { key: "supplier_name", label: "Supplier" },
+            { key: "supplier_name", label: "Supplier Name" },
             { key: "product", label: "Product" },
             { key: "quantity", label: "Qty" },
             { key: "status", label: "Status" },
