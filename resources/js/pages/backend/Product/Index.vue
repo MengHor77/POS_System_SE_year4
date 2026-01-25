@@ -5,7 +5,7 @@
                 Products Management
             </h1>
 
-            <div class="flex justify-between items-center mb-6">
+            <div class="flex flex-row gap-3 mb-6">
                 <button
                     @click="openCreateModal"
                     class="bg-dark text-white px-6 py-2 rounded-xl hover:bg-darkSoft shadow-md transition-all flex items-center gap-2"
