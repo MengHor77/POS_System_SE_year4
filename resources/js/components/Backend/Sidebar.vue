@@ -136,15 +136,16 @@ export default defineComponent({
                 route: "/admin/inventory",
             },
             {
-                icon: "fas fa-file-invoice",
-                label: "Purchase Order",
-                route: "/admin/purchase-order",
-            },
-            {
                 icon: "fas fa-truck",
                 label: "Supplier",
                 route: "/admin/supplier",
             },
+            {
+                icon: "fas fa-file-invoice",
+                label: "Purchase Order",
+                route: "/admin/purchase-order",
+            },
+
             {
                 icon: "fas fa-chart-line",
                 label: "Report",
