@@ -15,7 +15,12 @@
             <h2 class="text-2xl font-bold mb-4 text-primary">
                 Add New Product
             </h2>
-
+            <div
+                v-if="errorMessage"
+                class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm"
+            >
+                {{ errorMessage }}
+            </div>
             <form @submit.prevent="saveProduct" class="space-y-4">
                 <div>
                     <label class="block mb-1 font-semibold">Product Name</label>
@@ -125,6 +130,7 @@ export default defineComponent({
         });
 
         const categories = ref<any[]>([]);
+        const errorMessage = ref("");
 
         const fetchCategories = async () => {
             try {
@@ -141,22 +147,47 @@ export default defineComponent({
         onMounted(fetchCategories);
 
         const saveProduct = async () => {
+            errorMessage.value = "";
+
             try {
                 const payload = {
                     ...form,
                     category_id: Number(form.category_id),
                 };
 
-                await axios.post("/admin/product", payload);
+                const response = await axios.post("/admin/product", payload);
+
+                // Success
+                console.log(response.data.message);
                 emit("created");
                 emit("close");
             } catch (error: any) {
-                // ... រក្សាការឆែក Error ដូចកូដចាស់របស់អ្នក ...
-                emit("error", "Failed to save product.");
+                if (error.response) {
+                    const data = error.response.data;
+
+                    // If it's a Validation Error (422)
+                    if (error.response.status === 422 && data.errors) {
+                        // Get the first error message defined in the Controller
+                        errorMessage.value = Object.values(
+                            data.errors,
+                        ).flat()[0] as string;
+                    }
+                    // If it's our Custom Error (409) or any other JSON message
+                    else if (data.message) {
+                        errorMessage.value = data.message;
+                    } else {
+                        errorMessage.value = "An unexpected error occurred.";
+                    }
+                } else {
+                    errorMessage.value =
+                        "Cannot connect to server. Check your connection.";
+                }
+
+                emit("error", errorMessage.value);
             }
         };
 
-        return { form, saveProduct, categories };
+        return { form, saveProduct, categories, errorMessage };
     },
 });
 </script>

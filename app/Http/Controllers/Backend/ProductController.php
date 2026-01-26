@@ -43,51 +43,53 @@ class ProductController extends Controller
         return response()->json($product);
     }
 
-    public function store(Request $request)
-    {
-        // 1. Validation
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'category_id' => 'required|integer|exists:categories,id', 
-            'barcode' => 'required|integer|unique:products,barcode',
-            'price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
+   public function store(Request $request)
+{
+    // 1. Validation with Custom Messages
+    $request->validate([
+        'name'        => 'required|string|max:255',
+        'category_id' => 'required|integer|exists:categories,id',
+        'barcode'     => 'required|integer|unique:products,barcode',
+        'price'       => 'required|numeric|min:0',
+        'stock'       => 'required|integer|min:0',
+    ], [
+        // This is where you define the message for Vue to show
+        'barcode.unique' => 'This barcode already exists. Please enter a new barcode.',
+        'category_id.exists' => 'The selected category is invalid.',
+    ]);
+
+    try {
+        // 2. Fetch category name
+        $categoryModel = Category::findOrFail($request->category_id);
+
+        // 3. Create Product
+        $product = Product::create([
+            'name'        => $request->name,
+            'category_id' => $request->category_id,
+            'category'    => $categoryModel->name, 
+            'barcode'     => $request->barcode,
+            'price'       => $request->price,
+            'stock'       => $request->stock,
         ]);
 
-        try {
-            // 2. Fetch the category name to satisfy the 'category' string column in migration
-            $categoryModel = Category::findOrFail($request->category_id);
-            // 3. Create the product
-            $product = Product::create([
-                'name'        => $request->name,
-                'category_id' => $request->category_id,
-                'category'    => $categoryModel->name, 
-                'barcode'     => $request->barcode,
-                'price'       => $request->price,
-                'stock'       => $request->stock,
-            ]);
+        return response()->json([
+            'message' => 'Product created successfully',
+            'product' => $product->load('category'), 
+        ], 201);
 
+    } catch (QueryException $e) {
+        // Handle Duplicate Barcode if validation was bypassed (Race condition)
+        if ($e->errorInfo[1] == 1062) {
             return response()->json([
-                'message' => 'Product created successfully',
-                'product' => $product->load('category'), 
-            ]);
-
-        } catch (QueryException $e) {
-            // Handle Duplicate Barcode (SQL Error 1062)
-            if ($e->errorInfo[1] == 1062) {
-                return response()->json([
-                    'message' => 'This barcode already exists. Please enter a new barcode.'
-                ], 409); 
-            }
-            
-            // Log other errors for debugging
-            \Log::error($e->getMessage());
-            
-            return response()->json([
-                'message' => 'Database error: ' . $e->getMessage()
-            ], 500);
+                'message' => 'This barcode already exists. Please enter a new barcode.'
+            ], 409); 
         }
+
+        return response()->json([
+            'message' => 'Database error: ' . $e->getMessage()
+        ], 500);
     }
+}
 
     // Update product
    public function update(Request $request, $id)
@@ -118,7 +120,7 @@ class ProductController extends Controller
     ]);
 }
 
-    // Delete product
+  
     public function destroy($id)
     {
         $product = Product::findOrFail($id);
