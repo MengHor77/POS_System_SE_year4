@@ -7,7 +7,7 @@
                 </h1>
             </div>
 
-            <div class="flex flex-row gap-3 w-full pb-6 items-center">
+            <div class="flex flex-row flex-wrap gap-3 w-full pb-6 items-center">
                 <div class="w-50">
                     <button
                         @click="showCreate = true"
@@ -24,6 +24,12 @@
                         @search="fetch(1)"
                     />
                 </div>
+
+                <DateRangeFilter
+                    v-model:startDate="startDate"
+                    v-model:endDate="endDate"
+                    @filter="fetch(1)"
+                />
 
                 <FilterStatus
                     v-model="selectedStatus"
@@ -137,7 +143,8 @@ import axios from "axios";
 import BackendLayout from "../../../layouts/BackendLayout.vue";
 import PurchaseOrderCreate from "./Create.vue";
 import PurchaseOrderEdit from "./Edit.vue";
-import FilterStatus from "./FilterPendingOrRecievedStatus.vue"; // Import the new filter
+import FilterStatus from "./FilterPendingOrRecievedStatus.vue";
+import DateRangeFilter from "../../../components/Backend/DateRangeFilter.vue"; // NEW IMPORT
 import Pigination from "../../../components/Backend/Pigination.vue";
 import FlashMessage from "../../../components/Backend/FlassMessage.vue";
 import Table from "../../../components/Backend/Table.vue";
@@ -148,7 +155,8 @@ export default defineComponent({
         BackendLayout,
         PurchaseOrderCreate,
         PurchaseOrderEdit,
-        FilterStatus, // Register it
+        FilterStatus,
+        DateRangeFilter, // REGISTER COMPONENT
         SearchInput,
         Pigination,
         FlashMessage,
@@ -161,7 +169,11 @@ export default defineComponent({
         const editId = ref<number | null>(null);
 
         const filterText = ref("");
-        const selectedStatus = ref(""); // New ref for status filtering
+        const selectedStatus = ref("");
+
+        const startDate = ref("");
+        const endDate = ref("");
+
         const currentPage = ref(1);
         const lastPage = ref(1);
         const perPage = ref(5);
@@ -197,7 +209,9 @@ export default defineComponent({
                 const res = await axios.get("/admin/purchase-order/data", {
                     params: {
                         search: filterText.value,
-                        status: selectedStatus.value, // Pass status to backend
+                        status: selectedStatus.value,
+                        start_date: startDate.value, 
+                        end_date: endDate.value, 
                         page,
                         per_page: perPage.value,
                     },
@@ -268,7 +282,9 @@ export default defineComponent({
             showEdit,
             editId,
             filterText,
-            selectedStatus, // Return to template
+            selectedStatus,
+            startDate,  
+            endDate, 
             currentPage,
             lastPage,
             perPage,
