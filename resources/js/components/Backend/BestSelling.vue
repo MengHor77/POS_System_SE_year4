@@ -11,7 +11,7 @@
             </button>
         </div>
 
-        <ul class="flex-1 overflow-y-auto custom-scrollbar">
+        <ul class="flex-1 overflow-y-auto custom-scrollbar pr-4">
             <li
                 v-for="product in products"
                 :key="product.id"
@@ -29,10 +29,12 @@
                 </div>
 
                 <div class="text-right">
-                    <span class="block font-bold text-secondary text-lg">
+                    <span
+                        class="block font-bold text-secondary text-lg leading-none"
+                    >
                         {{ product.sales_count }}
                     </span>
-                    <span class="text-xxs text-muted uppercase"
+                    <span class="text-[10px] text-muted uppercase font-medium"
                         >Units Sold</span
                     >
                 </div>
@@ -55,7 +57,7 @@ import { defineComponent, PropType } from "vue";
 interface Product {
     id: number;
     name: string;
-    category_name: string; // Added this
+    category_name: string;
     sales_count: number;
 }
 
@@ -69,3 +71,25 @@ export default defineComponent({
     },
 });
 </script>
+
+<style scoped>
+/* Improved Scrollbar Styling */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px; /* Slightly wider for easier viewing */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Light track background */
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #d1d5db; /* grayLight from your config */
+    border-radius: 10px;
+    border: 2px solid #f1f1f1; /* Creates a padding effect inside the scrollbar */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: #9ca3af; /* Darker on hover */
+}
+</style>
