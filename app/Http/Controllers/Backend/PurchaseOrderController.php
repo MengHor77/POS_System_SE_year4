@@ -61,6 +61,7 @@ class PurchaseOrderController extends Controller
         $formattedData = $orders->getCollection()->map(function ($order) {
             return [
                 'id'            => $order->id,
+                'product_supplier_id' => $order->product_supplier_id, 
                 'supplier_name' => $order->supplier_name,
                 'quantity'      => $order->quantity,
                 'status'        => $order->status ?? 'pending',

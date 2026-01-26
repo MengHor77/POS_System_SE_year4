@@ -69,7 +69,7 @@
                     </button>
                     <button
                         type="submit"
-                        class="px-4 py-2 rounded bg-primary text-white hover:bg-primary/90"
+                        class="px-4 py-2 rounded bg-bgBtnSave hover:bg-bgBtnSaveHover text-white"
                     >
                         Update
                     </button>
@@ -108,7 +108,6 @@ export default defineComponent({
                     params: { search: props.orderId },
                 });
 
-                // The API returns { data: [...] }. Find the order in that array.
                 const order = res.data.data.find(
                     (o: any) => o.id === props.orderId,
                 );
