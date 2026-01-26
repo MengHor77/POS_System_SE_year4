@@ -14,6 +14,10 @@ use App\Http\Controllers\Backend\ProductSupplierController;
 use App\Http\Controllers\Backend\PurchaseOrderController;
 use App\Http\Controllers\Backend\CategoryController;
 use App\Http\Controllers\Frontend\GetStartController;
+use App\Http\Controllers\Backend\ReportController;
+
+
+
 
 // 1. Static Pages (ទំព័រដើម)
 Route::get('/', [GetStartController::class, 'index']);
@@ -64,6 +68,9 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     foreach ($spaRoutes as $route) {
         Route::get($route, fn() => view('app'));
     }
+
+    Route::get('/report/data', [ReportController::class, 'index']);
+Route::get('/report/data', [ReportController::class, 'index']);
 
     // Purchase Order API
     Route::get('/purchase-order/data', [PurchaseOrderController::class, 'index']);
