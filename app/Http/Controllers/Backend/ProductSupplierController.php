@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
 use App\Models\ProductSupplier;
+use App\Models\Sale;  
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductSupplierController extends Controller
 {
@@ -12,7 +14,7 @@ class ProductSupplierController extends Controller
     {
         $search = $request->input('search');
 
-        // 1. Calculate Stats (Calculate these BEFORE filtering/paginating)
+        // 1. Calculate Stats (Keeping your old logic)
         $today = \Carbon\Carbon::today();
         $thisMonth = \Carbon\Carbon::now()->month;
         $thisYear = \Carbon\Carbon::now()->year;
@@ -26,44 +28,40 @@ class ProductSupplierController extends Controller
             'thisYear'     => DB::table('sales')->whereYear('created_at', $thisYear)->sum('total_amount') ?? 0,
         ];
 
-        // 2. Your existing Search/Query logic
-        $query = Sale::with(['product', 'category']);
+        // 2. Query logic (Corrected to ProductSupplier model to match the page intent)
+        $query = ProductSupplier::with(['product']);
 
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->where('id', 'like', "%{$search}%")
-                ->orWhere('cashier_name', 'like', "%{$search}%")
+                ->orWhere('supplier_name', 'like', "%{$search}%")
                 ->orWhereHas('product', function ($p) use ($search) {
                     $p->where('name', 'like', "%{$search}%");
                 });
             });
         }
 
-        $sales = $query->orderBy('created_at', 'desc')->paginate(5);
+        $suppliers = $query->orderBy('created_at', 'desc')->paginate(5);
 
-        // 3. Transform data for the table
-        $sales->getCollection()->transform(function ($sale) {
+        // 3. Transform data (Kept your transformation style)
+        $suppliers->getCollection()->transform(function ($item) {
             return [
-                'id'            => $sale->id,
-                'product_id'    => $sale->product_id,
-                'product_name'  => $sale->product->name ?? 'N/A',
-                'category'      => $sale->category->name ?? 'N/A',
-                'unit_price'    => $sale->quantity > 0 ? ($sale->total_amount / $sale->quantity) : 0,
-                'quantity'      => $sale->quantity,
-                'total_amount'  => $sale->total_amount,
-                'cashier_name'  => $sale->cashier_name,
-                'cashier_email' => $sale->cashier_email,
-                'created_at'    => $sale->created_at->format('Y-m-d H:i'),
+                'id'            => $item->id,
+                'product_id'    => $item->product_id,
+                'product'       => $item->product, // Required for row.product?.name in Vue
+                'supplier_name' => $item->supplier_name,
+                'quantity'      => $item->quantity,
+                'price'         => $item->price,
+                'created_at'    => $item->created_at->format('Y-m-d H:i'),
             ];
         });
 
-        // 4. IMPORTANT: Return both the sales and the stats
-        return response()->json([
-            'sales_data' => $sales,
+        // 4. FIX: Merge stats into the main response so Vue can find pagination keys
+        return response()->json(array_merge($suppliers->toArray(), [
             'stats' => $stats
-        ]);
+        ]));
     }
-    // Store new supplier
+
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -77,26 +75,19 @@ class ProductSupplierController extends Controller
         return response()->json(['message' => 'Supplier created']);
     }
 
-    // Update existing supplier
-   public function update(Request $request, $id)
-{
-    $supplier = ProductSupplier::findOrFail($id);
+    public function update(Request $request, $id)
+    {
+        $supplier = ProductSupplier::findOrFail($id);
+        $data = $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'supplier_name' => 'required|string',
+            'quantity' => 'required|integer|min:0',
+            'price' => 'required|numeric|min:0',
+        ]);
 
-    $data = $request->validate([
-        'product_id' => 'required|exists:products,id',
-        'supplier_name' => 'required|string',
-        'quantity' => 'required|integer|min:0',
-       'price' => 'required|numeric|min:0',
-    ]);
-
-    $supplier->update($data);
-    $supplier->load('product');
-
-    return response()->json([
-        'message' => 'Supplier updated',
-        'data' => $supplier
-    ]);
-}
+        $supplier->update($data);
+        return response()->json(['message' => 'Supplier updated', 'data' => $supplier->load('product')]);
+    }
 
     public function destroy($id)
     {
