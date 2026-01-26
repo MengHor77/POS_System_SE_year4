@@ -85,12 +85,41 @@ export default defineComponent({
         CartSidebar,
     },
     setup() {
+        // --- State ---
         const products = ref<any[]>([]);
         const cart = ref<any[]>([]);
         const search = ref("");
         const loading = ref(true);
         const showPaymentModal = ref(false);
 
+        // --- Magic Logic: Real-time Stock Calculation ---
+        /**
+         * This computed property takes the master product list and subtracts
+         * whatever is currently sitting in the user's cart.
+         * This updates the UI instantly as they click.
+         */
+        const displayedProducts = computed(() => {
+            return products.value.map((product) => {
+                const cartItem = cart.value.find(
+                    (item) => item.id === product.id,
+                );
+                const currentCartQty = cartItem ? cartItem.qty : 0;
+                return {
+                    ...product,
+                    // Calculated stock = Database Stock - Cart Quantity
+                    stock: product.stock - currentCartQty,
+                };
+            });
+        });
+
+        const cartTotal = computed(() => {
+            return cart.value.reduce(
+                (acc, item) => acc + Number(item.price) * item.qty,
+                0,
+            );
+        });
+
+        // --- Methods ---
         const fetchProducts = async () => {
             loading.value = true;
             try {
@@ -101,7 +130,6 @@ export default defineComponent({
                     },
                 });
 
-                // ឆែកទម្រង់ទិន្នន័យពី Laravel Paginate
                 if (response.data && response.data.data) {
                     products.value = response.data.data;
                 } else {
@@ -115,7 +143,15 @@ export default defineComponent({
         };
 
         const addToCart = (product: any) => {
-            if (product.stock <= 0) return;
+            // Important: Check stock against the computed "Live" stock
+            const liveProduct = displayedProducts.value.find(
+                (p) => p.id === product.id,
+            );
+            if (!liveProduct || liveProduct.stock <= 0) {
+                alert("Out of stock!");
+                return;
+            }
+
             const existing = cart.value.find((item) => item.id === product.id);
             if (existing) {
                 existing.qty++;
@@ -125,8 +161,15 @@ export default defineComponent({
         };
 
         const increaseQty = (id: number) => {
+            // Check if we can increase (is there more stock available?)
+            const product = products.value.find((p) => p.id === id);
             const item = cart.value.find((i) => i.id === id);
-            if (item) item.qty++;
+
+            if (item && product && item.qty < product.stock) {
+                item.qty++;
+            } else {
+                alert("No more stock available!");
+            }
         };
 
         const decreaseQty = (id: number) => {
@@ -141,8 +184,6 @@ export default defineComponent({
         const removeFromCart = (id: number) => {
             cart.value = cart.value.filter((i) => i.id !== id);
         };
-
-        // Inside your Index.vue (where you handle <PaymentModal @confirm="handleCheckout" />)
 
         const handleCheckout = async () => {
             if (cart.value.length === 0) return;
@@ -161,12 +202,12 @@ export default defineComponent({
                 await nextTick();
                 window.print();
 
-                // 3. Reset UI
-                cart.value = [];
+                // 3. Success Workflow
+                cart.value = []; // This resets the card stock labels to the 'pre-sale' values
                 showPaymentModal.value = false;
 
-                // 4. Refresh products to show new stock levels
-                fetchProducts();
+                // 4. Refresh: Get the NEW official stock levels from DB
+                await fetchProducts();
 
                 alert("Transaction Successful!");
             } catch (err: any) {
@@ -175,17 +216,12 @@ export default defineComponent({
             }
         };
 
-        const cartTotal = computed(() => {
-            return cart.value.reduce(
-                (acc, item) => acc + Number(item.price) * item.qty,
-                0,
-            );
-        });
-
+        // --- Lifecycle ---
         onMounted(fetchProducts);
 
         return {
-            products,
+            // We return displayedProducts AS 'products' so the template doesn't need to change
+            products: displayedProducts,
             cart,
             search,
             loading,
