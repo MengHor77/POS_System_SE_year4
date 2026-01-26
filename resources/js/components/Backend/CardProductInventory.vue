@@ -8,7 +8,7 @@
             </h2>
 
             <p class="text-sm text-muted">
-                {{ product.brand }}
+                {{ product.category }}
             </p>
 
             <div class="mt-4 flex gap-3">

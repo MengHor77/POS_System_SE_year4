@@ -14,7 +14,12 @@
             class="bg-bgCard p-4 rounded-xl flex justify-between items-center shadow-card border border-border"
         >
             <div>
-                <p class="font-medium text-darkSoft">{{ product.name }}</p>
+                <p class="font-medium text-darkSoft">
+                    {{ product.name }}
+                </p>
+                <p class="text-sm text-muted">
+                    {{ product.category }}
+                </p>
                 <p class="text-sm text-muted">
                     Stock:
                     <span class="text-danger font-bold">{{

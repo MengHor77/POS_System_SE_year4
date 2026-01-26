@@ -35,7 +35,7 @@
                     <button
                         type="button"
                         @click="$emit('close')"
-                        class="px-4 py-2 text-muted hover:bg-bgHover rounded-lg transition-colors"
+                        class="px-4 py-2 rounded-lg bg-bgBtnCancel text-white hover:bg-bgBtnCancelHover"
                     >
                         Cancel
                     </button>
