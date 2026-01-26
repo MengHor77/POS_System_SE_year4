@@ -12,28 +12,42 @@ class ReportController extends Controller
     public function index(Request $request)
     {
         $today = Carbon::today();
-        $totalRevenue = Sale::sum('total_amount') ?? 0;
-        $todaysSale = Sale::whereDate('created_at', $today)->sum('total_amount') ?? 0;
+        
+        // Base Query
+        $query = Sale::with(['product']);
 
-         $query = Sale::with(['product']);
-
-         if ($request->filled('search')) {
+        // 1. Filter by Search
+        if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('id', 'like', "%{$search}%")  
-                  ->orWhere('cashier_email', 'like', "%{$search}%")  
-                  ->orWhere('cashier_name', 'like', "%{$search}%") 
-                  ->orWhereHas('product', function($p) use ($search) {
-                      $p->where('name', 'like', "%{$search}%");  
-                  });
+                ->orWhere('cashier_email', 'like', "%{$search}%")  
+                ->orWhere('cashier_name', 'like', "%{$search}%") 
+                ->orWhereHas('product', function($p) use ($search) {
+                    $p->where('name', 'like', "%{$search}%");  
+                });
             });
         }
- 
+
+        // 2. NEW: Filter by Date Range
+        if ($request->filled('start_date')) {
+            $query->where('created_at', '>=', Carbon::parse($request->start_date));
+        }
+        if ($request->filled('end_date')) {
+            $query->where('created_at', '<=', Carbon::parse($request->end_date));
+        }
+
+        // Calculate Totals based on filtered query (optional: or keep global totals)
+        $totalRevenue = Sale::sum('total_amount') ?? 0;
+        $todaysSale = Sale::whereDate('created_at', $today)->sum('total_amount') ?? 0;
+
+        // Get Data and Group
         $sales = $query->latest()->get()->groupBy(function($item) {
             return $item->created_at->format('Y-m-d H:i:s') . $item->cashier_email;
         });
 
-         $currentPage = $request->input('page', 1);
+        // Pagination Logic
+        $currentPage = $request->input('page', 1);
         $perPage = 10;
         $currentItems = $sales->slice(($currentPage - 1) * $perPage, $perPage)->values();
         

@@ -59,12 +59,20 @@
                         </p>
                     </div>
                 </div>
-                <div class="flex items-center gap-4 pb-6 no-print">
+
+                <div class="flex flex-wrap items-center gap-4 pb-6 no-print">
                     <SearchInput
                         v-model="searchQuery"
                         @search="fetchData(1)"
-                        placeholder="Search ID, Cashier, or Product..."
+                        placeholder="Search ID, Cashier name , email..."
                     />
+
+                    <DateRangeFilter
+                        v-model:startDate="startDate"
+                        v-model:endDate="endDate"
+                        @filter="fetchData(1)"
+                    />
+
                     <button
                         @click="printReport"
                         class="bg-primary hover:bg-darkSoft text-white px-5 py-2 rounded-xl shadow-card transition-all flex items-center"
@@ -72,6 +80,7 @@
                         <i class="fas fa-print mr-2"></i> Print Report
                     </button>
                 </div>
+
                 <div
                     class="bg-bgCard border border-border rounded-xl2 overflow-hidden shadow-card"
                 >
@@ -92,7 +101,6 @@
                                 >#{{ row.id }}</span
                             >
                         </template>
-
                         <template #cell-cashier_email="{ row }">
                             <div class="flex flex-col py-2">
                                 <span class="font-bold text-gray-900">{{
@@ -103,7 +111,6 @@
                                 }}</span>
                             </div>
                         </template>
-
                         <template #cell-product_name="{ row }">
                             <div class="flex flex-col gap-1 py-2">
                                 <div
@@ -120,7 +127,6 @@
                                 </div>
                             </div>
                         </template>
-
                         <template #cell-unit_price="{ row }">
                             <div class="flex flex-col gap-1 py-2">
                                 <div
@@ -132,13 +138,11 @@
                                 </div>
                             </div>
                         </template>
-
                         <template #cell-total_amount="{ row }">
                             <span class="font-extrabold text-success text-lg">{{
                                 formatPrice(row.total_amount || 0)
                             }}</span>
                         </template>
-
                         <template #cell-date_formatted="{ row }">
                             <div class="text-sm text-gray-700 py-2">
                                 <i class="far fa-clock mr-1 text-muted"></i>
@@ -148,6 +152,7 @@
                     </Table>
                 </div>
             </div>
+
             <div class="no-print mt-6">
                 <Pigination
                     v-if="pagination.total > 0"
@@ -169,16 +174,28 @@ import BackendLayout from "../../../layouts/BackendLayout.vue";
 import Table from "../../../components/Backend/Table.vue";
 import SearchInput from "../../../components/Backend/SearchInput.vue";
 import Pigination from "../../../components/Backend/Pigination.vue";
+import DateRangeFilter from "../../../components/Backend/DateRangeFilter.vue"; // Import this
 
 export default defineComponent({
     name: "ReportIndex",
-    components: { BackendLayout, Table, SearchInput, Pigination },
+    components: {
+        BackendLayout,
+        Table,
+        SearchInput,
+        Pigination,
+        DateRangeFilter,
+    },
     setup() {
         const totalRevenue = ref(0);
         const todaysSale = ref(0);
         const transactions = ref([]);
         const reportDate = ref("");
         const searchQuery = ref("");
+
+        // NEW: Date states
+        const startDate = ref("");
+        const endDate = ref("");
+
         const pagination = ref({
             current_page: 1,
             last_page: 1,
@@ -198,7 +215,12 @@ export default defineComponent({
         const fetchData = async (page = 1) => {
             try {
                 const response = await axios.get("/admin/report/data", {
-                    params: { page: page, search: searchQuery.value },
+                    params: {
+                        page: page,
+                        search: searchQuery.value,
+                        start_date: startDate.value, // Send start date
+                        end_date: endDate.value, // Send end date
+                    },
                 });
                 const res = response.data;
                 totalRevenue.value = res.dash?.totalRevenue || 0;
@@ -240,6 +262,8 @@ export default defineComponent({
             tableColumns,
             searchQuery,
             pagination,
+            startDate,
+            endDate,  
             fetchData,
             formatPrice,
             printReport,
@@ -249,14 +273,11 @@ export default defineComponent({
 </script>
 
 <style scoped>
-/* Only visible on physical paper or PDF */
+/* (Keep your existing @media print styles here) */
 .print-only {
     display: none;
 }
-
 @media print {
-    /* 1. HIDE EVERYTHING EXCEPT THE REPORT */
-    /* Target layout parts like Sidebar and Top Nav to stop the overlap */
     :deep(aside),
     :deep(nav),
     :deep(header),
@@ -264,86 +285,36 @@ export default defineComponent({
     :deep(.top-navbar),
     .no-print {
         display: none !important;
-        visibility: hidden !important;
-        height: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
     }
-
-    /* 2. RESET PAGE POSITIONING */
-    /* Remove background colors and move report to top-left corner */
     .p-6.bg-bgMain {
         padding: 0 !important;
-        margin: 0 !important;
         background: white !important;
-        width: 100% !important;
     }
-
     #printable-area {
         position: absolute !important;
         top: 0 !important;
         left: 0 !important;
         width: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
     }
-
-    /* 3. FIX CARDS (TOTAL REVENUE, TODAY SALES) */
-    /* Grid often breaks in print; we force Flexbox row layout */
     .grid {
         display: flex !important;
         flex-direction: row !important;
-        gap: 15px !important;
-        margin-bottom: 20px !important;
+        gap: 10px !important;
     }
-
     .grid > div {
         flex: 1 !important;
-        border: 1px solid #e5e7eb !important;
-        border-radius: 12px !important;
-        box-shadow: none !important;
-        background: white !important;
+        border: 1px solid #eee !important;
     }
-
-    /* 4. TABLE STYLING */
-    .bg-bgCard {
-        background: white !important;
-        border: 1px solid #e5e7eb !important;
-        box-shadow: none !important;
-    }
-
-    table {
-        width: 100% !important;
-        border-collapse: collapse !important;
-    }
-
-    /* Prevent table rows from being cut in half across pages */
-    tr {
-        page-break-inside: avoid !important;
-    }
-
-    /* 5. TITLES & COLORS */
-    .print-only {
-        display: block !important;
-        text-align: center;
-        border-bottom: 2px solid #000;
-        margin-bottom: 30px;
-        padding-bottom: 10px;
-    }
-
-    /* Force all colored text to high-contrast black for paper */
     .text-primary,
     .text-secondary,
     .text-success,
-    .text-info,
-    .text-3xl {
+    .text-info {
         color: #000 !important;
-        font-weight: bold !important;
     }
-}
-
-/* Screen layout spacing */
-.gap-1 {
-    gap: 0.25rem;
+    .print-only {
+        display: block !important;
+        text-align: center;
+        border-bottom: 2px solid #333;
+    }
 }
 </style>
