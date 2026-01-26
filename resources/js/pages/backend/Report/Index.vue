@@ -201,13 +201,25 @@ export default defineComponent({
     .no-print {
         display: none !important;
     }
+
     /* Ensure background colors show in PDF */
     .bg-bgCard,
     .bg-gray-50,
     .bg-bgMain {
         background-color: white !important;
+        /* Standard property for modern browsers */
+        print-color-adjust: exact;
+        /* Vendor prefix for Chrome/Safari */
         -webkit-print-color-adjust: exact;
     }
+
+    /* Apply to status badges specifically so they keep their soft colors when printing */
+    .bg-successSoft,
+    .bg-warningSoft {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+
     .shadow-card,
     .shadow-soft {
         box-shadow: none !important;
