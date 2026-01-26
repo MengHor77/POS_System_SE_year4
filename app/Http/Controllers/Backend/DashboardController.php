@@ -38,12 +38,19 @@ class DashboardController extends Controller
             ->sum('total_amount') ?? 0;
 
         // 5. Best Selling Products (top 5)
+
         $bestSellingProducts = DB::table('sales')
             ->join('products', 'sales.product_id', '=', 'products.id')
-            ->select('products.id', 'products.name', DB::raw('SUM(sales.quantity) as sales_count'))
-            ->groupBy('products.id', 'products.name')
+            ->join('categories', 'products.category_id', '=', 'categories.id') // Join categories
+            ->select(
+                'products.id', 
+                'products.name', 
+                'categories.name as category_name', // Get category name
+                DB::raw('SUM(sales.quantity) as sales_count')
+            )
+            ->groupBy('products.id', 'products.name', 'categories.name')
             ->orderByDesc('sales_count')
-            ->limit(5)
+            ->limit(5) // You can change this to 10 if you prefer
             ->get();
 
         // 6. Recent Sales (latest 10) 

@@ -1,44 +1,46 @@
 <template>
     <BackendLayout>
         <div class="p-6 bg-bgMain min-h-screen">
-            <h1 class="text-3xl font-bold text-primary mb-1">
-                Sales Analytics
-            </h1>
-            <p class="mb-6 text-gray-600">
-                Overview of sales performance and trends
-            </p>
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-primary tracking-tight">
+                    Sales Analytics
+                </h1>
+                <p class="text-muted">
+                    Real-time overview of your POS performance
+                </p>
+            </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <CardDashboard
                     title="Total Revenue"
                     :value="formatPrice(totalRevenue)"
-                    class="bg-bgCard"
+                    class="shadow-card border-t-4 border-primary"
                 >
                     <template #icon
-                        ><i
-                            class="fas fa-dollar-sign text-secondary text-2xl"
-                        ></i
+                        ><i class="fas fa-wallet text-primary text-2xl"></i
                     ></template>
                 </CardDashboard>
 
                 <CardDashboard
                     title="Today's Sale"
                     :value="formatPrice(todaysSale)"
-                    class="bg-bgCard"
+                    class="shadow-card border-t-4 border-secondary"
                 >
                     <template #icon
-                        ><i class="fas fa-calendar-day text-info text-2xl"></i
+                        ><i
+                            class="fas fa-cash-register text-secondary text-2xl"
+                        ></i
                     ></template>
                 </CardDashboard>
 
                 <CardDashboard
                     title="This Month"
                     :value="formatPrice(thisMonth)"
-                    class="bg-bgCard"
+                    class="shadow-card border-t-4 border-warning"
                 >
                     <template #icon
                         ><i
-                            class="fas fa-calendar-alt text-warning text-2xl"
+                            class="fas fa-calendar-check text-warning text-2xl"
                         ></i
                     ></template>
                 </CardDashboard>
@@ -46,10 +48,10 @@
                 <CardDashboard
                     title="This Year"
                     :value="formatPrice(thisYear)"
-                    class="bg-bgCard"
+                    class="shadow-card border-t-4 border-info"
                 >
                     <template #icon
-                        ><i class="fas fa-calendar text-primary text-2xl"></i
+                        ><i class="fas fa-chart-bar text-info text-2xl"></i
                     ></template>
                 </CardDashboard>
             </div>
@@ -58,7 +60,7 @@
                 <CardDashboard
                     title="Pending Shipments"
                     :value="pendingShipments"
-                    class="bg-bgCard"
+                    class="bg-bgCard shadow-soft"
                 >
                     <template #icon
                         ><i class="fas fa-truck text-pending text-2xl"></i
@@ -67,10 +69,12 @@
                 <CardDashboard
                     title="Low Stock Alerts"
                     :value="lowStockCount"
-                    class="bg-bgCard"
+                    class="bg-bgCard shadow-soft"
                 >
                     <template #icon
-                        ><i class="fas fa-bell text-danger text-2xl"></i
+                        ><i
+                            class="fas fa-exclamation-triangle text-danger text-2xl"
+                        ></i
                     ></template>
                 </CardDashboard>
             </div>
@@ -90,7 +94,6 @@ import { defineComponent, ref, onMounted } from "vue";
 import axios from "axios";
 import CardDashboard from "../../../components/Backend/CardDashboard.vue";
 import BackendLayout from "../../../layouts/BackendLayout.vue";
-// New Component Imports
 import SalesGraph from "../../../components/Backend/SalesGraph.vue";
 import BestSelling from "../../../components/Backend/BestSelling.vue";
 import RecentSales from "../../../components/Backend/RecentSales.vue";
@@ -119,6 +122,7 @@ export default defineComponent({
                 "$" +
                 Number(val).toLocaleString(undefined, {
                     minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
                 })
             );
         };
@@ -162,10 +166,13 @@ export default defineComponent({
 
 <style>
 .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
+    width: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.1);
-    border-radius: 3px;
+    background-color: #e5e7eb;
+    border-radius: 20px;
 }
 </style>
