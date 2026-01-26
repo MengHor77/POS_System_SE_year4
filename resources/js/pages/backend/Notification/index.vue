@@ -6,22 +6,19 @@
                 Low Stock Notifications
             </h1>
 
-            <!-- Barcode Filter -->
-            <SearchInput
-                v-if="products.length > 0"
-                v-model="barcode"
-                placeholder="Filter by barcode or name"
-                @filter="fetchLowStock(1)"
-                containerClass="mb-4 flex gap-2 w-20"
-                inputClass="border p-2 rounded flex-1"
-                buttonClass="bg-darkSoft text-white px-4 py-2 rounded"
-            />
+            <div class="mb-6 w-80">
+                <SearchInput
+                    v-model="barcode"
+                    placeholder="Search by barcode or name"
+                    @search="fetchLowStock(1)"
+                />
+            </div>
 
             <div
                 v-if="products.length === 0"
                 class="text-center text-gray-500 mt-10"
             >
-                🎉 All products have sufficient stock. the product less than
+                🎉 All products have sufficient stock. Products with less than
                 amount 6 show here. You can
                 <router-link
                     to="/admin/product"
@@ -31,75 +28,44 @@
                 </router-link>
             </div>
 
-            <div v-else class="bg-bgCard rounded-xl shadow-card p-6">
-                <table class="w-full border-border rounded-lg overflow-hidden">
-                    <thead class="bg-tableHeader text-sm">
-                        <tr class="bg-gray-100 rounded-lg">
-                            <th class="p-3 border-y text-start">ID</th>
-                            <th class="p-3 border-y text-start">Name</th>
-                            <th class="p-3 border-y text-start">Brand</th>
-                            <th class="p-3 border-y text-start">Barcode</th>
-                            <th class="p-3 border-y text-start">Price</th>
-                            <th class="p-3 border-y text-start">Stock</th>
-                            <th class="p-3 border-y text-start">Status</th>
-                            <th class="p-3 border-y text-start">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr
-                            v-for="product in products"
-                            :key="product.id"
-                            class="text-sm hover:bg-tableRowHover transition"
+            <div v-else>
+                <Table :columns="tableColumns" :data="products" rowKey="id">
+                    <template #cell-stock="{ row }">
+                        <span
+                            :class="
+                                row.stock <= 5 ? 'text-red-500 font-bold' : ''
+                            "
                         >
-                            <td class="p-3 border-y text-start">
-                                {{ product.id }}
-                            </td>
-                            <td class="p-3 border-y text-start">
-                                {{ product.name }}
-                            </td>
-                            <td class="p-3 border-y text-start">
-                                {{ product.brand }}
-                            </td>
-                            <td class="p-3 border-y text-start">
-                                {{ product.barcode }}
-                            </td>
-                            <td class="p-3 border-y text-start">
-                                {{ product.price }}
-                            </td>
-                            <td
-                                class="p-3 border-y text-start font-bold"
-                                :class="
-                                    product.stock <= 5 ? 'text-red-500' : ''
-                                "
-                            >
-                                {{ product.stock }}
-                            </td>
-                            <td class="p-3 border-y text-start">
-                                <span
-                                    class="px-2 py-1 text-xs rounded-full bg-red-500 text-white"
-                                >
-                                    Low Stock
-                                </span>
-                            </td>
-                            <td class="p-3 border-y text-start flex gap-2">
-                                <button
-                                    @click="editProduct(product)"
-                                    class="px-3 py-1 rounded-lg bg-blue-100 text-bgBtnEdit hover:bg-bgBtnEdit hover:text-white transition"
-                                >
-                                    <i class="fas fa-pen"></i>
-                                </button>
-                                <button
-                                    @click="deleteProduct(product.id)"
-                                    class="px-3 py-1 rounded-lg bg-dangerSoft text-danger hover:bg-bgBtnDelete hover:text-white transition"
-                                >
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                            {{ row.stock }}
+                        </span>
+                    </template>
 
+                    <template #cell-status>
+                        <span
+                            class="px-2 py-1 text-xs rounded-full bg-red-500 text-white"
+                        >
+                            Low Stock
+                        </span>
+                    </template>
+
+                    <template #cell-actions="{ row }">
+                        <div class="flex gap-2">
+                            <button
+                                @click="editProduct(row)"
+                                class="px-3 py-1 rounded-lg bg-blue-100 text-bgBtnEdit hover:bg-bgBtnEdit hover:text-white transition"
+                            >
+                                <i class="fas fa-pen"></i>
+                            </button>
+                            <button
+                                @click="deleteProduct(row.id)"
+                                class="px-3 py-1 rounded-lg bg-dangerSoft text-danger hover:bg-bgBtnDelete hover:text-white transition"
+                            >
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </template>
+                </Table>
+            </div>
             <Pigination
                 v-if="pagination.last_page > 1"
                 class="mt-6"
@@ -110,7 +76,6 @@
                 @page-change="fetchLowStock"
             />
 
-            <!-- Edit Modal -->
             <EditProduct
                 v-if="editingProduct"
                 :product="editingProduct"
@@ -128,6 +93,7 @@ import axios from "axios";
 import EditProduct from "./Edit.vue";
 import Pigination from "../../../components/Backend/Pigination.vue";
 import SearchInput from "../../../components/Backend/SearchInput.vue";
+import Table from "../../../components/Backend/Table.vue"; // Import the Table component
 
 interface Product {
     id: number;
@@ -140,10 +106,23 @@ interface Product {
 
 export default defineComponent({
     name: "Notification",
-    components: { BackendLayout, EditProduct, Pigination, SearchInput },
+    components: { BackendLayout, EditProduct, Pigination, SearchInput, Table },
     setup() {
         const products = ref<Product[]>([]);
         const barcode = ref("");
+
+        // Define Table Columns
+        const tableColumns = [
+            { key: "id", label: "ID" },
+            { key: "name", label: "Name" },
+            { key: "brand", label: "Brand" },
+            { key: "barcode", label: "Barcode" },
+            { key: "price", label: "Price" },
+            { key: "stock", label: "Stock" },
+            { key: "status", label: "Status" },
+            { key: "actions", label: "Actions" },
+        ];
+
         const pagination = ref({
             current_page: 1,
             last_page: 1,
@@ -153,20 +132,24 @@ export default defineComponent({
         const editingProduct = ref<Product | null>(null);
 
         const fetchLowStock = async (page = 1) => {
-            const res = await axios.get("/admin/notification/data", {
-                params: {
-                    page,
-                    per_page: pagination.value.per_page,
-                    search: barcode.value,
-                },
-            });
-            products.value = res.data.data;
-            pagination.value = {
-                current_page: res.data.current_page,
-                last_page: res.data.last_page,
-                per_page: res.data.per_page,
-                total: res.data.total,
-            };
+            try {
+                const res = await axios.get("/admin/notification/data", {
+                    params: {
+                        page,
+                        per_page: pagination.value.per_page,
+                        search: barcode.value,
+                    },
+                });
+                products.value = res.data.data;
+                pagination.value = {
+                    current_page: res.data.current_page,
+                    last_page: res.data.last_page,
+                    per_page: res.data.per_page,
+                    total: res.data.total,
+                };
+            } catch (error) {
+                console.error("Error fetching low stock:", error);
+            }
         };
 
         const editProduct = (product: Product) => {
@@ -176,8 +159,12 @@ export default defineComponent({
         const deleteProduct = async (id: number) => {
             if (!confirm("Are you sure you want to delete this product?"))
                 return;
-            await axios.delete(`/admin/notification/${id}`);
-            fetchLowStock(pagination.value.current_page);
+            try {
+                await axios.delete(`/admin/notification/${id}`);
+                fetchLowStock(pagination.value.current_page);
+            } catch (error) {
+                console.error("Error deleting product:", error);
+            }
         };
 
         onMounted(() => fetchLowStock());
@@ -190,6 +177,7 @@ export default defineComponent({
             fetchLowStock,
             editProduct,
             deleteProduct,
+            tableColumns,
         };
     },
 });
