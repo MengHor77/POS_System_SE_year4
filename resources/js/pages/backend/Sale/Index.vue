@@ -7,19 +7,29 @@
                         Sales Management
                     </h1>
 
-                    <div class="flex items-center gap-3 w-full md:w-auto">
-                        <SearchInput
-                            v-model="searchQuery"
-                            placeholder="Search ID, Product, or Cashier..."
-                            @search="fetchSales(1)"
-                        />
+                    <div
+                        class="flex flex-wrap items-center justify-between gap-4"
+                    >
+                        <div class="flex items-center gap-3 w-full md:w-auto">
+                            <SearchInput
+                                v-model="searchQuery"
+                                placeholder="Search ID, Product, or Cashier..."
+                                @search="fetchSales(1)"
+                            />
 
-                        <button
-                            @click="fetchSales(1)"
-                            class="px-4 py-2 bg-bgCard hover:bg-bgHover text-muted border border-border rounded-lg text-sm transition shadow-soft flex items-center gap-2"
-                        >
-                            <i class="fas fa-sync-alt"></i> Refresh
-                        </button>
+                            <button
+                                @click="fetchSales(1)"
+                                class="px-4 py-2 bg-bgCard hover:bg-bgHover text-muted border border-border rounded-lg text-sm transition shadow-soft flex items-center gap-2"
+                            >
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
+
+                        <DateRangeFilter
+                            v-model:startDate="startDate"
+                            v-model:endDate="endDate"
+                            @filter="fetchSales(1)"
+                        />
                     </div>
                 </div>
 
@@ -86,6 +96,7 @@ import BackendLayout from "../../../layouts/BackendLayout.vue";
 import Table from "../../../components/Backend/Table.vue";
 import Pigination from "../../../components/Backend/Pigination.vue";
 import SearchInput from "../../../components/Backend/SearchInput.vue";
+import DateRangeFilter from "../../../components/Backend/DateRangeFilter.vue";
 import SaleTransactionDetails from "./SaleTransactionDetails.vue";
 import axios from "axios";
 
@@ -109,6 +120,7 @@ export default defineComponent({
         Table,
         Pigination,
         SearchInput,
+        DateRangeFilter,
         SaleTransactionDetails,
     },
     setup() {
@@ -116,6 +128,9 @@ export default defineComponent({
         const selectedSale = ref<Sale | null>(null);
         const showModal = ref(false);
         const searchQuery = ref("");
+
+        const startDate = ref("");
+        const endDate = ref("");
 
         const pagination = reactive({
             currentPage: 1,
@@ -140,6 +155,8 @@ export default defineComponent({
                     params: {
                         page: page,
                         search: searchQuery.value,
+                        start_date: startDate.value,
+                        end_date: endDate.value,
                     },
                 });
 
@@ -174,6 +191,8 @@ export default defineComponent({
             openDetail,
             searchQuery,
             pagination,
+            startDate,
+            endDate,
         };
     },
 });
