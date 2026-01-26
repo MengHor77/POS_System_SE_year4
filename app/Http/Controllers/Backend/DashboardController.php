@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backend;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
@@ -17,36 +18,26 @@ class DashboardController extends Controller
         $thisMonth = Carbon::now()->month;
         $thisYear = Carbon::now()->year;
 
-        // Total Revenue (sum of total_amount from sales)
-        $totalRevenue = DB::table('sales')->sum('total_amount');
+        // 1. Total Revenue (All time)
+        $totalRevenue = DB::table('sales')->sum('total_amount') ?? 0;
 
-        // Today's Sale
+        // 2. Today's Sale amount
         $todaysSale = DB::table('sales')
             ->whereDate('created_at', $today)
-            ->sum('total_amount');
+            ->sum('total_amount') ?? 0;
 
-        // This Month Revenue
+        // 3. This Month amount
         $thisMonthRevenue = DB::table('sales')
             ->whereMonth('created_at', $thisMonth)
             ->whereYear('created_at', $thisYear)
-            ->sum('total_amount');
+            ->sum('total_amount') ?? 0;
 
-        // This Year Revenue
+        // 4. This Year amount
         $thisYearRevenue = DB::table('sales')
             ->whereYear('created_at', $thisYear)
-            ->sum('total_amount');
+            ->sum('total_amount') ?? 0;
 
-        // Pending Shipments
-        $pendingShipments = DB::table('shipments')
-            ->where('status', 'pending')
-            ->count();
-
-        // Notifications (unread)
-        $notifications = DB::table('notifications')
-            ->where('is_read', 0)
-            ->count();
-
-        // Best Selling Products (top 5)
+        // 5. Best Selling Products (top 5)
         $bestSellingProducts = DB::table('sales')
             ->join('products', 'sales.product_id', '=', 'products.id')
             ->select('products.id', 'products.name', DB::raw('SUM(sales.quantity) as sales_count'))
@@ -55,23 +46,25 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        // Recent Sales (latest 10)
+        // 6. Recent Sales (latest 10) 
         $recentSales = DB::table('sales')
             ->join('products', 'sales.product_id', '=', 'products.id')
             ->select('sales.id', 'products.name as product_name', 'sales.total_amount', 'sales.created_at')
             ->orderByDesc('sales.created_at')
             ->limit(10)
-            ->get();
+            ->get()
+            ->map(function ($sale) {
+                $sale->created_at = Carbon::parse($sale->created_at)->format('Y-m-d H:i');
+                return $sale;
+            });
 
         return response()->json([
-            'totalRevenue' => $totalRevenue,
-            'todaysSale' => $todaysSale,
-            'thisMonth' => $thisMonthRevenue,
-            'thisYear' => $thisYearRevenue,
-            'pendingShipments' => $pendingShipments,
-            'notifications' => $notifications,
+            'totalRevenue' => (float)$totalRevenue,
+            'todaysSale'   => (float)$todaysSale,
+            'thisMonth'    => (float)$thisMonthRevenue,
+            'thisYear'     => (float)$thisYearRevenue,
             'bestSellingProducts' => $bestSellingProducts,
-            'recentSales' => $recentSales,
+            'recentSales'      => $recentSales,
         ]);
     }
 }

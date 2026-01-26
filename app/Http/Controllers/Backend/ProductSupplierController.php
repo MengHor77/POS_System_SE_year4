@@ -9,27 +9,60 @@ use Illuminate\Http\Request;
 class ProductSupplierController extends Controller
 {
     public function index(Request $request)
-{
-    $perPage = $request->per_page ?? 5;
-    $search = $request->search;
+    {
+        $search = $request->input('search');
 
-    $query = ProductSupplier::with('product');
+        // 1. Calculate Stats (Calculate these BEFORE filtering/paginating)
+        $today = \Carbon\Carbon::today();
+        $thisMonth = \Carbon\Carbon::now()->month;
+        $thisYear = \Carbon\Carbon::now()->year;
 
-    if ($search) {
-        $query->where(function($q) use ($search) {
-            $q->where('id', 'like', "%{$search}%")
-            ->orWhere('supplier_name', 'like', "%{$search}%")
-            ->orWhereHas('product', function($q2) use ($search) {
-                $q2->where('name', 'like', "%{$search}%");
+        $stats = [
+            'totalRevenue' => DB::table('sales')->sum('total_amount') ?? 0,
+            'todaysSale'   => DB::table('sales')->whereDate('created_at', $today)->sum('total_amount') ?? 0,
+            'thisMonth'    => DB::table('sales')->whereMonth('created_at', $thisMonth)
+                                                ->whereYear('created_at', $thisYear)
+                                                ->sum('total_amount') ?? 0,
+            'thisYear'     => DB::table('sales')->whereYear('created_at', $thisYear)->sum('total_amount') ?? 0,
+        ];
+
+        // 2. Your existing Search/Query logic
+        $query = Sale::with(['product', 'category']);
+
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('id', 'like', "%{$search}%")
+                ->orWhere('cashier_name', 'like', "%{$search}%")
+                ->orWhereHas('product', function ($p) use ($search) {
+                    $p->where('name', 'like', "%{$search}%");
+                });
             });
-        });
-    }
+        }
 
-    // តម្រៀបតាម ID ពីធំមកតូច ដើម្បីឱ្យទិន្នន័យថ្មីនៅខាងលើ
-    $suppliers = $query->orderBy('id', 'desc')->paginate($perPage);
-    
-    return response()->json($suppliers);
-}
+        $sales = $query->orderBy('created_at', 'desc')->paginate(5);
+
+        // 3. Transform data for the table
+        $sales->getCollection()->transform(function ($sale) {
+            return [
+                'id'            => $sale->id,
+                'product_id'    => $sale->product_id,
+                'product_name'  => $sale->product->name ?? 'N/A',
+                'category'      => $sale->category->name ?? 'N/A',
+                'unit_price'    => $sale->quantity > 0 ? ($sale->total_amount / $sale->quantity) : 0,
+                'quantity'      => $sale->quantity,
+                'total_amount'  => $sale->total_amount,
+                'cashier_name'  => $sale->cashier_name,
+                'cashier_email' => $sale->cashier_email,
+                'created_at'    => $sale->created_at->format('Y-m-d H:i'),
+            ];
+        });
+
+        // 4. IMPORTANT: Return both the sales and the stats
+        return response()->json([
+            'sales_data' => $sales,
+            'stats' => $stats
+        ]);
+    }
     // Store new supplier
     public function store(Request $request)
     {

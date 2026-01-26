@@ -1,7 +1,6 @@
 <template>
     <BackendLayout>
         <div class="p-6 bg-bgMain min-h-screen">
-            <!-- Dashboard Title -->
             <h1 class="text-3xl font-bold text-primary mb-1">
                 Sales Analytics
             </h1>
@@ -9,146 +8,79 @@
                 Overview of sales performance and trends
             </p>
 
-            <!-- Main Stats Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Total Revenue -->
                 <CardDashboard
-                    class="bg-bgCard"
                     title="Total Revenue"
-                    :value="'$' + totalRevenue"
+                    :value="formatPrice(totalRevenue)"
+                    class="bg-bgCard"
                 >
-                    <template #icon>
-                        <i
+                    <template #icon
+                        ><i
                             class="fas fa-dollar-sign text-secondary text-2xl"
-                        ></i>
-                    </template>
+                        ></i
+                    ></template>
                 </CardDashboard>
 
-                <!-- Today's Sale -->
                 <CardDashboard
-                    class="bg-bgCard"
                     title="Today's Sale"
-                    :value="'$' + todaysSale"
+                    :value="formatPrice(todaysSale)"
+                    class="bg-bgCard"
                 >
-                    <template #icon>
-                        <i class="fas fa-calendar-day text-info text-2xl"></i>
-                    </template>
+                    <template #icon
+                        ><i class="fas fa-calendar-day text-info text-2xl"></i
+                    ></template>
                 </CardDashboard>
 
-                <!-- This Month -->
                 <CardDashboard
-                    class="bg-bgCard"
                     title="This Month"
-                    :value="'$' + thisMonth"
+                    :value="formatPrice(thisMonth)"
+                    class="bg-bgCard"
                 >
-                    <template #icon>
-                        <i
+                    <template #icon
+                        ><i
                             class="fas fa-calendar-alt text-warning text-2xl"
-                        ></i>
-                    </template>
+                        ></i
+                    ></template>
                 </CardDashboard>
 
-                <!-- This Year -->
                 <CardDashboard
-                    class="bg-bgCard"
                     title="This Year"
-                    :value="'$' + thisYear"
+                    :value="formatPrice(thisYear)"
+                    class="bg-bgCard"
                 >
-                    <template #icon>
-                        <i class="fas fa-calendar text-primary text-2xl"></i>
-                    </template>
+                    <template #icon
+                        ><i class="fas fa-calendar text-primary text-2xl"></i
+                    ></template>
                 </CardDashboard>
             </div>
 
-            <!-- Additional Section -->
             <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <CardDashboard
-                    class="bg-bgCard"
                     title="Pending Shipments"
                     :value="pendingShipments"
-                >
-                    <template #icon>
-                        <i class="fas fa-truck text-pending text-2xl"></i>
-                    </template>
-                </CardDashboard>
-
-                <CardDashboard
                     class="bg-bgCard"
-                    title="Notifications"
-                    :value="lowStockCount"
                 >
-                    <template #icon>
-                        <i class="fas fa-bell text-danger text-2xl"></i>
-                    </template>
+                    <template #icon
+                        ><i class="fas fa-truck text-pending text-2xl"></i
+                    ></template>
+                </CardDashboard>
+                <CardDashboard
+                    title="Low Stock Alerts"
+                    :value="lowStockCount"
+                    class="bg-bgCard"
+                >
+                    <template #icon
+                        ><i class="fas fa-bell text-danger text-2xl"></i
+                    ></template>
                 </CardDashboard>
             </div>
 
-            <!-- Sales Graph & Best Selling Products -->
             <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Sales Graph -->
-                <div
-                    class="bg-bgCard p-6 rounded-2xl shadow-md h-96 flex items-center justify-center"
-                >
-                    <span class="text-gray-400">[Sales Graph Placeholder]</span>
-                </div>
-
-                <!-- Best Selling Products -->
-                <div
-                    class="bg-bgCard p-6 rounded-2xl shadow-md h-96 flex flex-col"
-                >
-                    <h2 class="text-lg font-bold mb-4 text-primary">
-                        Best Selling Products
-                    </h2>
-                    <ul class="flex-1 overflow-y-auto">
-                        <li
-                            v-for="product in bestSellingProducts"
-                            :key="product.id"
-                            class="flex justify-between py-2 border-b border-border"
-                        >
-                            <span class="text-gray-700">{{
-                                product.name
-                            }}</span>
-                            <span class="font-semibold text-secondary">{{
-                                product.sales_count
-                            }}</span>
-                        </li>
-                        <li
-                            v-if="bestSellingProducts.length === 0"
-                            class="text-center text-gray-400 py-4"
-                        >
-                            No best selling products yet.
-                        </li>
-                    </ul>
-                </div>
+                <SalesGraph />
+                <BestSelling :products="bestSellingProducts" />
             </div>
 
-            <!-- Recent Sales -->
-            <div class="mt-8 bg-bgCard p-6 rounded-2xl shadow-md h-96">
-                <h2 class="text-lg font-bold mb-4 text-primary">
-                    Recent Sales
-                </h2>
-                <ul class="overflow-y-auto h-80">
-                    <li
-                        v-for="sale in recentSales"
-                        :key="sale.id"
-                        class="flex justify-between py-2 border-b border-border"
-                    >
-                        <span class="text-gray-700">{{
-                            sale.product_name
-                        }}</span>
-                        <span class="font-semibold text-secondary"
-                            >${{ sale.total_amount }}</span
-                        >
-                        <span class="text-gray-500">{{ sale.created_at }}</span>
-                    </li>
-                    <li
-                        v-if="recentSales.length === 0"
-                        class="text-center text-gray-400 py-4"
-                    >
-                        No recent sales yet.
-                    </li>
-                </ul>
-            </div>
+            <RecentSales :sales="recentSales" />
         </div>
     </BackendLayout>
 </template>
@@ -158,68 +90,60 @@ import { defineComponent, ref, onMounted } from "vue";
 import axios from "axios";
 import CardDashboard from "../../../components/Backend/CardDashboard.vue";
 import BackendLayout from "../../../layouts/BackendLayout.vue";
-
-interface BestSellingProduct {
-    id: number;
-    name: string;
-    sales_count: number;
-}
-
-interface RecentSale {
-    id: number;
-    product_name: string;
-    total_amount: number;
-    created_at: string;
-}
+// New Component Imports
+import SalesGraph from "../../../components/Backend/SalesGraph.vue";
+import BestSelling from "../../../components/Backend/BestSelling.vue";
+import RecentSales from "../../../components/Backend/RecentSales.vue";
 
 export default defineComponent({
     name: "Dashboard",
-    components: { CardDashboard, BackendLayout },
+    components: {
+        CardDashboard,
+        BackendLayout,
+        SalesGraph,
+        BestSelling,
+        RecentSales,
+    },
     setup() {
         const totalRevenue = ref(0);
         const todaysSale = ref(0);
         const thisMonth = ref(0);
         const thisYear = ref(0);
         const pendingShipments = ref(0);
-        const notifications = ref(0);
-        const bestSellingProducts = ref<BestSellingProduct[]>([]);
-        const recentSales = ref<RecentSale[]>([]);
-
         const lowStockCount = ref(0);
+        const bestSellingProducts = ref([]);
+        const recentSales = ref([]);
 
-        const fetchLowStockCount = async () => {
+        const formatPrice = (val: number) => {
+            return (
+                "$" +
+                Number(val).toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                })
+            );
+        };
+
+        const fetchData = async () => {
             try {
-                const res = await axios.get("/admin/notification/count");
-                lowStockCount.value = res.data.total ?? 0;
+                const [dash, notify] = await Promise.all([
+                    axios.get("/admin/dashboard/data"),
+                    axios.get("/admin/notification/count"),
+                ]);
+
+                totalRevenue.value = dash.data.totalRevenue ?? 0;
+                todaysSale.value = dash.data.todaysSale ?? 0;
+                thisMonth.value = dash.data.thisMonth ?? 0;
+                thisYear.value = dash.data.thisYear ?? 0;
+                pendingShipments.value = dash.data.pendingShipments ?? 0;
+                bestSellingProducts.value = dash.data.bestSellingProducts ?? [];
+                recentSales.value = dash.data.recentSales ?? [];
+                lowStockCount.value = notify.data.total ?? 0;
             } catch (err) {
-                console.error("Failed to fetch low-stock count", err);
+                console.error("Dashboard Fetch Error:", err);
             }
         };
 
-        onMounted(() => {
-            fetchDashboardData();
-            fetchLowStockCount();
-        });
-
-        const fetchDashboardData = async () => {
-            try {
-                const res = await axios.get("/admin/dashboard/data");
-                totalRevenue.value = res.data.totalRevenue ?? 0;
-                todaysSale.value = res.data.todaysSale ?? 0;
-                thisMonth.value = res.data.thisMonth ?? 0;
-                thisYear.value = res.data.thisYear ?? 0;
-                pendingShipments.value = res.data.pendingShipments ?? 0;
-                notifications.value = res.data.notifications ?? 0;
-                bestSellingProducts.value = res.data.bestSellingProducts ?? [];
-                recentSales.value = res.data.recentSales ?? [];
-            } catch (err) {
-                console.error("Failed to fetch dashboard data", err);
-            }
-        };
-
-        onMounted(() => {
-            fetchDashboardData();
-        });
+        onMounted(fetchData);
 
         return {
             totalRevenue,
@@ -227,22 +151,21 @@ export default defineComponent({
             thisMonth,
             thisYear,
             pendingShipments,
-            notifications,
             lowStockCount,
             bestSellingProducts,
             recentSales,
+            formatPrice,
         };
     },
 });
 </script>
 
-<style scoped>
-/* Scrollbar styling for long lists */
-ul::-webkit-scrollbar {
+<style>
+.custom-scrollbar::-webkit-scrollbar {
     width: 6px;
 }
-ul::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.2);
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.1);
     border-radius: 3px;
 }
 </style>
