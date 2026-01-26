@@ -2,7 +2,7 @@
     <BackendLayout>
         <div class="p-6 bg-bgMain min-h-screen">
             <div
-                class="flex justify-between items-center mb-8 border-b border-border pb-4"
+                class="flex justify-between items-center mb-8 border-b border-border pb-4 no-print"
             >
                 <div>
                     <h1 class="text-3xl font-bold text-gray-800 tracking-tight">
@@ -14,133 +14,140 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div
-                    class="p-6 border border-border rounded-xl2 bg-bgCard shadow-soft"
-                >
-                    <p
-                        class="text-xs text-muted uppercase font-bold tracking-wider mb-1"
-                    >
-                        Total Revenue
-                    </p>
-                    <p class="text-3xl font-extrabold text-primary">
-                        {{ formatPrice(totalRevenue) }}
-                    </p>
-                </div>
-                <div
-                    class="p-6 border border-border rounded-xl2 bg-bgCard shadow-soft"
-                >
-                    <p
-                        class="text-xs text-muted uppercase font-bold tracking-wider mb-1"
-                    >
-                        Today's Sales
-                    </p>
-                    <p class="text-3xl font-extrabold text-secondary">
-                        {{ formatPrice(todaysSale) }}
-                    </p>
-                </div>
-                <div
-                    class="p-6 border border-border rounded-xl2 bg-bgCard shadow-soft"
-                >
-                    <p
-                        class="text-xs text-muted uppercase font-bold tracking-wider mb-1"
-                    >
-                        Transactions Count
-                    </p>
-                    <p class="text-3xl font-extrabold text-info">
-                        {{ pagination.total }}
-                    </p>
-                </div>
-            </div>
-            <div class="flex items-center gap-4 no-print pb-6">
-                <SearchInput
-                    v-model="searchQuery"
-                    @search="fetchData(1)"
-                    placeholder="Search ID, Cashier, or Product..."
-                />
-                <button
-                    @click="printReport"
-                    class="bg-primary hover:bg-darkSoft text-white px-5 py-2 rounded-xl shadow-card transition-all flex items-center"
-                >
-                    <i class="fas fa-print mr-2"></i> Print Report
-                </button>
-            </div>
-            <div
-                class="bg-bgCard border border-border rounded-xl2 overflow-hidden shadow-card"
-            >
-                <div class="bg-tableHeader p-4 border-b border-border">
-                    <h3 class="font-bold text-dark">
-                        Grouped Sales Transactions
-                    </h3>
+            <div id="printable-area">
+                <div class="print-only mb-6">
+                    <h1 class="text-2xl font-bold">Sales Transaction Report</h1>
+                    <p class="text-sm">Generated on {{ reportDate }}</p>
+                    <hr class="my-4 border-gray-300" />
                 </div>
 
-                <Table
-                    :columns="tableColumns"
-                    :data="transactions"
-                    rowKey="id"
-                    class="w-full"
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div
+                        class="p-6 border border-border rounded-xl2 bg-bgCard shadow-soft"
+                    >
+                        <p
+                            class="text-xs text-muted uppercase font-bold tracking-wider mb-1"
+                        >
+                            Total Revenue
+                        </p>
+                        <p class="text-3xl font-extrabold text-primary">
+                            {{ formatPrice(totalRevenue) }}
+                        </p>
+                    </div>
+                    <div
+                        class="p-6 border border-border rounded-xl2 bg-bgCard shadow-soft"
+                    >
+                        <p
+                            class="text-xs text-muted uppercase font-bold tracking-wider mb-1"
+                        >
+                            Today's Sales
+                        </p>
+                        <p class="text-3xl font-extrabold text-secondary">
+                            {{ formatPrice(todaysSale) }}
+                        </p>
+                    </div>
+                    <div
+                        class="p-6 border border-border rounded-xl2 bg-bgCard shadow-soft"
+                    >
+                        <p
+                            class="text-xs text-muted uppercase font-bold tracking-wider mb-1"
+                        >
+                            Transactions Count
+                        </p>
+                        <p class="text-3xl font-extrabold text-info">
+                            {{ pagination.total }}
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4 pb-6 no-print">
+                    <SearchInput
+                        v-model="searchQuery"
+                        @search="fetchData(1)"
+                        placeholder="Search ID, Cashier, or Product..."
+                    />
+                    <button
+                        @click="printReport"
+                        class="bg-primary hover:bg-darkSoft text-white px-5 py-2 rounded-xl shadow-card transition-all flex items-center"
+                    >
+                        <i class="fas fa-print mr-2"></i> Print Report
+                    </button>
+                </div>
+                <div
+                    class="bg-bgCard border border-border rounded-xl2 overflow-hidden shadow-card"
                 >
-                    <template #cell-id="{ row }">
-                        <span class="font-mono text-xs font-bold text-gray-600">
-                            #{{ row.id }}
-                        </span>
-                    </template>
-
-                    <template #cell-cashier_email="{ row }">
-                        <div class="flex flex-col py-2">
-                            <span class="font-bold text-gray-900">{{
-                                row.cashier_name || "N/A"
-                            }}</span>
-                            <span class="text-xxs text-muted">{{
-                                row.cashier_email || "N/A"
-                            }}</span>
-                        </div>
-                    </template>
-
-                    <template #cell-product_name="{ row }">
-                        <div class="flex flex-col gap-1 py-2">
-                            <div
-                                v-for="(item, index) in row.products"
-                                :key="index"
-                                class="text-xs border-b border-gray-100 last:border-0 pb-1"
+                    <div class="bg-tableHeader p-4 border-b border-border">
+                        <h3 class="font-bold text-dark">
+                            Grouped Sales Transactions
+                        </h3>
+                    </div>
+                    <Table
+                        :columns="tableColumns"
+                        :data="transactions"
+                        rowKey="id"
+                        class="w-full"
+                    >
+                        <template #cell-id="{ row }">
+                            <span
+                                class="font-mono text-xs font-bold text-gray-600"
+                                >#{{ row.id }}</span
                             >
-                                <span class="font-semibold text-primary">{{
-                                    item.name
+                        </template>
+
+                        <template #cell-cashier_email="{ row }">
+                            <div class="flex flex-col py-2">
+                                <span class="font-bold text-gray-900">{{
+                                    row.cashier_name || "N/A"
                                 }}</span>
-                                <span class="text-muted ml-2 font-bold"
-                                    >x{{ item.qty }}</span
+                                <span class="text-xxs text-muted">{{
+                                    row.cashier_email || "N/A"
+                                }}</span>
+                            </div>
+                        </template>
+
+                        <template #cell-product_name="{ row }">
+                            <div class="flex flex-col gap-1 py-2">
+                                <div
+                                    v-for="(item, index) in row.products"
+                                    :key="index"
+                                    class="text-xs border-b border-gray-100 last:border-0 pb-1"
                                 >
+                                    <span class="font-semibold text-primary">{{
+                                        item.name
+                                    }}</span>
+                                    <span class="text-muted ml-2 font-bold"
+                                        >x{{ item.qty }}</span
+                                    >
+                                </div>
                             </div>
-                        </div>
-                    </template>
+                        </template>
 
-                    <template #cell-unit_price="{ row }">
-                        <div class="flex flex-col gap-1 py-2">
-                            <div
-                                v-for="(item, index) in row.products"
-                                :key="index"
-                                class="text-xs pb-1 text-gray-600"
-                            >
-                                {{ formatPrice(item.price) }}
+                        <template #cell-unit_price="{ row }">
+                            <div class="flex flex-col gap-1 py-2">
+                                <div
+                                    v-for="(item, index) in row.products"
+                                    :key="index"
+                                    class="text-xs pb-1 text-gray-600"
+                                >
+                                    {{ formatPrice(item.price) }}
+                                </div>
                             </div>
-                        </div>
-                    </template>
+                        </template>
 
-                    <template #cell-total_amount="{ row }">
-                        <span class="font-extrabold text-success text-lg">
-                            {{ formatPrice(row.total_amount || 0) }}
-                        </span>
-                    </template>
+                        <template #cell-total_amount="{ row }">
+                            <span class="font-extrabold text-success text-lg">{{
+                                formatPrice(row.total_amount || 0)
+                            }}</span>
+                        </template>
 
-                    <template #cell-date_formatted="{ row }">
-                        <div class="text-sm text-gray-700 py-2">
-                            <i class="far fa-clock mr-1 text-muted"></i>
-                            {{ row.date_formatted }}
-                        </div>
-                    </template>
-                </Table>
+                        <template #cell-date_formatted="{ row }">
+                            <div class="text-sm text-gray-700 py-2">
+                                <i class="far fa-clock mr-1 text-muted"></i>
+                                {{ row.date_formatted }}
+                            </div>
+                        </template>
+                    </Table>
+                </div>
             </div>
-
             <div class="no-print mt-6">
                 <Pigination
                     v-if="pagination.total > 0"
@@ -191,18 +198,13 @@ export default defineComponent({
         const fetchData = async (page = 1) => {
             try {
                 const response = await axios.get("/admin/report/data", {
-                    params: {
-                        page: page,
-                        search: searchQuery.value,
-                    },
+                    params: { page: page, search: searchQuery.value },
                 });
-
                 const res = response.data;
                 totalRevenue.value = res.dash?.totalRevenue || 0;
                 todaysSale.value = res.dash?.todaysSale || 0;
                 reportDate.value = res.reportDate || "";
                 transactions.value = res.orders?.data || [];
-
                 pagination.value = {
                     current_page: res.orders?.current_page || 1,
                     last_page: res.orders?.last_page || 1,
@@ -247,20 +249,100 @@ export default defineComponent({
 </script>
 
 <style scoped>
+/* Only visible on physical paper or PDF */
+.print-only {
+    display: none;
+}
+
 @media print {
+    /* 1. HIDE EVERYTHING EXCEPT THE REPORT */
+    /* Target layout parts like Sidebar and Top Nav to stop the overlap */
+    :deep(aside),
+    :deep(nav),
+    :deep(header),
+    :deep(.sidebar),
+    :deep(.top-navbar),
     .no-print {
         display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
     }
-    .bg-bgCard,
-    .bg-bgMain {
-        background-color: white !important;
-        print-color-adjust: exact;
+
+    /* 2. RESET PAGE POSITIONING */
+    /* Remove background colors and move report to top-left corner */
+    .p-6.bg-bgMain {
+        padding: 0 !important;
+        margin: 0 !important;
+        background: white !important;
+        width: 100% !important;
     }
-    .shadow-card,
-    .shadow-soft {
+
+    #printable-area {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* 3. FIX CARDS (TOTAL REVENUE, TODAY SALES) */
+    /* Grid often breaks in print; we force Flexbox row layout */
+    .grid {
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 15px !important;
+        margin-bottom: 20px !important;
+    }
+
+    .grid > div {
+        flex: 1 !important;
+        border: 1px solid #e5e7eb !important;
+        border-radius: 12px !important;
+        box-shadow: none !important;
+        background: white !important;
+    }
+
+    /* 4. TABLE STYLING */
+    .bg-bgCard {
+        background: white !important;
+        border: 1px solid #e5e7eb !important;
         box-shadow: none !important;
     }
+
+    table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+    }
+
+    /* Prevent table rows from being cut in half across pages */
+    tr {
+        page-break-inside: avoid !important;
+    }
+
+    /* 5. TITLES & COLORS */
+    .print-only {
+        display: block !important;
+        text-align: center;
+        border-bottom: 2px solid #000;
+        margin-bottom: 30px;
+        padding-bottom: 10px;
+    }
+
+    /* Force all colored text to high-contrast black for paper */
+    .text-primary,
+    .text-secondary,
+    .text-success,
+    .text-info,
+    .text-3xl {
+        color: #000 !important;
+        font-weight: bold !important;
+    }
 }
+
+/* Screen layout spacing */
 .gap-1 {
     gap: 0.25rem;
 }
