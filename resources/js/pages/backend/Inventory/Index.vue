@@ -38,7 +38,7 @@
                         Current Inventory
                     </h1>
 
-                    <CardInventory
+                    <CardProductInventory
                         v-for="product in products"
                         :key="product.id"
                         :product="product"
@@ -83,7 +83,7 @@ import { defineComponent, ref, onMounted, computed } from "vue";
 import axios from "axios";
 
 import BackendLayout from "../../../layouts/BackendLayout.vue";
-import CardInventory from "../../../components//Backend/CardInventory.vue";
+import CardProductInventory from "../../../components/Backend/CardProductInventory.vue";
 import CardStockAlert from "../../../components/Backend/CardStockAlert.vue";
 import FlassMessage from "../../../components/Backend/FlassMessage.vue";
 import SearchInput from "../../../components/Backend/SearchInput.vue";
@@ -103,7 +103,7 @@ interface Product {
 export default defineComponent({
     components: {
         BackendLayout,
-        CardInventory,
+        CardProductInventory,
         Create,
         Edit,
         CardStockAlert,
