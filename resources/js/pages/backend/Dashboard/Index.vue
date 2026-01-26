@@ -62,9 +62,9 @@
                     :value="pendingShipments"
                     class="bg-bgCard shadow-soft"
                 >
-                    <template #icon
-                        ><i class="fas fa-truck text-pending text-2xl"></i
-                    ></template>
+                    <template #icon>
+                        <i class="fas fa-truck text-pending text-2xl"></i>
+                    </template>
                 </CardDashboard>
                 <CardDashboard
                     title="Low Stock Alerts"
@@ -116,7 +116,6 @@ export default defineComponent({
         const lowStockCount = ref(0);
         const bestSellingProducts = ref([]);
         const recentSales = ref([]);
-
         const formatPrice = (val: number) => {
             return (
                 "$" +

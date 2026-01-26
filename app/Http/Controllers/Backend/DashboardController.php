@@ -77,11 +77,17 @@ class DashboardController extends Controller
             ->get();
 
 
+        $pendingShipments = DB::table('purchase_orders')
+            ->where('status', '!=', 'received')
+            ->orWhereNull('status')
+            ->count();
+
         return response()->json([
             'totalRevenue' => (float)$totalRevenue,
             'todaysSale'   => (float)$todaysSale,
             'thisMonth'    => (float)$thisMonthRevenue,
             'thisYear'     => (float)$thisYearRevenue,
+            'pendingShipments'    => $pendingShipments, 
             'bestSellingProducts' => $bestSellingProducts,
             'recentSales'      => $recentSales,
             'chartLabels' => $monthlySales->pluck('month'), 
