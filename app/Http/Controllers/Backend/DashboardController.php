@@ -65,6 +65,18 @@ class DashboardController extends Controller
                 return $sale;
             });
 
+          $monthlySales = DB::table('sales')
+            ->select(
+            DB::raw("DATE_FORMAT(created_at, '%b') as month"),
+            DB::raw("SUM(total_amount) as total"),
+            DB::raw("MAX(created_at) as latest_date") // Used for correct sorting
+            )
+            ->where('created_at', '>=', now()->subMonths(5)->startOfMonth())
+            ->groupBy('month')
+            ->orderBy('latest_date', 'ASC')
+            ->get();
+
+
         return response()->json([
             'totalRevenue' => (float)$totalRevenue,
             'todaysSale'   => (float)$todaysSale,
@@ -72,6 +84,8 @@ class DashboardController extends Controller
             'thisYear'     => (float)$thisYearRevenue,
             'bestSellingProducts' => $bestSellingProducts,
             'recentSales'      => $recentSales,
+            'chartLabels' => $monthlySales->pluck('month'), 
+            'chartValues' => $monthlySales->pluck('total'),
         ]);
     }
 }

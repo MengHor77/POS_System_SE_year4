@@ -2,13 +2,8 @@
     <div class="bg-bgCard p-6 rounded-xl2 shadow-card h-96 flex flex-col">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-lg font-bold text-primary">
-                Best Selling Products
+                Best Selling (lastest 5)
             </h2>
-            <button
-                class="text-xxs font-semibold text-primary hover:text-darkSoft uppercase tracking-wider"
-            >
-                View All
-            </button>
         </div>
 
         <ul class="flex-1 overflow-y-auto custom-scrollbar pr-4">

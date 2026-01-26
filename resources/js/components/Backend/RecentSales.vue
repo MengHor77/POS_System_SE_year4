@@ -1,6 +1,8 @@
 <template>
     <div class="mt-8 bg-bgCard p-6 rounded-xl2 shadow-card h-96 flex flex-col">
-        <h2 class="text-lg font-bold mb-4 text-primary">Recent Sales</h2>
+        <h2 class="text-lg font-bold mb-4 text-primary">
+            Recent Sales (latest 10)
+        </h2>
 
         <ul class="flex-1 overflow-y-auto custom-scrollbar pr-4">
             <li
