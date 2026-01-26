@@ -70,7 +70,7 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::post('/purchase-order', [PurchaseOrderController::class, 'store']);
     Route::put('/purchase-order/{id}', [PurchaseOrderController::class, 'update']);
     Route::delete('/purchase-order/{id}', [PurchaseOrderController::class, 'destroy']);
-
+    Route::post('/purchase-order/{id}/receive', [PurchaseOrderController::class, 'receive']);
     // Admin Profile API
     Route::get('/profile/data', [ProfileController::class, 'list']);
     Route::get('/profile/{id}', [ProfileController::class, 'show']);

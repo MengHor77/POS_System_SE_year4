@@ -5,20 +5,30 @@ namespace App\Http\Controllers\Backend;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\PurchaseOrder;
+use App\Models\Product; 
+use Illuminate\Support\Facades\DB; 
 
 class PurchaseOrderController extends Controller
 {
-    
+    /**
+     * Display a listing of the resource with search, status filter, and pagination.
+     */
     public function index(Request $request)
     {
         $search = $request->input('search', '');
         $perPage = $request->input('per_page', 5);
+        $status = $request->input('status', ''); // Capture status from Vue FilterStatus
 
         $query = PurchaseOrder::with(['productSupplier.product']);
 
+        // --- NEW: Status Filtering Logic ---
+        if ($status !== '' && $status !== null) {
+            $query->where('status', $status);
+        }
+
+        // Search logic (ID, Supplier, or Product Name)
         if ($search) {
             $query->where(function ($q) use ($search) {
-                // Search by PO ID, Supplier Name, or Product Name
                 $q->where('id', 'like', "%{$search}%")
                   ->orWhere('supplier_name', 'like', "%{$search}%")
                   ->orWhereHas('productSupplier.product', function ($q2) use ($search) {
@@ -29,31 +39,33 @@ class PurchaseOrderController extends Controller
 
         $orders = $query->latest()->paginate($perPage);
 
-        // Transform data to match your Vue <template #cell-product="{ row }">
+        // Transform data for the Vue Table
         $formattedData = $orders->getCollection()->map(function ($order) {
             return [
-                'id' => $order->id,
+                'id'            => $order->id,
                 'supplier_name' => $order->supplier_name,
-                'quantity' => $order->quantity,
-                'status' => $order->status ?? 'pending',
-                'product_supplier_id' => $order->product_supplier_id,
-                'product' => [
-                    'id' => $order->productSupplier->product->id ?? null,
+                'quantity'      => $order->quantity,
+                'status'        => $order->status ?? 'pending',
+                'created_at'    => $order->created_at->format('Y-m-d H:i'),
+                'product'       => [
+                    'id'   => $order->productSupplier->product->id ?? null,
                     'name' => $order->productSupplier->product->name ?? 'N/A',
                 ],
             ];
         });
 
         return response()->json([
-            'data' => $formattedData,
+            'data'         => $formattedData,
             'current_page' => $orders->currentPage(),
-            'last_page' => $orders->lastPage(),
-            'per_page' => $orders->perPage(),
-            'total' => $orders->total(),
+            'last_page'    => $orders->lastPage(),
+            'per_page'     => $orders->perPage(),
+            'total'        => $orders->total(),
         ]);
     }
 
-   
+    /**
+     * Store a newly created resource in storage.
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -62,15 +74,19 @@ class PurchaseOrderController extends Controller
             'quantity'            => 'required|integer|min:1',
         ]);
 
+        $validated['status'] = 'pending';
+
         $order = PurchaseOrder::create($validated);
 
         return response()->json([
             'message' => 'Order created successfully',
-            'data' => $order
+            'data'    => $order
         ], 201);
     }
 
-   
+    /**
+     * Update the specified resource in storage.
+     */
     public function update(Request $request, $id)
     {
         $order = PurchaseOrder::findOrFail($id);
@@ -85,13 +101,54 @@ class PurchaseOrderController extends Controller
 
         return response()->json([
             'message' => 'Order updated successfully',
-            'data' => $order
+            'data'    => $order
         ]);
     }
 
+    /**
+     * Remove the specified resource from storage.
+     */
     public function destroy($id)
     {
         PurchaseOrder::findOrFail($id)->delete();
         return response()->json(['message' => 'Order deleted successfully']);
+    }
+
+    /**
+     * Process receiving of the order and increment product stock.
+     */
+    public function receive($id)
+    {
+        try {
+            DB::beginTransaction();
+
+            $order = PurchaseOrder::with('productSupplier.product')->findOrFail($id);
+
+            if ($order->status === 'received') {
+                return response()->json(['message' => 'Order already received.'], 422);
+            }
+
+            $product = $order->productSupplier->product;
+
+            if (!$product) {
+                throw new \Exception("Linked product not found.");
+            }
+
+            // Update Product Stock
+            $product->increment('stock', $order->quantity);
+
+            // Update Order Status
+            $order->update([
+                'status'      => 'received',
+                'received_at' => now()
+            ]);
+
+            DB::commit();
+            return response()->json(['message' => 'Stock updated and order marked as received!']);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Error: ' . $e->getMessage()], 500);
+        }
     }
 }

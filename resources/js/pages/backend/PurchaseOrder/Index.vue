@@ -24,6 +24,11 @@
                         @search="fetch(1)"
                     />
                 </div>
+
+                <FilterStatus
+                    v-model="selectedStatus"
+                    @update:modelValue="fetch(1)"
+                />
             </div>
 
             <FlashMessage
@@ -43,9 +48,9 @@
                     <template #cell-status="{ row }">
                         <span
                             :class="
-                                row.status === 'completed'
-                                    ? 'text-green-600'
-                                    : 'text-orange-600'
+                                row.status === 'received'
+                                    ? 'bg-green-100 text-green-700 px-2 py-1 rounded-lg text-xs font-bold'
+                                    : 'bg-orange-100 text-orange-700 px-2 py-1 rounded-lg text-xs font-bold'
                             "
                             class="capitalize"
                         >
@@ -53,20 +58,48 @@
                         </span>
                     </template>
 
+                    <template #cell-created_at="{ row }">
+                        <span class="text-sm text-gray-500">{{
+                            row.created_at
+                        }}</span>
+                    </template>
+
                     <template #cell-actions="{ row }">
                         <div class="flex gap-2">
                             <button
+                                v-if="row.status !== 'received'"
+                                @click="receiveOrder(row.id)"
+                                class="px-3 py-1 rounded-lg bg-green-600 text-white hover:bg-green-700 transition flex items-center gap-1 shadow-sm"
+                                title="Mark as Received"
+                            >
+                                <i class="fas fa-check-circle text-sm"></i>
+                                <span class="text-xs">Receive</span>
+                            </button>
+
+                            <button
+                                v-if="row.status !== 'received'"
                                 @click="openEdit(row)"
                                 class="px-3 py-1 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-600 hover:text-white transition"
+                                title="Edit Order"
                             >
                                 <i class="fas fa-pen text-sm"></i>
                             </button>
+
                             <button
+                                v-if="row.status !== 'received'"
                                 @click="deletePO(row.id)"
                                 class="px-3 py-1 rounded-lg bg-red-100 text-red-600 hover:bg-red-600 hover:text-white transition"
+                                title="Delete Order"
                             >
                                 <i class="fas fa-trash text-sm"></i>
                             </button>
+
+                            <span
+                                v-else
+                                class="text-gray-400 text-xs italic flex items-center gap-1"
+                            >
+                                <i class="fas fa-lock"></i> Locked
+                            </span>
                         </div>
                     </template>
                 </Table>
@@ -81,6 +114,7 @@
                 :per-page="perPage"
                 @page-change="fetch"
             />
+
             <PurchaseOrderCreate
                 v-if="showCreate"
                 @close="showCreate = false"
@@ -103,6 +137,7 @@ import axios from "axios";
 import BackendLayout from "../../../layouts/BackendLayout.vue";
 import PurchaseOrderCreate from "./Create.vue";
 import PurchaseOrderEdit from "./Edit.vue";
+import FilterStatus from "./FilterPendingOrRecievedStatus.vue"; // Import the new filter
 import Pigination from "../../../components/Backend/Pigination.vue";
 import FlashMessage from "../../../components/Backend/FlassMessage.vue";
 import Table from "../../../components/Backend/Table.vue";
@@ -113,6 +148,7 @@ export default defineComponent({
         BackendLayout,
         PurchaseOrderCreate,
         PurchaseOrderEdit,
+        FilterStatus, // Register it
         SearchInput,
         Pigination,
         FlashMessage,
@@ -125,6 +161,7 @@ export default defineComponent({
         const editId = ref<number | null>(null);
 
         const filterText = ref("");
+        const selectedStatus = ref(""); // New ref for status filtering
         const currentPage = ref(1);
         const lastPage = ref(1);
         const perPage = ref(5);
@@ -136,6 +173,7 @@ export default defineComponent({
             { key: "product", label: "Product" },
             { key: "quantity", label: "Qty" },
             { key: "status", label: "Status" },
+            { key: "created_at", label: "Date & Time" },
             { key: "actions", label: "Actions" },
         ];
 
@@ -159,6 +197,7 @@ export default defineComponent({
                 const res = await axios.get("/admin/purchase-order/data", {
                     params: {
                         search: filterText.value,
+                        status: selectedStatus.value, // Pass status to backend
                         page,
                         per_page: perPage.value,
                     },
@@ -169,6 +208,27 @@ export default defineComponent({
                 total.value = res.data.total;
             } catch (error) {
                 console.error("Error fetching data:", error);
+            }
+        };
+
+        const receiveOrder = async (id: number) => {
+            if (
+                !confirm(
+                    "Confirm receipt of goods? This will update product stock levels.",
+                )
+            )
+                return;
+            try {
+                const res = await axios.post(
+                    `/admin/purchase-order/${id}/receive`,
+                );
+                showFlash(res.data.message);
+                fetch(currentPage.value);
+            } catch (error: any) {
+                showFlash(
+                    error.response?.data?.message || "Failed to receive order",
+                    "error",
+                );
             }
         };
 
@@ -191,7 +251,7 @@ export default defineComponent({
         const onCreated = () => {
             showCreate.value = false;
             showFlash("Order created!");
-            fetch(1); // ត្រឡប់ទៅទំព័រទី១ ដើម្បីឃើញទិន្នន័យថ្មី
+            fetch(1);
         };
 
         const onUpdated = () => {
@@ -208,6 +268,7 @@ export default defineComponent({
             showEdit,
             editId,
             filterText,
+            selectedStatus, // Return to template
             currentPage,
             lastPage,
             perPage,
@@ -215,6 +276,7 @@ export default defineComponent({
             fetch,
             openEdit,
             deletePO,
+            receiveOrder,
             onCreated,
             onUpdated,
             flash,
