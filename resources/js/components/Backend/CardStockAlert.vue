@@ -1,29 +1,34 @@
 <template>
-    <div class="border border-red-200 bg-red-50 rounded-lg p-4">
-        <!-- Alert Header -->
+    <div
+        class="border border-dangerSoft bg-dangerSoft rounded-xl2 p-4 shadow-soft"
+    >
         <div class="flex items-center mb-3">
-            <i class="fa-solid fa-circle-exclamation text-red-600"></i>
+            <i class="fa-solid fa-circle-exclamation text-danger"></i>
 
-            <span class="text-red-600 font-semibold text-sm"
-                >Low Stock Alert</span
-            >
+            <span class="text-danger font-semibold text-sm ml-2">
+                Low Stock Alert
+            </span>
         </div>
 
-        <!-- Product Info Box -->
         <div
-            class="bg-white p-4 rounded-md flex justify-between items-center shadow-sm"
+            class="bg-bgCard p-4 rounded-xl flex justify-between items-center shadow-card border border-border"
         >
             <div>
-                <p class="font-medium text-gray-800">{{ product.name }}</p>
-                <p class="text-sm text-gray-500">
-                    Stock: {{ product.stock }} units
+                <p class="font-medium text-darkSoft">{{ product.name }}</p>
+                <p class="text-sm text-muted">
+                    Stock:
+                    <span class="text-danger font-bold">{{
+                        product.stock
+                    }}</span>
+                    units
                 </p>
             </div>
+
             <button
                 @click="$emit('add-stock', product)"
-                class="bg-black text-white text-sm px-3 py-1 rounded flex items-center space-x-1 hover:bg-gray-800"
+                class="bg-darkSoft text-white text-sm px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-dark transition-colors shadow-soft"
             >
-                <span>+</span>
+                <i class="fa-solid fa-plus"></i>
                 <span>Add Stock</span>
             </button>
         </div>
@@ -43,11 +48,13 @@ interface Product {
 }
 
 export default defineComponent({
+    name: "LowStockAlert",
     props: {
         product: {
             type: Object as PropType<Product>,
             required: true,
         },
     },
+    emits: ["add-stock"],
 });
 </script>

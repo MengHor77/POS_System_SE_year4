@@ -4,6 +4,7 @@
             <h1 class="text-2xl font-bold mb-6 text-primary">
                 Inventory Management
             </h1>
+
             <div class="w-80 py-6">
                 <SearchInput
                     v-model="search"
@@ -17,8 +18,8 @@
             </div>
 
             <div class="space-y-20">
-                <!-- LOW STOCK ALERTS -->
                 <div
+                    v-if="lowStockProducts.length > 0"
                     class="space-y-4 mb-6 bg-gray-100 p-6 rounded-xl shadow-sm"
                 >
                     <h1 class="pb-9 font-semibold text-xl text-warning">
@@ -26,11 +27,12 @@
                     </h1>
                     <CardStockAlert
                         v-for="product in lowStockProducts"
-                        :key="product.id"
+                        :key="'alert-' + product.id"
                         :product="product"
                         @add-stock="openStockIn"
                     />
                 </div>
+
                 <div
                     class="space-y-4 bg-gray-100 p-6 mb-6 rounded-xl shadow-sm"
                 >
@@ -40,7 +42,7 @@
 
                     <CardProductInventory
                         v-for="product in products"
-                        :key="product.id"
+                        :key="'inv-' + product.id"
                         :product="product"
                         class="w-full"
                         @stock-in="openStockIn(product)"
@@ -48,6 +50,7 @@
                     />
 
                     <Pigination
+                        v-if="pagination.last_page > 1"
                         :current-page="pagination.current_page"
                         :last-page="pagination.last_page"
                         :total="pagination.total"
@@ -57,7 +60,6 @@
                 </div>
             </div>
 
-            <!-- STOCK IN MODAL -->
             <Create
                 v-if="showStockIn && selectedProduct !== null"
                 :product="selectedProduct"
@@ -66,7 +68,6 @@
                 @created="fetchProducts"
             />
 
-            <!-- STOCK OUT MODAL -->
             <Edit
                 v-if="showStockOut && selectedProduct !== null"
                 :product="selectedProduct"
@@ -77,7 +78,6 @@
         </div>
     </BackendLayout>
 </template>
-
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed } from "vue";
 import axios from "axios";

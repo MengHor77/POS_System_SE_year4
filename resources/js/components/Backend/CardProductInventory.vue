@@ -30,8 +30,8 @@
         </div>
 
         <span
-            class="px-4 py-1 text-sm rounded-full font-bold shadow-soft"
-            :class="stockClass"
+            class="px-4 py-1 text-sm rounded-full font-bold shadow-soft transition-all duration-300"
+            :class="dynamicStockClass"
         >
             {{ product.stock }} in stock
         </span>
@@ -39,7 +39,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, PropType } from "vue";
+import { defineComponent, PropType, ref, watch } from "vue";
 
 /* ✅ LOCAL type */
 interface Product {
@@ -68,19 +68,30 @@ export default defineComponent({
     },
 
     setup(props) {
-        const stockClass = computed(() => {
-            // Using your Soft Status colors from tailwind.config.js
-            if (props.product.stock <= 5) {
-                return "bg-dangerSoft text-danger";
-            }
-            if (props.product.stock <= 10) {
-                return "bg-warningSoft text-warning";
-            }
-            // Default to your Brand primary/success colors
-            return "bg-successSoft text-success";
-        });
+        // Create a reactive ref to hold the CSS classes
+        const dynamicStockClass = ref("");
 
-        return { stockClass };
+        // Function to determine the styling based on current stock
+        const updateClass = (currentStock: number) => {
+            if (currentStock <= 5) {
+                dynamicStockClass.value = "bg-dangerSoft text-danger";
+            } else if (currentStock <= 10) {
+                dynamicStockClass.value = "bg-warningSoft text-warning";
+            } else {
+                dynamicStockClass.value = "bg-successSoft text-success";
+            }
+        };
+
+        // Watch the stock property of the product object
+        watch(
+            () => props.product.stock,
+            (newStock) => {
+                updateClass(newStock);
+            },
+            { immediate: true }, // Run immediately when component is created
+        );
+
+        return { dynamicStockClass };
     },
 });
 </script>
