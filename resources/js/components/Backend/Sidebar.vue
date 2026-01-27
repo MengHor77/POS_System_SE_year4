@@ -5,7 +5,7 @@
     >
         <!-- Logo + Toggle -->
         <div
-            class="flex items-center justify-between p-6 border-b border-darkSoft"
+            class="flex items-center justify-between p-6"
         >
             <span v-if="!collapsed" class="text-xl font-bold tracking-wide"
                 >Phone Store</span
