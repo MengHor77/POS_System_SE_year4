@@ -179,7 +179,6 @@ export default defineComponent({
             selectedSale.value = sale;
             showModal.value = true;
         };
-
         onMounted(() => fetchSales());
 
         return {

@@ -17,7 +17,8 @@ class SaleController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
-
+        $startDate = $request->input('start_date');  
+        $endDate = $request->input('end_date');
         $query = Sale::with(['product', 'category']);
 
         if (!empty($search)) {
@@ -29,7 +30,14 @@ class SaleController extends Controller
                   });
             });
         }
-
+    if (!empty($startDate) && !empty($endDate)) {
+            // We use whereBetween to find sales created from start to end
+            $query->whereBetween('created_at', [$startDate, $endDate]);
+        } elseif (!empty($startDate)) {
+            $query->where('created_at', '>=', $startDate);
+        } elseif (!empty($endDate)) {
+            $query->where('created_at', '<=', $endDate);
+        }
        
         $sales = $query->orderBy('created_at', 'desc')->paginate(5);
 
