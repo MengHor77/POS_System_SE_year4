@@ -66,13 +66,11 @@
                         @search="fetchData(1)"
                         placeholder="Search ID, Cashier name , email..."
                     />
-
                     <DateRangeFilter
                         v-model:startDate="startDate"
                         v-model:endDate="endDate"
                         @filter="fetchData(1)"
                     />
-
                     <button
                         @click="printReport"
                         class="bg-primary hover:bg-darkSoft text-white px-5 py-2 rounded-xl shadow-card transition-all flex items-center"
@@ -191,8 +189,6 @@ export default defineComponent({
         const transactions = ref([]);
         const reportDate = ref("");
         const searchQuery = ref("");
-
-        // NEW: Date states
         const startDate = ref("");
         const endDate = ref("");
 
@@ -218,8 +214,8 @@ export default defineComponent({
                     params: {
                         page: page,
                         search: searchQuery.value,
-                        start_date: startDate.value, // Send start date
-                        end_date: endDate.value, // Send end date
+                        start_date: startDate.value,
+                        end_date: endDate.value,
                     },
                 });
                 const res = response.data;
@@ -228,10 +224,10 @@ export default defineComponent({
                 reportDate.value = res.reportDate || "";
                 transactions.value = res.orders?.data || [];
                 pagination.value = {
-                    current_page: res.orders?.current_page || 1,
-                    last_page: res.orders?.last_page || 1,
-                    total: res.orders?.total || 0,
-                    per_page: res.orders?.per_page || 10,
+                    current_page: Number(res.orders?.current_page) || 1,
+                    last_page: Number(res.orders?.last_page) || 1,
+                    total: Number(res.orders?.total) || 0,
+                    per_page: Number(res.orders?.per_page) || 10,
                 };
             } catch (err) {
                 console.error("Report Fetch Error:", err);
@@ -240,14 +236,13 @@ export default defineComponent({
 
         const formatPrice = (val: any) => {
             const num = Number(val);
-            if (isNaN(num)) return "$0.00";
-            return (
-                "$" +
-                num.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                })
-            );
+            return isNaN(num)
+                ? "$0.00"
+                : "$" +
+                      num.toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                      });
         };
 
         const printReport = () => window.print();
@@ -263,7 +258,7 @@ export default defineComponent({
             searchQuery,
             pagination,
             startDate,
-            endDate,  
+            endDate,
             fetchData,
             formatPrice,
             printReport,
@@ -273,7 +268,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-/* (Keep your existing @media print styles here) */
 .print-only {
     display: none;
 }

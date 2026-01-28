@@ -29,27 +29,31 @@ class ReportController extends Controller
             });
         }
 
-        // 2. NEW: Filter by Date Range
+        // 2. Filter by Date Range
         if ($request->filled('start_date')) {
-            $query->where('created_at', '>=', Carbon::parse($request->start_date));
+            $query->whereDate('created_at', '>=', $request->start_date);
         }
         if ($request->filled('end_date')) {
-            $query->where('created_at', '<=', Carbon::parse($request->end_date));
+            $query->whereDate('created_at', '<=', $request->end_date);
         }
 
-        // Calculate Totals based on filtered query (optional: or keep global totals)
+        // Dashboard Stats
         $totalRevenue = Sale::sum('total_amount') ?? 0;
         $todaysSale = Sale::whereDate('created_at', $today)->sum('total_amount') ?? 0;
 
-        // Get Data and Group
-        $sales = $query->latest()->get()->groupBy(function($item) {
-            return $item->created_at->format('Y-m-d H:i:s') . $item->cashier_email;
+        // Get Data and Group by Y-m-d H:i (excluding seconds to keep items together)
+        $allSales = $query->latest()->get();
+        $groupedSales = $allSales->groupBy(function($item) {
+            return $item->created_at->format('Y-m-d H:i') . $item->cashier_email;
         });
 
         // Pagination Logic
-        $currentPage = $request->input('page', 1);
         $perPage = 10;
-        $currentItems = $sales->slice(($currentPage - 1) * $perPage, $perPage)->values();
+        $totalGrouped = $groupedSales->count(); 
+        $currentPage = (int)$request->input('page', 1);
+        $lastPage = (int)max(1, ceil($totalGrouped / $perPage)); 
+
+        $currentItems = $groupedSales->slice(($currentPage - 1) * $perPage, $perPage)->values();
         
         $formattedData = $currentItems->map(function ($group) {
             $first = $group->first();
@@ -64,28 +68,28 @@ class ReportController extends Controller
                         'price'=> $s->quantity > 0 ? ($s->total_amount / $s->quantity) : 0
                     ];
                 }),
-                'total_amount'   => $group->sum('total_amount'),
+                'total_amount'   => (float)$group->sum('total_amount'),
                 'date_formatted' => $first->created_at->format('d M Y, h:i A'),
             ];
         });
 
         return response()->json([
             'dash' => [
-                'totalRevenue' => $totalRevenue,
-                'todaysSale'   => $todaysSale,
+                'totalRevenue' => (float)$totalRevenue,
+                'todaysSale'   => (float)$todaysSale,
             ],
             'orders' => [
                 'data' => $formattedData,
-                'total' => $sales->count(),
+                'total' => $totalGrouped,
                 'current_page' => $currentPage,
-                'last_page' => ceil($sales->count() / $perPage),
+                'last_page' => $lastPage,
                 'per_page' => $perPage
             ],
             'reportDate' => Carbon::now()->format('d M Y, h:i A'),
         ]);
     }
 
-     public function getTransactionReport(Request $request)
+    public function getTransactionReport(Request $request)
     {
         $search = $request->input('search');
         $query = Sale::with(['product']);
@@ -112,7 +116,7 @@ class ReportController extends Controller
                 'product_name'   => $sale->product->name ?? 'N/A',
                 'unit_price'     => $sale->quantity > 0 ? ($sale->total_amount / $sale->quantity) : 0,
                 'quantity'       => $sale->quantity,
-                'total_amount'   => $sale->total_amount,
+                'total_amount'   => (float)$sale->total_amount,
                 'date_formatted' => $sale->created_at->format('d-m-Y H:i:s'),
             ];
         });
@@ -120,10 +124,12 @@ class ReportController extends Controller
         return response()->json([
             'orders' => $sales,
             'dash' => [
-                'totalRevenue' => Sale::sum('total_amount'),
+                'totalRevenue' => (float)Sale::sum('total_amount'),
                 'pendingShipments' => 0,
             ],
             'reportDate' => now()->format('d-m-Y H:i:s')
         ]);
     }
+
+    
 }
