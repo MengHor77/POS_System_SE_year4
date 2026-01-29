@@ -19,7 +19,7 @@
                 class="text-center text-gray-500 mt-10"
             >
                 🎉 All products have sufficient stock. Products with less than
-                amount 6 show here. You can
+                amount 6 show here.
                 <router-link
                     to="/admin/product"
                     class="text-blue-600 underline hover:text-blue-800"
@@ -30,6 +30,10 @@
 
             <div v-else>
                 <Table :columns="tableColumns" :data="products" rowKey="id">
+                    <template #cell-category="{ row }">
+                        {{ row.category?.name || row.category }}
+                    </template>
+
                     <template #cell-stock="{ row }">
                         <span
                             :class="
@@ -66,6 +70,7 @@
                     </template>
                 </Table>
             </div>
+
             <Pigination
                 v-if="pagination.last_page > 1"
                 class="mt-6"
@@ -95,23 +100,20 @@ import Pigination from "../../../components/Backend/Pigination.vue";
 import SearchInput from "../../../components/Backend/SearchInput.vue";
 import Table from "../../../components/Backend/Table.vue";
 
-interface Product {
-    id: number;
-    name: string;
-    brand: string;
-    barcode: string;
-    price: number;
-    stock: number;
-}
-
 export default defineComponent({
     name: "Notification",
     components: { BackendLayout, EditProduct, Pigination, SearchInput, Table },
     setup() {
-        const products = ref<Product[]>([]);
+        const products = ref([]);
         const barcode = ref("");
+        const pagination = ref({
+            current_page: 1,
+            last_page: 1,
+            per_page: 5,
+            total: 0,
+        });
+        const editingProduct = ref(null);
 
-        // Define Table Columns
         const tableColumns = [
             { key: "id", label: "ID" },
             { key: "name", label: "Name" },
@@ -123,21 +125,13 @@ export default defineComponent({
             { key: "actions", label: "Actions" },
         ];
 
-        const pagination = ref({
-            current_page: 1,
-            last_page: 1,
-            per_page: 5,
-            total: 0,
-        });
-        const editingProduct = ref<Product | null>(null);
-
         const fetchLowStock = async (page = 1) => {
             try {
                 const res = await axios.get("/admin/notification/data", {
                     params: {
                         page,
-                        per_page: pagination.value.per_page,
                         search: barcode.value,
+                        per_page: pagination.value.per_page,
                     },
                 });
                 products.value = res.data.data;
@@ -152,19 +146,14 @@ export default defineComponent({
             }
         };
 
-        const editProduct = (product: Product) => {
+        const editProduct = (product: any) => {
             editingProduct.value = { ...product };
         };
 
         const deleteProduct = async (id: number) => {
-            if (!confirm("Are you sure you want to delete this product?"))
-                return;
-            try {
-                await axios.delete(`/admin/notification/${id}`);
-                fetchLowStock(pagination.value.current_page);
-            } catch (error) {
-                console.error("Error deleting product:", error);
-            }
+            if (!confirm("Are you sure?")) return;
+            await axios.delete(`/admin/notification/${id}`);
+            fetchLowStock(pagination.value.current_page);
         };
 
         onMounted(() => fetchLowStock());

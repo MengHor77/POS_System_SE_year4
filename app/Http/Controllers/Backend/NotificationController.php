@@ -4,73 +4,76 @@ namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\Category;
 use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {
-    // Get low-stock products with optional barcode filter
     public function lowStock(Request $request)
     {
-        $threshold = 5; // Low stock threshold
-        $search = $request->get('search'); // can be barcode or name
+        $search = $request->get('search');
+        $threshold = 5;
 
-        $query = Product::where('stock', '<=', $threshold);
+        $query = Product::with('category')->where('stock', '<=', $threshold);
 
         if ($search) {
-            $query->where(function($q) use ($search) {
-                $q->where('barcode', 'like', "%{$search}%")
-                ->orWhere('name', 'like', "%{$search}%");
+            $query->where(function ($q) use ($search) {
+                $q->where('id', $search) 
+                  ->orWhere('name', 'like', "%{$search}%") 
+                  ->orWhere('barcode', 'like', "%{$search}%") 
+                  ->orWhereHas('category', function ($catQuery) use ($search) {
+                      $catQuery->where('name', 'like', "%{$search}%"); 
+                  });
             });
         }
 
-        $products = $query->orderBy('stock', 'asc')->paginate(5);
+        $perPage = $request->get('per_page', 5);
+        $products = $query->orderBy('id', 'desc')->paginate($perPage);
 
-        return response()->json([
-            'data' => $products->items(),
-            'current_page' => $products->currentPage(),
-            'last_page' => $products->lastPage(),
-            'per_page' => $products->perPage(),
-            'total' => $products->total(),
-        ]);
+        return response()->json($products);
     }
 
-
-    // Get total low-stock count for sidebar badge
     public function lowStockCount()
     {
         $threshold = 5;
         $total = Product::where('stock', '<=', $threshold)->count();
-
-        return response()->json([
-            'total' => $total
-        ]);
+        return response()->json(['total' => $total]);
     }
 
-    // ✅ Update product
     public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id);
 
-        $validated = $request->validate([
-           'name'    => 'sometimes|required|string|max:255',
-            'brand'   => 'sometimes|required|string|max:255',
+        $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'category' => 'sometimes|required', 
             'barcode' => 'sometimes|required|integer|unique:products,barcode,' . $id,
-            'price'   => 'sometimes|required|numeric',
-            'stock'   => 'sometimes|required|integer',
+            'price' => 'sometimes|required|numeric',
+            'stock' => 'sometimes|required|integer',
         ]);
 
-        $product->update($validated);
+        $data = $request->only(['name', 'barcode', 'price', 'stock']);
 
-        return response()->json(['message' => 'Product updated successfully']);
+        if ($request->has('category')) {
+            $categoryModel = Category::find($request->category);
+            if ($categoryModel) {
+                $data['category_id'] = $categoryModel->id;
+                $data['category'] = $categoryModel->name;  
+            }
+        }
+
+        $product->update($data);
+
+        return response()->json([
+            'message' => 'Product updated successfully',
+            'product' => $product->load('category'),
+        ]);
     }
 
-    // ✅ Delete product
     public function destroy($id)
     {
         $product = Product::findOrFail($id);
         $product->delete();
-
         return response()->json(['message' => 'Product deleted successfully']);
     }
-
 }
