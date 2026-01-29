@@ -93,7 +93,7 @@ import axios from "axios";
 import EditProduct from "./Edit.vue";
 import Pigination from "../../../components/Backend/Pigination.vue";
 import SearchInput from "../../../components/Backend/SearchInput.vue";
-import Table from "../../../components/Backend/Table.vue"; // Import the Table component
+import Table from "../../../components/Backend/Table.vue";
 
 interface Product {
     id: number;
@@ -115,7 +115,7 @@ export default defineComponent({
         const tableColumns = [
             { key: "id", label: "ID" },
             { key: "name", label: "Name" },
-            { key: "brand", label: "Brand" },
+            { key: "category", label: "Category" },
             { key: "barcode", label: "Barcode" },
             { key: "price", label: "Price" },
             { key: "stock", label: "Stock" },
