@@ -3,7 +3,6 @@
         class="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
     >
         <div class="bg-bgCard w-full max-w-lg rounded-2xl p-6 shadow-lg">
-            <!-- Header -->
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-bold text-primary">Edit Admin</h2>
                 <button
@@ -14,17 +13,10 @@
                 </button>
             </div>
 
-            <!-- Messages -->
-            <div v-if="message" class="text-green-600 text-center mb-3">
-                {{ message }}
-            </div>
-            <div v-if="errorMessage" class="text-red-600 text-center mb-3">
-                {{ errorMessage }}
-            </div>
+            <FlassMessage :message="message" type="success" />
+            <FlassMessage :message="errorMessage" type="error" />
 
-            <!-- Form -->
             <form @submit.prevent="updateAdmin" class="space-y-4">
-                <!-- Name -->
                 <div>
                     <label class="block font-semibold mb-1">Name</label>
                     <input
@@ -34,7 +26,6 @@
                     />
                 </div>
 
-                <!-- Email -->
                 <div>
                     <label class="block font-semibold mb-1">Email</label>
                     <input
@@ -44,8 +35,6 @@
                         required
                     />
                 </div>
-
-                <!-- Old Password -->
 
                 <div>
                     <label class="block font-medium mb-2">Old Password</label>
@@ -73,7 +62,6 @@
                     </div>
                 </div>
 
-                <!-- New Password -->
                 <div>
                     <label class="block font-medium mb-2">New Password</label>
                     <div class="relative">
@@ -100,7 +88,6 @@
                     </div>
                 </div>
 
-                <!-- Confirm Password -->
                 <div>
                     <label class="block font-medium mb-2"
                         >Confirm Password</label
@@ -129,7 +116,6 @@
                     </div>
                 </div>
 
-                <!-- Actions -->
                 <div class="flex justify-end pt-4 space-x-2">
                     <button
                         type="button"
@@ -153,9 +139,11 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from "vue";
 import axios from "axios";
+import FlassMessage from "../../../components/Backend/FlassMessage.vue";
 
 export default defineComponent({
     name: "EditProfile",
+    components: { FlassMessage },
     props: { id: { type: Number, required: true } },
     emits: ["close", "updated"],
     setup(props, { emit }) {
@@ -170,12 +158,10 @@ export default defineComponent({
         const message = ref("");
         const errorMessage = ref("");
 
-        // Show/hide passwords
         const showOldPassword = ref(false);
         const showNewPassword = ref(false);
         const showConfirmPassword = ref(false);
 
-        // Fetch admin data
         const fetchAdmin = async () => {
             try {
                 const res = await axios.get(`/admin/profile/${props.id}`);
@@ -186,13 +172,15 @@ export default defineComponent({
             }
         };
 
-        // Update admin
         const updateAdmin = async () => {
+            message.value = "";
+            errorMessage.value = "";
+
             try {
                 await axios.post(`/admin/profile/${props.id}`, form.value);
                 message.value = "Updated successfully";
                 emit("updated");
-                setTimeout(() => emit("close"), 500);
+                setTimeout(() => emit("close"), 2000);
             } catch (err: any) {
                 errorMessage.value =
                     err.response?.data?.message || "Update failed";

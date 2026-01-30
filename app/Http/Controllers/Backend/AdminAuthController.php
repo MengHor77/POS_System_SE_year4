@@ -43,7 +43,6 @@ class AdminAuthController extends Controller
 
     public function me()
     {
-        // ទាញយកព័ត៌មាន Admin ដែលកំពុង Login តាមរយៈ Guard 'admin'
         return response()->json(Auth::guard('admin')->user());
     }
 }
