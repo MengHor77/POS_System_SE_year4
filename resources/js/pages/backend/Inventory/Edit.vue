@@ -89,7 +89,7 @@ export default defineComponent({
                         note: note.value,
                     },
                 );
-
+                window.dispatchEvent(new Event("stock-updated"));
                 // Triggers the parent's fetchProducts, which triggers the Child's watch
                 emit("updated");
                 emit("close");

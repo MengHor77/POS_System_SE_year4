@@ -87,7 +87,7 @@ export default defineComponent({
                         note: note.value,
                     },
                 );
-
+                window.dispatchEvent(new Event("stock-updated"));
                 // 1. Tell parent to refresh data
                 emit("created");
 

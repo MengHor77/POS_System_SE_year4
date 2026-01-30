@@ -86,14 +86,12 @@ import axios from "axios";
 export default defineComponent({
     name: "Sidebar",
     setup() {
-       
         const savedCount = parseInt(
             sessionStorage.getItem("notif-count") || "0",
         );
         const savedState = localStorage.getItem("sidebar-collapsed") === "true";
         const collapsed = ref(savedState);
 
-       
         const toggleSidebar = () => {
             collapsed.value = !collapsed.value;
             localStorage.setItem(
@@ -184,10 +182,20 @@ export default defineComponent({
 
         onMounted(() => {
             fetchNotificationCount();
-            // Refresh every 30 seconds
+
+            // 1. Listen for the custom event from other components
+            window.addEventListener("stock-updated", fetchNotificationCount);
+
             const interval = setInterval(fetchNotificationCount, 30000);
 
-            return () => clearInterval(interval);
+            return () => {
+                clearInterval(interval);
+                // 2. Clean up the listener when sidebar is destroyed
+                window.removeEventListener(
+                    "stock-updated",
+                    fetchNotificationCount,
+                );
+            };
         });
 
         return {

@@ -141,6 +141,7 @@ export default defineComponent({
             try {
                 // បញ្ជូនទិន្នន័យទៅកាន់ API Update
                 await axios.put(`/admin/product/${form.id}`, form);
+                window.dispatchEvent(new Event("stock-updated"));
                 emit("updated");
                 emit("close");
             } catch (error: any) {

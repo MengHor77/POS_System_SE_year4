@@ -156,6 +156,7 @@ export default defineComponent({
                 };
 
                 const response = await axios.post("/admin/product", payload);
+                window.dispatchEvent(new Event("stock-updated"));
 
                 // Success
                 console.log(response.data.message);
