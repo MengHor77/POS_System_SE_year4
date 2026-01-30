@@ -30,14 +30,18 @@ class SaleController extends Controller
                   });
             });
         }
+        
+    // --- filtr date time   Add Carbon parsing to include the full day (00:00:00 to 23:59:59) ---
     if (!empty($startDate) && !empty($endDate)) {
-            // We use whereBetween to find sales created from start to end
-            $query->whereBetween('created_at', [$startDate, $endDate]);
-        } elseif (!empty($startDate)) {
-            $query->where('created_at', '>=', $startDate);
-        } elseif (!empty($endDate)) {
-            $query->where('created_at', '<=', $endDate);
-        }
+        $query->whereBetween('created_at', [
+            \Carbon\Carbon::parse($startDate)->startOfDay(), 
+            \Carbon\Carbon::parse($endDate)->endOfDay()
+        ]);
+    } elseif (!empty($startDate)) {
+        $query->where('created_at', '>=', \Carbon\Carbon::parse($startDate)->startOfDay());
+    } elseif (!empty($endDate)) {
+        $query->where('created_at', '<=', \Carbon\Carbon::parse($endDate)->endOfDay());
+    }
        
         $sales = $query->orderBy('created_at', 'desc')->paginate(5);
 
