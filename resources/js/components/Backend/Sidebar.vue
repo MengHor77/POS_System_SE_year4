@@ -18,7 +18,7 @@
 
             <button
                 @click="toggleSidebar"
-                class="absolute transition-all duration-300 px-3 py-2 rounded-full  hover:bg-primary"
+                class="absolute transition-all duration-300 px-3 py-2 rounded-full hover:bg-primary"
                 :class="collapsed ? 'left-1/2 -translate-x-1/2' : 'right-4'"
             >
                 <i
@@ -86,18 +86,14 @@ import axios from "axios";
 export default defineComponent({
     name: "Sidebar",
     setup() {
-        /**
-         * 1. PERSISTENCE LOGIC
-         * Check LocalStorage for a saved state.
-         * We compare the string "true" because LocalStorage only stores strings.
-         */
+       
+        const savedCount = parseInt(
+            sessionStorage.getItem("notif-count") || "0",
+        );
         const savedState = localStorage.getItem("sidebar-collapsed") === "true";
         const collapsed = ref(savedState);
 
-        /**
-         * 2. TOGGLE LOGIC
-         * Update both the reactive ref and the LocalStorage record.
-         */
+       
         const toggleSidebar = () => {
             collapsed.value = !collapsed.value;
             localStorage.setItem(
@@ -127,7 +123,7 @@ export default defineComponent({
                 icon: "fas fa-bell",
                 label: "Notification",
                 route: "/admin/notification",
-                count: 0,
+                count: savedCount,
             },
             {
                 icon: "fas fa-warehouse",
@@ -170,14 +166,16 @@ export default defineComponent({
         // Fetch low-stock notification count
         const fetchNotificationCount = async () => {
             try {
-                // Adjust this URL if you changed your API routes in web.php
                 const res = await axios.get("/admin/notification/count");
                 const notification = menuItems.find(
                     (i) => i.label === "Notification",
                 );
                 if (notification) {
-                    // Ensure we access the count from your specific API response structure
                     notification.count = res.data.total || 0;
+                    sessionStorage.setItem(
+                        "notif-count",
+                        (res.data.total || 0).toString(),
+                    );
                 }
             } catch (error) {
                 console.error("Failed to fetch notification count:", error);
@@ -189,7 +187,6 @@ export default defineComponent({
             // Refresh every 30 seconds
             const interval = setInterval(fetchNotificationCount, 30000);
 
-            // Clean up interval if the component is unmounted
             return () => clearInterval(interval);
         });
 
