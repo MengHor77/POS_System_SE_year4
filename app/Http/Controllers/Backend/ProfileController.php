@@ -36,8 +36,8 @@ class ProfileController extends Controller
         $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:admins,email,' . $admin->id,
-            'old_password' => 'nullable|string',
-            'password' => 'nullable|string|min:6|confirmed', // password_confirmation required if password is present
+            'old_password' => 'required|string',
+            'password' => 'required|string|min:6|confirmed', 
         ]);
 
         $admin->name = $request->name;
