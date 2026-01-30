@@ -80,7 +80,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, ref, onMounted } from "vue";
+import { defineComponent, reactive, ref, onMounted, onUnmounted } from "vue";
 import axios from "axios";
 
 export default defineComponent({
@@ -183,19 +183,17 @@ export default defineComponent({
         onMounted(() => {
             fetchNotificationCount();
 
-            // 1. Listen for the custom event from other components
             window.addEventListener("stock-updated", fetchNotificationCount);
 
             const interval = setInterval(fetchNotificationCount, 30000);
 
-            return () => {
+            onUnmounted(() => {
                 clearInterval(interval);
-                // 2. Clean up the listener when sidebar is destroyed
                 window.removeEventListener(
                     "stock-updated",
                     fetchNotificationCount,
                 );
-            };
+            });
         });
 
         return {

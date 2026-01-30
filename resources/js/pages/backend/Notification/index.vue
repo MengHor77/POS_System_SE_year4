@@ -153,6 +153,7 @@ export default defineComponent({
         const deleteProduct = async (id: number) => {
             if (!confirm("Are you sure?")) return;
             await axios.delete(`/admin/notification/${id}`);
+            window.dispatchEvent(new Event("stock-updated"));
             fetchLowStock(pagination.value.current_page);
         };
 

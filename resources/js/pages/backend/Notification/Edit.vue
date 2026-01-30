@@ -163,6 +163,7 @@ export default defineComponent({
             try {
                 // Pointing to your controller update route
                 await axios.put(`/admin/notification/${form.id}`, form);
+                window.dispatchEvent(new Event("stock-updated"));
                 emit("updated");
                 emit("close");
             } catch (error: any) {

@@ -210,8 +210,8 @@ export default defineComponent({
                     params: {
                         search: filterText.value,
                         status: selectedStatus.value,
-                        start_date: startDate.value, 
-                        end_date: endDate.value, 
+                        start_date: startDate.value,
+                        end_date: endDate.value,
                         page,
                         per_page: perPage.value,
                     },
@@ -236,6 +236,8 @@ export default defineComponent({
                 const res = await axios.post(
                     `/admin/purchase-order/${id}/receive`,
                 );
+                window.dispatchEvent(new Event("stock-updated"));
+
                 showFlash(res.data.message);
                 fetch(currentPage.value);
             } catch (error: any) {
@@ -283,8 +285,8 @@ export default defineComponent({
             editId,
             filterText,
             selectedStatus,
-            startDate,  
-            endDate, 
+            startDate,
+            endDate,
             currentPage,
             lastPage,
             perPage,
