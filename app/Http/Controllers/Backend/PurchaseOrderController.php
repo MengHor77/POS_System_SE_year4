@@ -11,9 +11,7 @@ use Carbon\Carbon;
 
 class PurchaseOrderController extends Controller
 {
-    /**
-     * Display a listing of the resource with search, status, and date range filtering.
-     */
+    
     public function index(Request $request)
     {
         $search = $request->input('search', '');
@@ -32,19 +30,20 @@ class PurchaseOrderController extends Controller
         }
 
         // --- NEW: Date Range Filtering Logic ---
-        if ($startDate && $endDate) {
-            // Parses the datetime-local format and ensures proper comparison
-            $query->whereBetween('created_at', [
-                Carbon::parse($startDate), 
-                Carbon::parse($endDate)
-            ]);
-        } elseif ($startDate) {
-            $query->where('created_at', '>=', Carbon::parse($startDate));
-        } elseif ($endDate) {
-            $query->where('created_at', '<=', Carbon::parse($endDate));
-        }
+       if ($startDate && $endDate) {
+        
+        $start = Carbon::parse($startDate)->startOfDay(); 
+        $end = Carbon::parse($endDate)->endOfDay();
+        $query->whereBetween('created_at', [$start, $end]);
+        
+    } elseif ($startDate) {
+        $query->where('created_at', '>=', Carbon::parse($startDate)->startOfDay());
+        
+    } elseif ($endDate) {
+        
+        $query->where('created_at', '<=', Carbon::parse($endDate)->endOfDay());
+    }
 
-        // Search logic (ID, Supplier, or Product Name)
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('id', 'like', "%{$search}%")
@@ -57,7 +56,6 @@ class PurchaseOrderController extends Controller
 
         $orders = $query->latest()->paginate($perPage);
 
-        // Transform data for the Vue Table
         $formattedData = $orders->getCollection()->map(function ($order) {
             return [
                 'id'            => $order->id,
@@ -82,9 +80,7 @@ class PurchaseOrderController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+   
     public function store(Request $request)
     {
         $validated = $request->validate([
