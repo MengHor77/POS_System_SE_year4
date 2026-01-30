@@ -29,13 +29,17 @@ class ReportController extends Controller
             });
         }
 
-        // 2. Filter by Date Range
-        if ($request->filled('start_date')) {
-            $query->whereDate('created_at', '>=', $request->start_date);
-        }
-        if ($request->filled('end_date')) {
-            $query->whereDate('created_at', '<=', $request->end_date);
-        }
+      // 2. Filter by Date Range (Fixed for gaps and full-day inclusion)
+    if ($request->filled('start_date') && $request->filled('end_date')) {
+        $query->whereBetween('created_at', [
+            Carbon::parse($request->start_date)->startOfDay(),
+            Carbon::parse($request->end_date)->endOfDay()
+        ]);
+    } elseif ($request->filled('start_date')) {
+        $query->where('created_at', '>=', Carbon::parse($request->start_date)->startOfDay());
+    } elseif ($request->filled('end_date')) {
+        $query->where('created_at', '<=', Carbon::parse($request->end_date)->endOfDay());
+    }
 
         // Dashboard Stats
         $totalRevenue = Sale::sum('total_amount') ?? 0;
