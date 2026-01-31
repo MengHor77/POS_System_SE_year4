@@ -9,7 +9,7 @@
                 <div class="w-full sm:w-auto">
                     <button
                         @click="showCreate = true"
-                        class="w-full sm:w-auto bg-dark text-white px-4 py-2 rounded hover:bg-darkSoft flex items-center justify-center gap-2 transition"
+                        class="w-full sm:w-auto bg-dark text-white px-4 py-2 rounded-xl hover:bg-darkSoft flex items-center justify-center gap-2 transition"
                     >
                         <i class="fas fa-plus"></i> Add Category
                     </button>
