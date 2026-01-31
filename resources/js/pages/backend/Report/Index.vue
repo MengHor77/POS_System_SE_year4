@@ -1,11 +1,13 @@
 <template>
     <BackendLayout>
-        <div class="p-6 bg-bgMain min-h-screen">
+        <div class="p-4 md:p-6 bg-bgMain min-h-screen">
             <div
-                class="flex justify-between items-center mb-8 border-b border-border pb-4 no-print"
+                class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 border-b border-border pb-4 no-print gap-4"
             >
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-800 tracking-tight">
+                    <h1
+                        class="text-2xl md:text-3xl font-bold text-gray-800 tracking-tight"
+                    >
                         Sales Transaction Report
                     </h1>
                     <p class="text-muted text-sm">
@@ -21,7 +23,9 @@
                     <hr class="my-4 border-gray-300" />
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div
+                    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-8"
+                >
                     <div
                         class="p-6 border border-border rounded-xl2 bg-bgCard shadow-soft"
                     >
@@ -30,7 +34,9 @@
                         >
                             Total Revenue
                         </p>
-                        <p class="text-3xl font-extrabold text-primary">
+                        <p
+                            class="text-2xl md:text-3xl font-extrabold text-primary"
+                        >
                             {{ formatPrice(totalRevenue) }}
                         </p>
                     </div>
@@ -42,38 +48,48 @@
                         >
                             Today's Sales
                         </p>
-                        <p class="text-3xl font-extrabold text-secondary">
+                        <p
+                            class="text-2xl md:text-3xl font-extrabold text-secondary"
+                        >
                             {{ formatPrice(todaysSale) }}
                         </p>
                     </div>
                     <div
-                        class="p-6 border border-border rounded-xl2 bg-bgCard shadow-soft"
+                        class="p-6 border border-border rounded-xl2 bg-bgCard shadow-soft sm:col-span-2 md:col-span-1"
                     >
                         <p
                             class="text-xs text-muted uppercase font-bold tracking-wider mb-1"
                         >
                             Transactions Count
                         </p>
-                        <p class="text-3xl font-extrabold text-info">
+                        <p
+                            class="text-2xl md:text-3xl font-extrabold text-info"
+                        >
                             {{ pagination.total }}
                         </p>
                     </div>
                 </div>
 
-                <div class="flex flex-wrap items-center gap-4 pb-6 no-print">
-                    <SearchInput
-                        v-model="searchQuery"
-                        @search="fetchData(1)"
-                        placeholder="Search ID, Cashier name , email..."
-                    />
-                    <DateRangeFilter
-                        v-model:startDate="startDate"
-                        v-model:endDate="endDate"
-                        @filter="fetchData(1)"
-                    />
+                <div
+                    class="flex flex-col lg:flex-row items-stretch lg:items-center gap-4 pb-6 no-print"
+                >
+                    <div class="w-full lg:w-1/3">
+                        <SearchInput
+                            v-model="searchQuery"
+                            @search="fetchData(1)"
+                            placeholder="Search ID, Cashier name..."
+                        />
+                    </div>
+                    <div class="flex-1">
+                        <DateRangeFilter
+                            v-model:startDate="startDate"
+                            v-model:endDate="endDate"
+                            @filter="fetchData(1)"
+                        />
+                    </div>
                     <button
                         @click="printReport"
-                        class="bg-primary hover:bg-darkSoft text-white px-5 py-2 rounded-xl shadow-card transition-all flex items-center"
+                        class="bg-primary hover:bg-darkSoft text-white px-5 py-2.5 rounded-xl shadow-card transition-all flex items-center justify-center"
                     >
                         <i class="fas fa-print mr-2"></i> Print Report
                     </button>
@@ -87,71 +103,79 @@
                             Grouped Sales Transactions
                         </h3>
                     </div>
-                    <Table
-                        :columns="tableColumns"
-                        :data="transactions"
-                        rowKey="id"
-                        class="w-full"
-                    >
-                        <template #cell-id="{ row }">
-                            <span
-                                class="font-mono text-xs font-bold text-gray-600"
-                                >#{{ row.id }}</span
-                            >
-                        </template>
-                        <template #cell-cashier_email="{ row }">
-                            <div class="flex flex-col py-2">
-                                <span class="font-bold text-gray-900">{{
-                                    row.cashier_name || "N/A"
-                                }}</span>
-                                <span class="text-xxs text-muted">{{
-                                    row.cashier_email || "N/A"
-                                }}</span>
-                            </div>
-                        </template>
-                        <template #cell-product_name="{ row }">
-                            <div class="flex flex-col gap-1 py-2">
-                                <div
-                                    v-for="(item, index) in row.products"
-                                    :key="index"
-                                    class="text-xs border-b border-gray-100 last:border-0 pb-1"
+                    <div class="overflow-x-auto">
+                        <Table
+                            :columns="tableColumns"
+                            :data="transactions"
+                            rowKey="id"
+                            class="w-full min-w-[800px]"
+                        >
+                            <template #cell-id="{ row }">
+                                <span
+                                    class="font-mono text-xs font-bold text-gray-600"
+                                    >#{{ row.id }}</span
                                 >
-                                    <span class="font-semibold text-primary">{{
-                                        item.name
+                            </template>
+                            <template #cell-cashier_email="{ row }">
+                                <div class="flex flex-col py-2">
+                                    <span class="font-bold text-gray-900">{{
+                                        row.cashier_name || "N/A"
                                     }}</span>
-                                    <span class="text-muted ml-2 font-bold"
-                                        >x{{ item.qty }}</span
+                                    <span class="text-xxs text-muted">{{
+                                        row.cashier_email || "N/A"
+                                    }}</span>
+                                </div>
+                            </template>
+                            <template #cell-product_name="{ row }">
+                                <div class="flex flex-col gap-1 py-2">
+                                    <div
+                                        v-for="(item, index) in row.products"
+                                        :key="index"
+                                        class="text-xs border-b border-gray-100 last:border-0 pb-1"
                                     >
+                                        <span
+                                            class="font-semibold text-primary"
+                                            >{{ item.name }}</span
+                                        >
+                                        <span class="text-muted ml-2 font-bold"
+                                            >x{{ item.qty }}</span
+                                        >
+                                    </div>
                                 </div>
-                            </div>
-                        </template>
-                        <template #cell-unit_price="{ row }">
-                            <div class="flex flex-col gap-1 py-2">
-                                <div
-                                    v-for="(item, index) in row.products"
-                                    :key="index"
-                                    class="text-xs pb-1 text-gray-600"
+                            </template>
+                            <template #cell-unit_price="{ row }">
+                                <div class="flex flex-col gap-1 py-2">
+                                    <div
+                                        v-for="(item, index) in row.products"
+                                        :key="index"
+                                        class="text-xs pb-1 text-gray-600"
+                                    >
+                                        {{ formatPrice(item.price) }}
+                                    </div>
+                                </div>
+                            </template>
+                            <template #cell-total_amount="{ row }">
+                                <span
+                                    class="font-extrabold text-success text-lg"
+                                    >{{
+                                        formatPrice(row.total_amount || 0)
+                                    }}</span
                                 >
-                                    {{ formatPrice(item.price) }}
+                            </template>
+                            <template #cell-date_formatted="{ row }">
+                                <div
+                                    class="text-sm text-gray-700 py-2 whitespace-nowrap"
+                                >
+                                    <i class="far fa-clock mr-1 text-muted"></i>
+                                    {{ row.date_formatted }}
                                 </div>
-                            </div>
-                        </template>
-                        <template #cell-total_amount="{ row }">
-                            <span class="font-extrabold text-success text-lg">{{
-                                formatPrice(row.total_amount || 0)
-                            }}</span>
-                        </template>
-                        <template #cell-date_formatted="{ row }">
-                            <div class="text-sm text-gray-700 py-2">
-                                <i class="far fa-clock mr-1 text-muted"></i>
-                                {{ row.date_formatted }}
-                            </div>
-                        </template>
-                    </Table>
+                            </template>
+                        </Table>
+                    </div>
                 </div>
             </div>
 
-            <div class="no-print mt-6">
+            <div class="no-print mt-6 flex justify-center md:justify-start">
                 <Pigination
                     v-if="pagination.total > 0"
                     :currentPage="pagination.current_page"
@@ -172,7 +196,7 @@ import BackendLayout from "../../../layouts/BackendLayout.vue";
 import Table from "../../../components/Backend/Table.vue";
 import SearchInput from "../../../components/Backend/SearchInput.vue";
 import Pigination from "../../../components/Backend/Pigination.vue";
-import DateRangeFilter from "../../../components/Backend/DateRangeFilter.vue"; // Import this
+import DateRangeFilter from "../../../components/Backend/DateRangeFilter.vue";
 
 export default defineComponent({
     name: "ReportIndex",
@@ -271,6 +295,9 @@ export default defineComponent({
 .print-only {
     display: none;
 }
+.overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+}
 @media print {
     :deep(aside),
     :deep(nav),
@@ -280,6 +307,7 @@ export default defineComponent({
     .no-print {
         display: none !important;
     }
+    .p-4,
     .p-6.bg-bgMain {
         padding: 0 !important;
         background: white !important;
