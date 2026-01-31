@@ -1,21 +1,22 @@
 <template>
-    <div class="bg-bgCard p-6 rounded-xl2 shadow-card h-96 flex flex-col">
-        <h2 class="text-lg font-bold mb-4 text-primary">Sales Analytics</h2>
+    <div class="bg-white p-6 rounded-xl2 shadow-card h-96 flex flex-col">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-bold text-primary">
+                Company Produce sales
+            </h2>
+            <span class="text-gray-400 text-xs font-medium"
+                >In thousands (USD)</span
+            >
+        </div>
+
         <div class="flex-1 relative">
             <div
                 v-if="!loaded"
-                class="absolute inset-0 flex items-center justify-center bg-bgMain rounded-lg border border-dashed border-grayLight"
+                class="absolute inset-0 flex items-center justify-center"
             >
-                <div class="text-center">
-                    <i
-                        class="fas fa-circle-notch fa-spin text-info text-2xl mb-2"
-                    ></i>
-                    <p
-                        class="text-xxs text-muted uppercase tracking-widest font-bold"
-                    >
-                        Loading Data...
-                    </p>
-                </div>
+                <i
+                    class="fas fa-circle-notch fa-spin text-green-600 text-2xl"
+                ></i>
             </div>
 
             <Line v-if="loaded" :data="chartData" :options="chartOptions" />
@@ -58,31 +59,21 @@ export default defineComponent({
         const loaded = ref(false);
         const chartData = ref<any>(null);
 
-        const myColors = {
-            primary: "#4f46e5",
-            info: "#0ea5e9",
-            border: "#e5e7eb",
-            muted: "#6b7280",
-        };
-
         const chartOptions: ChartOptions<"line"> = {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
                 legend: { display: false },
                 tooltip: {
-                    backgroundColor: "#4f46e5",
-                    titleFont: {
-                        size: 12,
-                        weight: "bold" as const, // Fixed: as const ensures this is the literal 'bold'
-                    },
+                    backgroundColor: "#1e293b", // Dark tooltip
+                    titleFont: { size: 13, weight: "bold" },
                     bodyFont: { size: 12 },
-                    padding: 10,
-                    cornerRadius: 8,
+                    padding: 12,
                     displayColors: false,
                     callbacks: {
+                        title: (context: any) => `Month: ${context[0].label}`,
                         label: (context: any) =>
-                            ` Revenue: $${Number(context.parsed.y).toLocaleString()}`,
+                            ` Revenue: $${context.parsed.y.toLocaleString()}k`,
                     },
                 },
             },
@@ -91,19 +82,15 @@ export default defineComponent({
                     beginAtZero: true,
                     grid: { color: "#f1f5f9" },
                     ticks: {
-                        color: myColors.muted,
-                        font: { size: 10 },
-                        callback: (value: any) => "$" + value.toLocaleString(),
+                        color: "#94a3b8",
+                        callback: (val) => `$${val}`,
                     },
                 },
                 x: {
                     grid: { display: false },
                     ticks: {
-                        color: myColors.muted,
-                        font: {
-                            size: 10,
-                            weight: 600,
-                        },
+                        color: "#64748b",
+                        font: { size: 11, weight: "bold" },
                     },
                 },
             },
@@ -117,24 +104,24 @@ export default defineComponent({
                     labels: res.data.chartLabels,
                     datasets: [
                         {
-                            label: "Monthly Revenue",
                             data: res.data.chartValues,
-                            borderColor: myColors.primary,
-                            backgroundColor: "rgba(79, 70, 229, 0.1)",
-                            fill: true,
-                            tension: 0.4,
-                            pointRadius: 4,
-                            pointHoverRadius: 6,
-                            pointBackgroundColor: "#ffffff",
-                            pointBorderColor: myColors.primary,
+                            borderColor: "#16a34a", // THE GREEN LINE
+                            backgroundColor: "transparent",
+                            tension: 0, // SHARP ANGLES (No curves)
+                            borderWidth: 2,
+                            pointRadius: 6,
+                            pointBackgroundColor: "#16a34a",
+                            pointBorderColor: "#ffffff",
                             pointBorderWidth: 2,
+                            pointHoverRadius: 8,
+                            fill: false,
                         },
                     ],
                 };
 
                 loaded.value = true;
             } catch (err) {
-                console.error("Failed to load chart data:", err);
+                console.error("Chart Error:", err);
             }
         };
 
