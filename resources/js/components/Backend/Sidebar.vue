@@ -18,7 +18,7 @@
 
             <button
                 @click="toggleSidebar"
-                class=" absolute transition-all duration-300 px-3 py-2 rounded-full hover:bg-darkSoft"
+                class=" absolute transition-all duration-300 p-3 rounded-full hover:bg-darkSoft"
                 :class="collapsed ? 'left-1/2 -translate-x-1/2' : 'right-4'"
             >
                 <i
