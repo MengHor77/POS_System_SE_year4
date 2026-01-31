@@ -1,5 +1,5 @@
 <template>
-    <div class="fixed inset-0 bg-black/30 flex justify-center items-center">
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
         <div class="bg-white p-6 rounded-lg w-96">
             <h3 class="text-xl font-bold mb-4">Edit Category</h3>
             <form @submit.prevent="submit">
