@@ -1,71 +1,89 @@
 <template>
     <BackendLayout>
-        <div class="p-6 bg-bgMain min-h-screen">
-            <h1 class="text-3xl font-bold mb-6 text-primary">
+        <div class="p-4 md:p-6 bg-bgMain min-h-screen">
+            <h1 class="text-2xl md:text-3xl font-bold mb-6 text-primary">
                 Product Suppliers Management
             </h1>
 
             <FlassMessage :message="flashMessage" :type="flashType" />
 
-            <div class="flex flex-row gap-3 w-full pb-6 items-center">
-                <div class="w-50">
+            <div
+                class="flex flex-col sm:flex-row gap-4 w-full pb-6 items-stretch sm:items-center"
+            >
+                <div class="w-full sm:w-auto">
                     <button
                         @click="showCreate = true"
-                        class="bg-dark text-white px-4 py-2 rounded-xl hover:bg-darkSoft shadow-md transition-all flex items-center gap-2"
+                        class="w-full sm:w-auto bg-dark text-white px-4 py-2.5 rounded-xl hover:bg-darkSoft shadow-md transition-all flex items-center justify-center gap-2"
                     >
                         <i class="fas fa-plus"></i> Add New Supplier
                     </button>
                 </div>
-                <div class="w-80">
+                <div class="w-full sm:w-80">
                     <SearchInput
                         v-model="filterText"
                         placeholder="Search ID, Product, or Supplier..."
                         @search="fetch(1)"
+                        containerClass="flex gap-2 w-full"
+                        inputClass="border p-2 rounded-xl flex-1 min-w-0 w-full focus:ring-2 focus:ring-primary outline-none"
                     />
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
-                <Table :columns="columns" :data="suppliers">
-                    <template #cell-product="{ row }">
-                        <span class="font-medium text-gray-800">
-                            {{ row.product?.name || "Unknown" }}
-                        </span>
-                    </template>
-
-                    <template #cell-price="{ row }">
-                        <span class="font-bold text-gray-700"
-                            >${{ row.price }}</span
-                        >
-                    </template>
-
-                    <template #cell-actions="{ row }">
-                        <div class="flex gap-2">
-                            <button
-                                @click="edit(row)"
-                                class="px-3 py-1 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-600 hover:text-white transition"
+            <div
+                class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100"
+            >
+                <div class="overflow-x-auto">
+                    <Table
+                        :columns="columns"
+                        :data="suppliers"
+                        class="min-w-full"
+                    >
+                        <template #cell-product="{ row }">
+                            <span
+                                class="font-medium text-gray-800 whitespace-nowrap"
                             >
-                                <i class="fas fa-pen text-sm"></i>
-                            </button>
-                            <button
-                                @click="remove(row.id)"
-                                class="px-3 py-1 rounded-lg bg-red-100 text-red-600 hover:bg-red-600 hover:text-white transition"
+                                {{ row.product?.name || "Unknown" }}
+                            </span>
+                        </template>
+
+                        <template #cell-price="{ row }">
+                            <span
+                                class="font-bold text-gray-700 whitespace-nowrap"
                             >
-                                <i class="fas fa-trash text-sm"></i>
-                            </button>
-                        </div>
-                    </template>
-                </Table>
+                                ${{ row.price }}
+                            </span>
+                        </template>
+
+                        <template #cell-actions="{ row }">
+                            <div class="flex gap-2">
+                                <button
+                                    @click="edit(row)"
+                                    class="px-3 py-2 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-600 hover:text-white transition"
+                                >
+                                    <i class="fas fa-pen text-sm"></i>
+                                </button>
+                                <button
+                                    @click="remove(row.id)"
+                                    class="px-3 py-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-600 hover:text-white transition"
+                                >
+                                    <i class="fas fa-trash text-sm"></i>
+                                </button>
+                            </div>
+                        </template>
+                    </Table>
+                </div>
             </div>
 
-            <Pigination
-                class="mt-6"
-                :current-page="pagination.current_page"
-                :last-page="pagination.last_page"
-                :total="pagination.total"
-                :per-page="pagination.per_page"
-                @page-change="fetch"
-            />
+            <div class="flex justify-center sm:justify-start">
+                <Pigination
+                    class="mt-6"
+                    :current-page="pagination.current_page"
+                    :last-page="pagination.last_page"
+                    :total="pagination.total"
+                    :per-page="pagination.per_page"
+                    @page-change="fetch"
+                />
+            </div>
 
             <CreateSupplier
                 v-if="showCreate"
@@ -172,7 +190,6 @@ export default {
 
                 suppliers.value = res.data.data;
 
-                // Sync Pagination
                 pagination.current_page = res.data.current_page;
                 pagination.last_page = res.data.last_page;
                 pagination.total = res.data.total;
@@ -235,3 +252,9 @@ export default {
     },
 };
 </script>
+
+<style scoped>
+.overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+}
+</style>
