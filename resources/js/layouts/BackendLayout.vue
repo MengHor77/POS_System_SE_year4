@@ -1,20 +1,26 @@
 <template>
-  <div class="flex h-screen overflow-hidden bg-bgMain">
-        <!-- Sidebar -->
-        <Sidebar :collapsed="collapsed" @toggle="toggleSidebar" />
+    <div class="flex h-screen overflow-hidden bg-bgMain relative">
+        <div
+            v-if="!collapsed"
+            @click="toggleSidebar"
+            class="fixed inset-0 bg-black/50 z-40 lg:hidden transition-opacity duration-300"
+        ></div>
 
-        <!-- Main Content -->
-        <div class="flex-1 flex flex-col transition-all duration-300 h-screen">
-            <!-- Header -->
-            <Header />
+        <Sidebar
+            :collapsed="collapsed"
+            @toggle="toggleSidebar"
+            class="fixed lg:static z-50 h-full"
+        />
 
-            <!-- Main content -->
-            <main class="flex-1 overflow-y-auto p-3">
+        <div
+            class="flex-1 flex flex-col transition-all duration-300 h-screen w-full min-w-0"
+        >
+            <Header @toggle-sidebar="toggleSidebar" />
 
-                <!-- ✅ GLOBAL SUCCESS MESSAGE -->
+            <main class="flex-1 overflow-y-auto p-3 md:p-6">
                 <div
                     v-if="successMessage"
-                    class="mb-4 p-3 bg-green-100 text-green-700 rounded shadow"
+                    class="mb-4 p-3 bg-green-100 text-green-700 rounded shadow border border-green-200"
                 >
                     {{ successMessage }}
                 </div>
@@ -34,11 +40,20 @@ export default defineComponent({
     name: "BackendLayout",
     components: { Header, Sidebar },
     setup() {
-        const collapsed = ref(false);
+        // Detect mobile on load
+        const isMobile = () => window.innerWidth < 1024;
+        const collapsed = ref(isMobile());
         const successMessage = ref("");
 
         const toggleSidebar = () => {
             collapsed.value = !collapsed.value;
+        };
+
+        // Auto-collapse when resizing to mobile
+        const handleResize = () => {
+            if (isMobile()) {
+                collapsed.value = true;
+            }
         };
 
         const showSuccess = (event: any) => {
@@ -50,18 +65,15 @@ export default defineComponent({
 
         onMounted(() => {
             window.addEventListener("success", showSuccess);
+            window.addEventListener("resize", handleResize);
         });
 
         onUnmounted(() => {
             window.removeEventListener("success", showSuccess);
+            window.removeEventListener("resize", handleResize);
         });
 
-        return {
-            collapsed,
-            toggleSidebar,
-            successMessage,
-        };
+        return { collapsed, toggleSidebar, successMessage };
     },
 });
 </script>
-
