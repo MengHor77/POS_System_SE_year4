@@ -2,7 +2,7 @@
     <div class="bg-white p-6 rounded-xl2 shadow-card h-96 flex flex-col">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-lg font-bold text-primary">
-                Company Produce sales
+                Company Produce sales overview
             </h2>
             <span class="text-gray-400 text-xs font-medium"
                 >In thousands (USD)</span
