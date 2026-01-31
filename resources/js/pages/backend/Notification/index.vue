@@ -1,85 +1,102 @@
 <template>
     <BackendLayout>
-        <div class="p-6 bg-bgMain min-h-screen">
-            <h1 class="text-3xl font-bold mb-6 text-warning">
-                <i class="fas fa-bell text-2xl"></i>
+        <div class="p-4 md:p-6 bg-bgMain min-h-screen">
+            <h1
+                class="text-2xl md:text-3xl font-bold mb-6 text-warning flex items-center gap-3"
+            >
+                <i class="fas fa-bell"></i>
                 Low Stock Notifications
             </h1>
 
-            <div class="mb-6 w-80">
+            <div class="mb-6 w-full sm:w-80">
                 <SearchInput
                     v-model="barcode"
                     placeholder="Search by barcode or name"
                     @search="fetchLowStock(1)"
+                    containerClass="flex gap-2 w-full"
+                    inputClass="border p-2 rounded-xl flex-1 min-w-0 w-full focus:ring-2 focus:ring-warning outline-none"
                 />
             </div>
 
             <div
                 v-if="products.length === 0"
-                class="text-center text-gray-500 mt-10"
+                class="text-center text-gray-500 mt-10 px-4"
             >
                 🎉 All products have sufficient stock. Products with less than
                 amount 6 show here.
                 <router-link
                     to="/admin/product"
-                    class="text-blue-600 underline hover:text-blue-800"
+                    class="block sm:inline text-blue-600 underline hover:text-blue-800 mt-2 sm:mt-0"
                 >
                     adjust stock here
                 </router-link>
             </div>
 
-            <div v-else>
-                <Table :columns="tableColumns" :data="products" rowKey="id">
-                    <template #cell-category="{ row }">
-                        {{ row.category?.name || row.category }}
-                    </template>
+            <div v-else class="bg-white rounded-2xl shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <Table
+                        :columns="tableColumns"
+                        :data="products"
+                        rowKey="id"
+                        class="min-w-full"
+                    >
+                        <template #cell-category="{ row }">
+                            <span class="whitespace-nowrap">
+                                {{ row.category?.name || row.category }}
+                            </span>
+                        </template>
 
-                    <template #cell-stock="{ row }">
-                        <span
-                            :class="
-                                row.stock <= 5 ? 'text-red-500 font-bold' : ''
-                            "
-                        >
-                            {{ row.stock }}
-                        </span>
-                    </template>
-
-                    <template #cell-status>
-                        <span
-                            class="px-2 py-1 text-xs rounded-full bg-red-500 text-white"
-                        >
-                            Low Stock
-                        </span>
-                    </template>
-
-                    <template #cell-actions="{ row }">
-                        <div class="flex gap-2">
-                            <button
-                                @click="editProduct(row)"
-                                class="px-3 py-1 rounded-lg bg-blue-100 text-bgBtnEdit hover:bg-bgBtnEdit hover:text-white transition"
+                        <template #cell-stock="{ row }">
+                            <span
+                                :class="
+                                    row.stock <= 5
+                                        ? 'text-red-500 font-bold'
+                                        : ''
+                                "
                             >
-                                <i class="fas fa-pen"></i>
-                            </button>
-                            <button
-                                @click="deleteProduct(row.id)"
-                                class="px-3 py-1 rounded-lg bg-dangerSoft text-danger hover:bg-bgBtnDelete hover:text-white transition"
+                                {{ row.stock }}
+                            </span>
+                        </template>
+
+                        <template #cell-status>
+                            <span
+                                class="px-2 py-1 text-xs rounded-full bg-red-500 text-white whitespace-nowrap"
                             >
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </template>
-                </Table>
+                                Low Stock
+                            </span>
+                        </template>
+
+                        <template #cell-actions="{ row }">
+                            <div class="flex gap-2">
+                                <button
+                                    @click="editProduct(row)"
+                                    class="px-3 py-2 rounded-lg bg-blue-100 text-bgBtnEdit hover:bg-bgBtnEdit hover:text-white transition"
+                                >
+                                    <i class="fas fa-pen"></i>
+                                </button>
+                                <button
+                                    @click="deleteProduct(row.id)"
+                                    class="px-3 py-2 rounded-lg bg-dangerSoft text-danger hover:bg-bgBtnDelete hover:text-white transition"
+                                >
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </template>
+                    </Table>
+                </div>
             </div>
 
-            <Pigination
-                v-if="pagination.last_page > 1"
-                class="mt-6"
-                :currentPage="pagination.current_page"
-                :lastPage="pagination.last_page"
-                :total="pagination.total"
-                :perPage="pagination.per_page"
-                @page-change="fetchLowStock"
-            />
+            <div class="flex justify-center sm:justify-start">
+                <Pigination
+                    v-if="pagination.last_page > 1"
+                    class="mt-6"
+                    :currentPage="pagination.current_page"
+                    :lastPage="pagination.last_page"
+                    :total="pagination.total"
+                    :perPage="pagination.per_page"
+                    @page-change="fetchLowStock"
+                />
+            </div>
 
             <EditProduct
                 v-if="editingProduct"
@@ -172,3 +189,12 @@ export default defineComponent({
     },
 });
 </script>
+
+<style scoped>
+/* Ensure smooth horizontal scrolling on touch devices */
+.overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+}
+</style>
