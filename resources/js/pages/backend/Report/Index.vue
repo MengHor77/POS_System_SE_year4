@@ -1,12 +1,12 @@
 <template>
     <BackendLayout>
-        <div class="p-4 md:p-6 bg-bgMain min-h-screen">
+        <div class="p-4 md:p-6 bg-bgMain min-h-screen no-print-container">
             <div
-                class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 border-b border-border pb-4 no-print gap-4"
+                class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 border-b border-border pb-4 gap-4"
             >
                 <div>
                     <h1
-                        class="text-2xl md:text-3xl font-bold text-gray-800 tracking-tight"
+                        class="text-2xl md:text-3xl font-bold text-primary tracking-tight"
                     >
                         Sales Transaction Report
                     </h1>
@@ -16,166 +16,117 @@
                 </div>
             </div>
 
-            <div id="printable-area">
-                <div class="print-only mb-6">
-                    <h1 class="text-2xl font-bold">Sales Transaction Report</h1>
-                    <p class="text-sm">Generated on {{ reportDate }}</p>
-                    <hr class="my-4 border-gray-300" />
-                </div>
-
+            <div
+                class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-8"
+            >
                 <div
-                    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-8"
+                    class="p-6 border border-border rounded-xl2 bg-bgCard shadow-soft"
                 >
-                    <div
-                        class="p-6 border border-border rounded-xl2 bg-bgCard shadow-soft"
-                    >
-                        <p
-                            class="text-xs text-muted uppercase font-bold tracking-wider mb-1"
-                        >
-                            Total Revenue
-                        </p>
-                        <p
-                            class="text-2xl md:text-3xl font-extrabold text-primary"
-                        >
-                            {{ formatPrice(totalRevenue) }}
-                        </p>
-                    </div>
-                    <div
-                        class="p-6 border border-border rounded-xl2 bg-bgCard shadow-soft"
-                    >
-                        <p
-                            class="text-xs text-muted uppercase font-bold tracking-wider mb-1"
-                        >
-                            Today's Sales
-                        </p>
-                        <p
-                            class="text-2xl md:text-3xl font-extrabold text-secondary"
-                        >
-                            {{ formatPrice(todaysSale) }}
-                        </p>
-                    </div>
-                    <div
-                        class="p-6 border border-border rounded-xl2 bg-bgCard shadow-soft sm:col-span-2 md:col-span-1"
-                    >
-                        <p
-                            class="text-xs text-muted uppercase font-bold tracking-wider mb-1"
-                        >
-                            Transactions Count
-                        </p>
-                        <p
-                            class="text-2xl md:text-3xl font-extrabold text-info"
-                        >
-                            {{ pagination.total }}
-                        </p>
-                    </div>
+                    <p class="text-xs text-muted uppercase font-bold mb-1">
+                        Total Revenue
+                    </p>
+                    <p class="text-2xl font-extrabold text-primary">
+                        {{ formatPrice(totalRevenue) }}
+                    </p>
                 </div>
-
                 <div
-                    class="flex flex-col lg:flex-row items-stretch lg:items-center gap-4 pb-6 no-print"
+                    class="p-6 border border-border rounded-xl2 bg-bgCard shadow-soft"
                 >
-                    <div class="w-full lg:w-1/3">
-                        <SearchInput
-                            v-model="searchQuery"
-                            @search="fetchData(1)"
-                            placeholder="Search ID, Cashier name..."
-                        />
-                    </div>
-                    <div class="flex-1">
-                        <DateRangeFilter
-                            v-model:startDate="startDate"
-                            v-model:endDate="endDate"
-                            @filter="fetchData(1)"
-                        />
-                    </div>
-                    <button
-                        @click="printReport"
-                        class="bg-primary hover:bg-darkSoft text-white px-5 py-2.5 rounded-xl shadow-card transition-all flex items-center justify-center"
-                    >
-                        <i class="fas fa-print mr-2"></i> Print Report
-                    </button>
+                    <p class="text-xs text-muted uppercase font-bold mb-1">
+                        Today's Sales
+                    </p>
+                    <p class="text-2xl font-extrabold text-secondary">
+                        {{ formatPrice(todaysSale) }}
+                    </p>
                 </div>
-
                 <div
-                    class="bg-bgCard border border-border rounded-xl2 overflow-hidden shadow-card"
+                    class="p-6 border border-border rounded-xl2 bg-bgCard shadow-soft"
                 >
-                    <div class="bg-tableHeader p-4 border-b border-border">
-                        <h3 class="font-bold text-dark">
-                            Grouped Sales Transactions
-                        </h3>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <Table
-                            :columns="tableColumns"
-                            :data="transactions"
-                            rowKey="id"
-                            class="w-full min-w-[800px]"
-                        >
-                            <template #cell-id="{ row }">
-                                <span
-                                    class="font-mono text-xs font-bold text-gray-600"
-                                    >#{{ row.id }}</span
-                                >
-                            </template>
-                            <template #cell-cashier_email="{ row }">
-                                <div class="flex flex-col py-2">
-                                    <span class="font-bold text-gray-900">{{
-                                        row.cashier_name || "N/A"
-                                    }}</span>
-                                    <span class="text-xxs text-muted">{{
-                                        row.cashier_email || "N/A"
-                                    }}</span>
-                                </div>
-                            </template>
-                            <template #cell-product_name="{ row }">
-                                <div class="flex flex-col gap-1 py-2">
-                                    <div
-                                        v-for="(item, index) in row.products"
-                                        :key="index"
-                                        class="text-xs border-b border-gray-100 last:border-0 pb-1"
-                                    >
-                                        <span
-                                            class="font-semibold text-primary"
-                                            >{{ item.name }}</span
-                                        >
-                                        <span class="text-muted ml-2 font-bold"
-                                            >x{{ item.qty }}</span
-                                        >
-                                    </div>
-                                </div>
-                            </template>
-                            <template #cell-unit_price="{ row }">
-                                <div class="flex flex-col gap-1 py-2">
-                                    <div
-                                        v-for="(item, index) in row.products"
-                                        :key="index"
-                                        class="text-xs pb-1 text-gray-600"
-                                    >
-                                        {{ formatPrice(item.price) }}
-                                    </div>
-                                </div>
-                            </template>
-                            <template #cell-total_amount="{ row }">
-                                <span
-                                    class="font-extrabold text-success text-lg"
-                                    >{{
-                                        formatPrice(row.total_amount || 0)
-                                    }}</span
-                                >
-                            </template>
-                            <template #cell-date_formatted="{ row }">
-                                <div
-                                    class="text-sm text-gray-700 py-2 whitespace-nowrap"
-                                >
-                                    <i class="far fa-clock mr-1 text-muted"></i>
-                                    {{ row.date_formatted }}
-                                </div>
-                            </template>
-                        </Table>
-                    </div>
+                    <p class="text-xs text-muted uppercase font-bold mb-1">
+                        Totall Transactions
+                    </p>
+                    <p class="text-2xl font-extrabold text-info">
+                        {{ pagination.total }}
+                    </p>
                 </div>
             </div>
 
-            <div class="no-print mt-6 flex justify-center md:justify-start">
+            <div
+                class="flex flex-col lg:flex-row items-stretch lg:items-center gap-4 pb-6"
+            >
+                <div class="w-full lg:w-1/3">
+                    <SearchInput
+                        v-model="searchQuery"
+                        @search="fetchData(1)"
+                        placeholder="Search ID, Cashier, or Product..."
+                    />
+                </div>
+                <div class="flex-1">
+                    <DateRangeFilter
+                        v-model:startDate="startDate"
+                        v-model:endDate="endDate"
+                        @filter="fetchData(1)"
+                    />
+                </div>
+
+                <SaveFileToTxt
+                    :transactions="allTransactionsForExport"
+                    :reportDate="reportDate"
+                    :totalRevenue="totalRevenue"
+                    @click="prepareDataForExport"
+                />
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm overflow-x-auto">
+                <Table :columns="tableColumns" :data="transactions" rowKey="id">
+                    <template #cell-id="{ row }">
+                        <span
+                            class="font-mono text-xs font-bold text-gray-600"
+                            >{{ row.id }}</span
+                        >
+                    </template>
+                    <template #cell-cashier_email="{ row }">
+                        <div class="flex flex-col">
+                            <span class="font-semibold text-gray-900">{{
+                                row.cashier_name
+                            }}</span>
+                            <span class="text-[13px] text-muted">{{
+                                row.cashier_email
+                            }}</span>
+                        </div>
+                    </template>
+                    <template #cell-product_name="{ row }">
+                        <div
+                            v-for="(item, i) in row.products"
+                            :key="i"
+                            class="font-semibold border-b border-gray-100 last:border-0 py-1"
+                        >
+                            <span class="font-semibold text-primary">{{
+                                item.name
+                            }}</span>
+                            <span class="font-semibold text-success pl-3"
+                                >x{{ item.qty }}</span
+                            >
+                        </div>
+                    </template>
+                    <template #cell-unit_price="{ row }">
+                        <div
+                            v-for="(item, i) in row.products"
+                            :key="i"
+                            class="font-semibold py-1"
+                        >
+                            {{ formatPrice(item.price) }}
+                        </div>
+                    </template>
+                    <template #cell-total_amount="{ row }">
+                        <span class="font-extrabold text-success">{{
+                            formatPrice(row.total_amount)
+                        }}</span>
+                    </template>
+                </Table>
+            </div>
+
+            <div class="mt-6 flex justify-center">
                 <Pigination
                     v-if="pagination.total > 0"
                     :currentPage="pagination.current_page"
@@ -197,25 +148,26 @@ import Table from "../../../components/Backend/Table.vue";
 import SearchInput from "../../../components/Backend/SearchInput.vue";
 import Pigination from "../../../components/Backend/Pigination.vue";
 import DateRangeFilter from "../../../components/Backend/DateRangeFilter.vue";
+import SaveFileToTxt from "../../../components/Backend/saveFiletoTxt.vue";
 
 export default defineComponent({
-    name: "ReportIndex",
     components: {
         BackendLayout,
         Table,
         SearchInput,
         Pigination,
         DateRangeFilter,
+        SaveFileToTxt,
     },
     setup() {
+        const transactions = ref([]);
+        const allTransactionsForExport = ref([]);
         const totalRevenue = ref(0);
         const todaysSale = ref(0);
-        const transactions = ref([]);
         const reportDate = ref("");
         const searchQuery = ref("");
         const startDate = ref("");
         const endDate = ref("");
-
         const pagination = ref({
             current_page: 1,
             last_page: 1,
@@ -226,117 +178,66 @@ export default defineComponent({
         const tableColumns = [
             { key: "id", label: "ID" },
             { key: "cashier_email", label: "Cashier" },
-            { key: "product_name", label: "Items Sold" },
+            { key: "product_name", label: "Items" },
             { key: "unit_price", label: "Price/Unit" },
-            { key: "total_amount", label: "Transaction Total" },
-            { key: "date_formatted", label: "Date & Time" },
+            { key: "total_amount", label: "Total" },
+            { key: "date_formatted", label: "Date" },
         ];
 
-        const fetchData = async (page = 1) => {
+        const fetchData = async (page = 1, isExport = false) => {
             try {
-                const response = await axios.get("/admin/report/data", {
-                    params: {
-                        page: page,
-                        search: searchQuery.value,
-                        start_date: startDate.value,
-                        end_date: endDate.value,
-                    },
-                });
-                const res = response.data;
-                totalRevenue.value = res.dash?.totalRevenue || 0;
-                todaysSale.value = res.dash?.todaysSale || 0;
-                reportDate.value = res.reportDate || "";
-                transactions.value = res.orders?.data || [];
-                pagination.value = {
-                    current_page: Number(res.orders?.current_page) || 1,
-                    last_page: Number(res.orders?.last_page) || 1,
-                    total: Number(res.orders?.total) || 0,
-                    per_page: Number(res.orders?.per_page) || 10,
+                const params = {
+                    page,
+                    search: searchQuery.value,
+                    start_date: startDate.value,
+                    end_date: endDate.value,
+                    per_page: isExport ? "all" : 10,
                 };
-            } catch (err) {
-                console.error("Report Fetch Error:", err);
+                const { data } = await axios.get("/admin/report/data", {
+                    params,
+                });
+
+                if (isExport) {
+                    allTransactionsForExport.value = data.orders.data;
+                } else {
+                    transactions.value = data.orders.data;
+                    totalRevenue.value = data.dash.totalRevenue;
+                    todaysSale.value = data.dash.todaysSale;
+                    reportDate.value = data.reportDate;
+                    pagination.value = {
+                        current_page: data.orders.current_page,
+                        last_page: data.orders.last_page,
+                        total: data.orders.total,
+                        per_page: data.orders.per_page,
+                    };
+                }
+            } catch (e) {
+                console.error(e);
             }
         };
 
-        const formatPrice = (val: any) => {
-            const num = Number(val);
-            return isNaN(num)
-                ? "$0.00"
-                : "$" +
-                      num.toLocaleString(undefined, {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                      });
-        };
-
-        const printReport = () => window.print();
+        const prepareDataForExport = () => fetchData(1, true);
+        const formatPrice = (val: any) =>
+            "$" +
+            Number(val).toLocaleString(undefined, { minimumFractionDigits: 2 });
 
         onMounted(() => fetchData(1));
 
         return {
+            transactions,
+            allTransactionsForExport,
             totalRevenue,
             todaysSale,
-            transactions,
             reportDate,
-            tableColumns,
             searchQuery,
-            pagination,
             startDate,
             endDate,
+            pagination,
+            tableColumns,
             fetchData,
+            prepareDataForExport,
             formatPrice,
-            printReport,
         };
     },
 });
 </script>
-
-<style scoped>
-.print-only {
-    display: none;
-}
-.overflow-x-auto {
-    -webkit-overflow-scrolling: touch;
-}
-@media print {
-    :deep(aside),
-    :deep(nav),
-    :deep(header),
-    :deep(.sidebar),
-    :deep(.top-navbar),
-    .no-print {
-        display: none !important;
-    }
-    .p-4,
-    .p-6.bg-bgMain {
-        padding: 0 !important;
-        background: white !important;
-    }
-    #printable-area {
-        position: absolute !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100% !important;
-    }
-    .grid {
-        display: flex !important;
-        flex-direction: row !important;
-        gap: 10px !important;
-    }
-    .grid > div {
-        flex: 1 !important;
-        border: 1px solid #eee !important;
-    }
-    .text-primary,
-    .text-secondary,
-    .text-success,
-    .text-info {
-        color: #000 !important;
-    }
-    .print-only {
-        display: block !important;
-        text-align: center;
-        border-bottom: 2px solid #333;
-    }
-}
-</style>

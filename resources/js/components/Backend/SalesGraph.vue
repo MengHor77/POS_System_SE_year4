@@ -37,9 +37,9 @@ import {
     Tooltip,
     Legend,
     Filler,
+    ChartOptions,
 } from "chart.js";
 
-// Register ChartJS modules
 ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -58,7 +58,6 @@ export default defineComponent({
         const loaded = ref(false);
         const chartData = ref<any>(null);
 
-        // Your Tailwind Config Colors for JS use
         const myColors = {
             primary: "#4f46e5",
             info: "#0ea5e9",
@@ -66,14 +65,17 @@ export default defineComponent({
             muted: "#6b7280",
         };
 
-        const chartOptions = {
+        const chartOptions: ChartOptions<"line"> = {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
                 legend: { display: false },
                 tooltip: {
-                    backgroundColor: "#4f46e5", // Using 'primary'
-                    titleFont: { size: 12, weight: "bold" },
+                    backgroundColor: "#4f46e5",
+                    titleFont: {
+                        size: 12,
+                        weight: "bold" as const, // Fixed: as const ensures this is the literal 'bold'
+                    },
                     bodyFont: { size: 12 },
                     padding: 10,
                     cornerRadius: 8,
@@ -87,7 +89,7 @@ export default defineComponent({
             scales: {
                 y: {
                     beginAtZero: true,
-                    grid: { color: "#f1f5f9", drawBorder: false }, // Using 'tableHeader' style
+                    grid: { color: "#f1f5f9" },
                     ticks: {
                         color: myColors.muted,
                         font: { size: 10 },
@@ -98,7 +100,10 @@ export default defineComponent({
                     grid: { display: false },
                     ticks: {
                         color: myColors.muted,
-                        font: { size: 10, weight: "600" },
+                        font: {
+                            size: 10,
+                            weight: 600,
+                        },
                     },
                 },
             },
@@ -106,19 +111,18 @@ export default defineComponent({
 
         const fetchChartData = async () => {
             try {
-                // Fetching from your Laravel Backend
                 const res = await axios.get("/admin/dashboard/data");
 
                 chartData.value = {
-                    labels: res.data.chartLabels, // e.g., ["Jan", "Feb", "Mar"]
+                    labels: res.data.chartLabels,
                     datasets: [
                         {
                             label: "Monthly Revenue",
-                            data: res.data.chartValues, // e.g., [500, 1200, 800]
+                            data: res.data.chartValues,
                             borderColor: myColors.primary,
-                            backgroundColor: "rgba(79, 70, 229, 0.1)", // Primary with 10% opacity
+                            backgroundColor: "rgba(79, 70, 229, 0.1)",
                             fill: true,
-                            tension: 0.4, // Smooth professional curves
+                            tension: 0.4,
                             pointRadius: 4,
                             pointHoverRadius: 6,
                             pointBackgroundColor: "#ffffff",
