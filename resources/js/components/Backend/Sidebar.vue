@@ -100,6 +100,10 @@ export default defineComponent({
     props: { collapsed: Boolean },
     emits: ["toggle"],
     setup(props, { emit }) {
+        const savedCount = parseInt(
+            sessionStorage.getItem("notif-count") || "0",
+        );
+
         const toggleSidebar = () => {
             emit("toggle");
         };
@@ -131,7 +135,7 @@ export default defineComponent({
                 icon: "fas fa-bell",
                 label: "Notification",
                 route: "/admin/notification",
-                count: 0,
+                count: savedCount, // 2. USE THE SAVED COUNT HERE
             },
             {
                 icon: "fas fa-warehouse",
@@ -168,20 +172,50 @@ export default defineComponent({
 
         const fetchNotificationCount = async () => {
             try {
-                const res = await axios.get("/admin/notification/count");
+                // Add a timestamp to ensure the browser doesn't cache the old API result
+                const res = await axios.get(
+                    `/admin/notification/count?t=${new Date().getTime()}`,
+                );
                 const notification = menuItems.find(
                     (i) => i.label === "Notification",
                 );
-                if (notification) notification.count = res.data.total || 0;
+
+                if (notification) {
+                    const total = res.data.total || 0;
+                    notification.count = total;
+
+                    // 3. SAVE TO MEMORY FOR THE NEXT PAGE LOAD
+                    sessionStorage.setItem("notif-count", total.toString());
+                }
             } catch (e) {
-                console.error(e);
+                console.error("Notification fetch error:", e);
             }
         };
 
         onMounted(() => {
             fetchNotificationCount();
-            const interval = setInterval(fetchNotificationCount, 30000);
-            onUnmounted(() => clearInterval(interval));
+
+            // Listen for manual updates from other components (Sales, Products, etc.)
+            window.addEventListener(
+                "refresh-notifications",
+                fetchNotificationCount,
+            );
+            window.addEventListener("stock-updated", fetchNotificationCount);
+
+            // Auto-refresh every 10 seconds
+            const interval = setInterval(fetchNotificationCount, 10000);
+
+            onUnmounted(() => {
+                clearInterval(interval);
+                window.removeEventListener(
+                    "refresh-notifications",
+                    fetchNotificationCount,
+                );
+                window.removeEventListener(
+                    "stock-updated",
+                    fetchNotificationCount,
+                );
+            });
         });
 
         return { menuItems, toggleSidebar, handleItemClick };
