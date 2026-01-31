@@ -72,7 +72,7 @@
                 </div>
             </div>
 
-            <div class="flex justify-center md:justify-start">
+            <div class="mt-6 flex justify-center md:justify-end">
                 <Pagination
                     v-if="pagination.total > pagination.per_page"
                     class="mt-6"

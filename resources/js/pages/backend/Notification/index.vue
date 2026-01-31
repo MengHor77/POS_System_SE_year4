@@ -86,7 +86,7 @@
                 </div>
             </div>
 
-            <div class="flex justify-center sm:justify-start">
+            <div class="mt-6 flex justify-center md:justify-end">
                 <Pigination
                     v-if="pagination.last_page > 1"
                     class="mt-6"

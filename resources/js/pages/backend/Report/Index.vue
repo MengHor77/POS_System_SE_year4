@@ -126,7 +126,7 @@
                 </Table>
             </div>
 
-            <div class="mt-6 flex justify-center">
+            <div class="mt-6 flex justify-center md:justify-end">
                 <Pigination
                     v-if="pagination.total > 0"
                     :currentPage="pagination.current_page"

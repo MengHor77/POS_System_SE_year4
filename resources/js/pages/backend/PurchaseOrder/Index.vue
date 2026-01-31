@@ -121,7 +121,7 @@
                 </div>
             </div>
 
-            <div class="flex justify-center sm:justify-start">
+            <div class="mt-6 flex justify-center md:justify-end">
                 <Pigination
                     v-if="total > perPage"
                     class="mt-6"

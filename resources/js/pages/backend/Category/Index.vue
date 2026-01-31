@@ -56,7 +56,7 @@
                 </Table>
             </div>
 
-            <div class="mt-4 flex justify-end overflow-x-auto">
+            <div class="mt-6 flex justify-center md:justify-end">
                 <Pigination
                     v-if="categories.total > perPage"
                     :current-page="categories.current_page"

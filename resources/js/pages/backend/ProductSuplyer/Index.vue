@@ -74,7 +74,7 @@
                 </div>
             </div>
 
-            <div class="flex justify-center sm:justify-start">
+            <div class="mt-6 flex justify-center md:justify-end">
                 <Pigination
                     class="mt-6"
                     :current-page="pagination.current_page"
