@@ -24,7 +24,6 @@
                 >
                     {{ successMessage }}
                 </div>
-
                 <slot />
             </main>
         </div>
@@ -32,7 +31,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, onUnmounted } from "vue";
+import { defineComponent, ref, onMounted, onUnmounted, watch } from "vue";
+import { useRoute } from "vue-router";
 import Header from "../components/Backend/Header.vue";
 import Sidebar from "../components/Backend/Sidebar.vue";
 
@@ -40,19 +40,43 @@ export default defineComponent({
     name: "BackendLayout",
     components: { Header, Sidebar },
     setup() {
-        // Detect mobile on load
+        const route = useRoute();
         const isMobile = () => window.innerWidth < 1024;
-        const collapsed = ref(isMobile());
+
+        const savedState = localStorage.getItem("sidebar-collapsed");
+        const collapsed = ref(
+            savedState !== null ? JSON.parse(savedState) : isMobile(),
+        );
+
         const successMessage = ref("");
 
         const toggleSidebar = () => {
             collapsed.value = !collapsed.value;
+            localStorage.setItem(
+                "sidebar-collapsed",
+                JSON.stringify(collapsed.value),
+            );
         };
 
-        // Auto-collapse when resizing to mobile
+        // 1. WATCHER: When the route changes (user clicks a menu item),
+        // collapse the sidebar automatically if on mobile.
+        watch(
+            () => route.path,
+            () => {
+                if (isMobile()) {
+                    collapsed.value = true;
+                    localStorage.setItem(
+                        "sidebar-collapsed",
+                        JSON.stringify(true),
+                    );
+                }
+            },
+        );
+
         const handleResize = () => {
             if (isMobile()) {
                 collapsed.value = true;
+                localStorage.setItem("sidebar-collapsed", JSON.stringify(true));
             }
         };
 

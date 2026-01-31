@@ -46,6 +46,7 @@
                 <router-link
                     v-if="item.route"
                     :to="item.route"
+                    @click="handleItemClick"
                     class="flex items-center h-12 px-4 cursor-pointer hover:bg-darkSoft transition-all duration-300 rounded-lg overflow-hidden group"
                     active-class="font-bold text-primary bg-infoSoft"
                 >
@@ -91,7 +92,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, ref, onMounted, onUnmounted } from "vue";
+import { defineComponent, reactive, onMounted, onUnmounted } from "vue";
 import axios from "axios";
 
 export default defineComponent({
@@ -99,12 +100,15 @@ export default defineComponent({
     props: { collapsed: Boolean },
     emits: ["toggle"],
     setup(props, { emit }) {
-        const savedCount = parseInt(
-            sessionStorage.getItem("notif-count") || "0",
-        );
-
         const toggleSidebar = () => {
             emit("toggle");
+        };
+
+        const handleItemClick = () => {
+            const isMobile = window.innerWidth < 1024;
+            if (isMobile && !props.collapsed) {
+                emit("toggle");
+            }
         };
 
         const menuItems = reactive([
@@ -127,7 +131,7 @@ export default defineComponent({
                 icon: "fas fa-bell",
                 label: "Notification",
                 route: "/admin/notification",
-                count: savedCount,
+                count: 0,
             },
             {
                 icon: "fas fa-warehouse",
@@ -168,13 +172,7 @@ export default defineComponent({
                 const notification = menuItems.find(
                     (i) => i.label === "Notification",
                 );
-                if (notification) {
-                    notification.count = res.data.total || 0;
-                    sessionStorage.setItem(
-                        "notif-count",
-                        (res.data.total || 0).toString(),
-                    );
-                }
+                if (notification) notification.count = res.data.total || 0;
             } catch (e) {
                 console.error(e);
             }
@@ -183,35 +181,10 @@ export default defineComponent({
         onMounted(() => {
             fetchNotificationCount();
             const interval = setInterval(fetchNotificationCount, 30000);
-            window.addEventListener("stock-updated", fetchNotificationCount);
-            onUnmounted(() => {
-                clearInterval(interval);
-                window.removeEventListener(
-                    "stock-updated",
-                    fetchNotificationCount,
-                );
-            });
+            onUnmounted(() => clearInterval(interval));
         });
 
-        return { menuItems, toggleSidebar };
+        return { menuItems, toggleSidebar, handleItemClick };
     },
 });
 </script>
-
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.2s ease;
-}
-.fade-enter-from,
-.fade-leave-to {
-    opacity: 0;
-}
-.custom-scrollbar::-webkit-scrollbar {
-    width: 4px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #333;
-    border-radius: 10px;
-}
-</style>
