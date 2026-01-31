@@ -1,50 +1,40 @@
 <template>
     <BackendLayout>
-        <div class="p-6 bg-bgMain min-h-screen">
-            <h1 class="text-3xl font-bold mb-6 text-primary">Admin Profiles</h1>
+        <div class="p-4 md:p-6 bg-bgMain min-h-screen">
+            <h1 class="text-2xl md:text-3xl font-bold mb-6 text-primary">
+                Admin Profiles
+            </h1>
 
             <FlassMessage :message="flashMessage" :type="flashType" />
 
             <div class="bg-bgCard rounded-2xl shadow overflow-hidden">
-                <table class="w-full border-collapse">
-                    <thead class="bg-gray-100">
-                        <tr>
-                            <th class="p-3 text-left">ID</th>
-                            <th class="p-3 text-left">Name</th>
-                            <th class="p-3 text-left">Email</th>
-                            <th class="p-3 text-center">Action</th>
-                        </tr>
-                    </thead>
+                <div class="overflow-x-auto">
+                    <Table :columns="columns" :data="admins" class="min-w-full">
+                        <template #cell-id="{ row }">
+                            <span class="font-medium text-gray-700">
+                                {{ row.id }}
+                            </span>
+                        </template>
 
-                    <tbody>
-                        <tr
-                            v-for="admin in admins"
-                            :key="admin.id"
-                            class="border-t hover:bg-gray-50"
-                        >
-                            <td class="p-3">{{ admin.id }}</td>
-                            <td class="p-3">{{ admin.name }}</td>
-                            <td class="p-3">{{ admin.email }}</td>
-                            <td class="p-3 text-center">
+                        <template #cell-actions="{ row }">
+                            <div class="flex justify-start gap-2">
                                 <button
-                                    @click="openEdit(admin.id)"
-                                    class="px-4 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                                    @click="openEdit(row.id)"
+                                    class="px-3 py-1.5 rounded-lg bg-blue-100 text-bgBtnEdit hover:bg-bgBtnEdit hover:text-white transition shadow-sm"
+                                    title="Edit"
                                 >
-                                    Edit
+                                    <i class="fas fa-pen"></i>
                                 </button>
-                            </td>
-                        </tr>
+                            </div>
+                        </template>
 
-                        <tr v-if="admins.length === 0">
-                            <td
-                                colspan="4"
-                                class="p-4 text-center text-gray-500"
-                            >
+                        <template v-if="admins.length === 0" #empty>
+                            <div class="p-8 text-center text-gray-500">
                                 No admins found
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                            </div>
+                        </template>
+                    </Table>
+                </div>
             </div>
 
             <Edit
@@ -62,6 +52,7 @@ import { defineComponent, ref, onMounted } from "vue";
 import axios from "axios";
 import BackendLayout from "../../../layouts/BackendLayout.vue";
 import Edit from "./Edit.vue";
+import Table from "../../../components/Backend/Table.vue";
 import FlassMessage from "../../../components/Backend/FlassMessage.vue";
 
 interface Admin {
@@ -72,15 +63,27 @@ interface Admin {
 
 export default defineComponent({
     name: "ProfileIndex",
-    components: { BackendLayout, Edit, FlassMessage },
+    components: {
+        BackendLayout,
+        Edit,
+        FlassMessage,
+        Table,
+    },
     setup() {
         const admins = ref<Admin[]>([]);
         const showEditModal = ref(false);
         const selectedId = ref<number | null>(null);
 
-        // Message states
         const flashMessage = ref("");
         const flashType = ref<"success" | "error">("success");
+
+        // Removed text-center to keep alignment consistent with other pages
+        const columns = [
+            { key: "id", label: "ID" },
+            { key: "name", label: "Name" },
+            { key: "email", label: "Email" },
+            { key: "actions", label: "Actions" },
+        ];
 
         const fetchAdmins = async () => {
             try {
@@ -95,6 +98,9 @@ export default defineComponent({
             fetchAdmins();
             flashMessage.value = "Admin profile updated successfully!";
             flashType.value = "success";
+            setTimeout(() => {
+                flashMessage.value = "";
+            }, 3000);
         };
 
         const openEdit = (id: number) => {
@@ -111,6 +117,7 @@ export default defineComponent({
 
         return {
             admins,
+            columns,
             showEditModal,
             selectedId,
             openEdit,
@@ -123,8 +130,11 @@ export default defineComponent({
     },
 });
 </script>
+
 <style scoped>
-tbody tr:hover {
-    transition: background-color 0.2s ease-in-out;
+.overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
 }
 </style>
