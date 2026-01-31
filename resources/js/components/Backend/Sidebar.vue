@@ -1,11 +1,11 @@
 <template>
     <aside
-        class="flex flex-col bg-dark text-white transition-all duration-300"
+        class="flex   flex-col bg-dark text-white transition-all duration-300"
         :class="collapsed ? 'w-20' : 'w-64'"
     >
         <!-- Logo + Toggle -->
         <div
-            class="relative flex items-center h-20 px-4 transition-all duration-300"
+            class="relative border-b border-darkSoft  flex items-center h-20 px-4 transition-all duration-300"
         >
             <transition name="fade">
                 <span
@@ -18,7 +18,7 @@
 
             <button
                 @click="toggleSidebar"
-                class="absolute transition-all duration-300 px-3 py-2 rounded-full hover:bg-primary"
+                class=" absolute transition-all duration-300 px-3 py-2 rounded-full hover:bg-darkSoft"
                 :class="collapsed ? 'left-1/2 -translate-x-1/2' : 'right-4'"
             >
                 <i

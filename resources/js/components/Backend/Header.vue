@@ -1,6 +1,6 @@
 <template>
     <header
-        class="bg-white shadow px-6 py-4 flex justify-between items-center no-print"
+        class="bg-white border-b border-gray-200 px-6 h-20 flex justify-between items-center no-print"
     >
         <h1 class="text-3xl font-bold text-primary flex items-center gap-2">
             <i class="fas fa-boxes"></i> Admin Dashboard
