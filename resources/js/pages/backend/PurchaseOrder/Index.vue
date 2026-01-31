@@ -1,23 +1,22 @@
 <template>
     <BackendLayout>
-        <div class="p-6 bg-bgMain min-h-screen">
-            <div class="flex justify-between items-center mb-6">
-                <h1 class="text-2xl font-bold text-primary">
+        <div class="p-4 md:p-6 bg-bgMain min-h-screen">
+            <div
+                class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4"
+            >
+                <h1 class="text-2xl md:text-3xl font-bold text-primary">
                     Purchase Orders Management
                 </h1>
+                <button
+                    @click="showCreate = true"
+                    class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-dark text-white hover:bg-darkSoft transition shadow-md flex items-center justify-center gap-2"
+                >
+                    <i class="fas fa-plus"></i> New Purchase Order
+                </button>
             </div>
 
-            <div class="flex flex-row flex-wrap gap-3 w-full pb-6 items-center">
-                <div class="w-50">
-                    <button
-                        @click="showCreate = true"
-                        class="px-4 py-2 rounded-xl bg-dark text-white hover:bg-darkSoft transition shadow-md flex items-center gap-2"
-                    >
-                        <i class="fas fa-plus"></i> New Purchase Order
-                    </button>
-                </div>
-
-                <div class="w-80">
+            <div class="flex flex-col lg:flex-row gap-4 w-full pb-6">
+                <div class="w-full lg:w-1/3">
                     <SearchInput
                         v-model="filterText"
                         placeholder="Search ID, Product or Supplier..."
@@ -25,16 +24,22 @@
                     />
                 </div>
 
-                <DateRangeFilter
-                    v-model:startDate="startDate"
-                    v-model:endDate="endDate"
-                    @filter="fetch(1)"
-                />
-
-                <FilterStatus
-                    v-model="selectedStatus"
-                    @update:modelValue="fetch(1)"
-                />
+                <div class="flex flex-col md:flex-row gap-4 flex-1">
+                    <div class="flex-1">
+                        <DateRangeFilter
+                            v-model:startDate="startDate"
+                            v-model:endDate="endDate"
+                            @filter="fetch(1)"
+                        />
+                    </div>
+                    <div class="w-full md:w-48">
+                        <FilterStatus
+                            v-model="selectedStatus"
+                            @update:modelValue="fetch(1)"
+                            class="w-full"
+                        />
+                    </div>
+                </div>
             </div>
 
             <FlashMessage
@@ -43,90 +48,96 @@
                 :type="flash.type"
             />
 
-            <div class="bg-white rounded-2xl shadow-sm overflow-hidden mt-2">
-                <Table :columns="columns" :data="purchaseOrders">
-                    <template #cell-product="{ row }">
-                        <span class="font-medium text-gray-700">{{
-                            row.product?.name
-                        }}</span>
-                    </template>
-
-                    <template #cell-status="{ row }">
-                        <span
-                            :class="
-                                row.status === 'received'
-                                    ? 'bg-green-100 text-green-700 px-2 py-1 rounded-lg text-xs font-bold'
-                                    : 'bg-orange-100 text-orange-700 px-2 py-1 rounded-lg text-xs font-bold'
-                            "
-                            class="capitalize"
-                        >
-                            {{ row.status || "Pending" }}
-                        </span>
-                    </template>
-
-                    <template #cell-created_at="{ row }">
-                        <span class="text-sm text-gray-500">{{
-                            row.created_at
-                        }}</span>
-                    </template>
-
-                    <template #cell-actions="{ row }">
-                        <div class="flex gap-2">
-                            <button
-                                v-if="row.status !== 'received'"
-                                @click="receiveOrder(row.id)"
-                                class="px-3 py-1 rounded-lg bg-green-600 text-white hover:bg-green-700 transition flex items-center gap-1 shadow-sm"
-                                title="Mark as Received"
-                            >
-                                <i class="fas fa-check-circle text-sm"></i>
-                                <span class="text-xs">Receive</span>
-                            </button>
-
-                            <button
-                                v-if="row.status !== 'received'"
-                                @click="openEdit(row)"
-                                class="px-3 py-1 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-600 hover:text-white transition"
-                                title="Edit Order"
-                            >
-                                <i class="fas fa-pen text-sm"></i>
-                            </button>
-
-                            <button
-                                v-if="row.status !== 'received'"
-                                @click="deletePO(row.id)"
-                                class="px-3 py-1 rounded-lg bg-red-100 text-red-600 hover:bg-red-600 hover:text-white transition"
-                                title="Delete Order"
-                            >
-                                <i class="fas fa-trash text-sm"></i>
-                            </button>
-
+            <div
+                class="bg-white rounded-2xl shadow-sm overflow-hidden mt-2 border border-gray-100"
+            >
+                <div class="overflow-x-auto">
+                    <Table
+                        :columns="columns"
+                        :data="purchaseOrders"
+                        class="min-w-full"
+                    >
+                        <template #cell-product="{ row }">
                             <span
-                                v-else
-                                class="text-gray-400 text-xs italic flex items-center gap-1"
+                                class="font-medium text-gray-700 whitespace-nowrap"
+                                >{{ row.product?.name }}</span
                             >
-                                <i class="fas fa-lock"></i> Locked
+                        </template>
+
+                        <template #cell-status="{ row }">
+                            <span
+                                :class="
+                                    row.status === 'received'
+                                        ? 'bg-green-100 text-green-700'
+                                        : 'bg-orange-100 text-orange-700'
+                                "
+                                class="px-2 py-1 rounded-lg text-xs font-bold capitalize whitespace-nowrap"
+                            >
+                                {{ row.status || "Pending" }}
                             </span>
-                        </div>
-                    </template>
-                </Table>
+                        </template>
+
+                        <template #cell-created_at="{ row }">
+                            <span
+                                class="text-sm text-gray-500 whitespace-nowrap"
+                                >{{ row.created_at }}</span
+                            >
+                        </template>
+
+                        <template #cell-actions="{ row }">
+                            <div class="flex items-center gap-2">
+                                <template v-if="row.status !== 'received'">
+                                    <button
+                                        @click="receiveOrder(row.id)"
+                                        class="px-3 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition flex items-center gap-1 shadow-sm whitespace-nowrap"
+                                    >
+                                        <i
+                                            class="fas fa-check-circle text-sm"
+                                        ></i
+                                        ><span class="text-xs">Receive</span>
+                                    </button>
+                                    <button
+                                        @click="openEdit(row)"
+                                        class="px-3 py-2 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-600 hover:text-white transition"
+                                    >
+                                        <i class="fas fa-pen text-sm"></i>
+                                    </button>
+                                    <button
+                                        @click="deletePO(row.id)"
+                                        class="px-3 py-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-600 hover:text-white transition"
+                                    >
+                                        <i class="fas fa-trash text-sm"></i>
+                                    </button>
+                                </template>
+                                <span
+                                    v-else
+                                    class="text-gray-400 text-xs italic flex items-center gap-1 whitespace-nowrap"
+                                >
+                                    <i class="fas fa-lock"></i> Locked
+                                </span>
+                            </div>
+                        </template>
+                    </Table>
+                </div>
             </div>
 
-            <Pigination
-                v-if="total > perPage"
-                class="mt-6"
-                :current-page="currentPage"
-                :last-page="lastPage"
-                :total="total"
-                :per-page="perPage"
-                @page-change="fetch"
-            />
+            <div class="flex justify-center sm:justify-start">
+                <Pigination
+                    v-if="total > perPage"
+                    class="mt-6"
+                    :current-page="currentPage"
+                    :last-page="lastPage"
+                    :total="total"
+                    :per-page="perPage"
+                    @page-change="fetch"
+                />
+            </div>
 
             <PurchaseOrderCreate
                 v-if="showCreate"
                 @close="showCreate = false"
                 @saved="onCreated"
             />
-
             <PurchaseOrderEdit
                 v-if="showEdit && editId !== null"
                 :order-id="editId"
@@ -144,7 +155,7 @@ import BackendLayout from "../../../layouts/BackendLayout.vue";
 import PurchaseOrderCreate from "./Create.vue";
 import PurchaseOrderEdit from "./Edit.vue";
 import FilterStatus from "./FilterPendingOrRecievedStatus.vue";
-import DateRangeFilter from "../../../components/Backend/DateRangeFilter.vue"; // NEW IMPORT
+import DateRangeFilter from "../../../components/Backend/DateRangeFilter.vue";
 import Pigination from "../../../components/Backend/Pigination.vue";
 import FlashMessage from "../../../components/Backend/FlassMessage.vue";
 import Table from "../../../components/Backend/Table.vue";
@@ -156,7 +167,7 @@ export default defineComponent({
         PurchaseOrderCreate,
         PurchaseOrderEdit,
         FilterStatus,
-        DateRangeFilter, // REGISTER COMPONENT
+        DateRangeFilter,
         SearchInput,
         Pigination,
         FlashMessage,
@@ -167,13 +178,10 @@ export default defineComponent({
         const showCreate = ref(false);
         const showEdit = ref(false);
         const editId = ref<number | null>(null);
-
         const filterText = ref("");
         const selectedStatus = ref("");
-
         const startDate = ref("");
         const endDate = ref("");
-
         const currentPage = ref(1);
         const lastPage = ref(1);
         const perPage = ref(5);
@@ -237,7 +245,6 @@ export default defineComponent({
                     `/admin/purchase-order/${id}/receive`,
                 );
                 window.dispatchEvent(new Event("stock-updated"));
-
                 showFlash(res.data.message);
                 fetch(currentPage.value);
             } catch (error: any) {
@@ -303,3 +310,12 @@ export default defineComponent({
     },
 });
 </script>
+
+<style scoped>
+.overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+}
+:deep(th) {
+    white-space: nowrap;
+}
+</style>
