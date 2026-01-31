@@ -1,84 +1,107 @@
 <template>
     <BackendLayout>
         <template #default>
-            <div class="container mx-auto p-6 bg-bgMain min-h-screen">
+            <div class="p-4 md:p-6 bg-bgMain min-h-screen">
                 <div class="mb-6">
-                    <h1 class="text-3xl font-bold mb-6 text-primary">
+                    <h1
+                        class="text-2xl md:text-3xl font-bold mb-6 text-primary"
+                    >
                         Sales Management
                     </h1>
 
                     <div
-                        class="flex flex-wrap items-center justify-between gap-4"
+                        class="flex flex-col lg:flex-row lg:items-center justify-between gap-4"
                     >
-                        <div class="flex items-center gap-3 w-full md:w-auto">
-                            <SearchInput
-                                v-model="searchQuery"
-                                placeholder="Search ID, Product, or Cashier..."
-                                @search="fetchSales(1)"
-                            />
+                        <div
+                            class="flex flex-row items-center gap-3 w-full lg:w-auto"
+                        >
+                            <div class="flex-grow md:w-80">
+                                <SearchInput
+                                    v-model="searchQuery"
+                                    placeholder="Search ID, Product, or Cashier..."
+                                    @search="fetchSales(1)"
+                                />
+                            </div>
 
                             <button
                                 @click="fetchSales(1)"
-                                class="px-4 py-2 bg-bgCard hover:bg-bgHover text-muted border border-border rounded-lg text-sm transition shadow-soft flex items-center gap-2"
+                                class="whitespace-nowrap px-4 py-2 bg-bgCard hover:bg-bgHover text-muted border border-border rounded-lg text-sm transition shadow-soft flex items-center gap-2"
                             >
-                                <i class="fas fa-sync-alt"></i> Refresh
+                                <i class="fas fa-sync-alt"></i>
+                                <span class="hidden sm:inline">Refresh</span>
                             </button>
                         </div>
 
-                        <DateRangeFilter
-                            v-model:startDate="startDate"
-                            v-model:endDate="endDate"
-                            @filter="fetchSales(1)"
-                        />
+                        <div class="w-full lg:w-auto overflow-x-auto">
+                            <DateRangeFilter
+                                v-model:startDate="startDate"
+                                v-model:endDate="endDate"
+                                @filter="fetchSales(1)"
+                                class="w-full"
+                            />
+                        </div>
                     </div>
                 </div>
 
                 <div
                     class="bg-bgCard rounded-xl2 shadow-card border border-border overflow-hidden"
                 >
-                    <Table :columns="columns" :data="sales" row-key="id">
-                        <template #cell-cashier_name="{ row }">
-                            <div class="flex flex-col">
-                                <span class="font-medium text-gray-900">{{
-                                    row.cashier_name
-                                }}</span>
-                                <span class="text-xxs text-muted">{{
-                                    row.cashier_email
-                                }}</span>
-                            </div>
-                        </template>
+                    <div class="overflow-x-auto">
+                        <Table
+                            :columns="columns"
+                            :data="sales"
+                            row-key="id"
+                            class="min-w-full"
+                        >
+                            <template #cell-cashier_name="{ row }">
+                                <div class="flex flex-col min-w-[150px]">
+                                    <span class="font-medium text-gray-900">{{
+                                        row.cashier_name
+                                    }}</span>
+                                    <span class="text-xxs text-muted">{{
+                                        row.cashier_email
+                                    }}</span>
+                                </div>
+                            </template>
 
-                        <template #cell-total_amount="{ row }">
-                            <span class="font-semibold text-success">
-                                ${{ Number(row.total_amount).toFixed(2) }}
-                            </span>
-                        </template>
+                            <template #cell-total_amount="{ row }">
+                                <span
+                                    class="font-semibold text-success whitespace-nowrap"
+                                >
+                                    ${{ Number(row.total_amount).toFixed(2) }}
+                                </span>
+                            </template>
 
-                        <template #cell-actions="{ row }">
-                            <button
-                                @click="openDetail(row)"
-                                class="px-3 py-1 bg-info text-white text-xs rounded-md hover:opacity-90 transition flex items-center gap-1 shadow-soft"
-                            >
-                                <i class="fas fa-eye text-xxs"></i> View
-                            </button>
-                        </template>
+                            <template #cell-actions="{ row }">
+                                <button
+                                    @click="openDetail(row)"
+                                    class="px-3 py-1 bg-info text-white text-xs rounded-md hover:opacity-90 transition flex items-center gap-1 shadow-soft"
+                                >
+                                    <i class="fas fa-eye text-xxs"></i> View
+                                </button>
+                            </template>
 
-                        <template #cell-created_at="{ row }">
-                            <span class="text-sm text-muted">{{
-                                row.created_at
-                            }}</span>
-                        </template>
-                    </Table>
+                            <template #cell-created_at="{ row }">
+                                <span
+                                    class="text-sm text-muted whitespace-nowrap"
+                                    >{{ row.created_at }}</span
+                                >
+                            </template>
+                        </Table>
+                    </div>
                 </div>
 
-                <Pigination
-                    v-if="pagination.total > 0"
-                    :current-page="pagination.currentPage"
-                    :last-page="pagination.lastPage"
-                    :total="pagination.total"
-                    :per-page="pagination.perPage"
-                    @page-change="fetchSales"
-                />
+                <div class="flex justify-center md:justify-start">
+                    <Pigination
+                        v-if="pagination.total > 0"
+                        class="mt-6"
+                        :current-page="pagination.currentPage"
+                        :last-page="pagination.lastPage"
+                        :total="pagination.total"
+                        :per-page="pagination.perPage"
+                        @page-change="fetchSales"
+                    />
+                </div>
 
                 <SaleTransactionDetails
                     v-if="showModal"
@@ -128,7 +151,6 @@ export default defineComponent({
         const selectedSale = ref<Sale | null>(null);
         const showModal = ref(false);
         const searchQuery = ref("");
-
         const startDate = ref("");
         const endDate = ref("");
 
@@ -179,6 +201,7 @@ export default defineComponent({
             selectedSale.value = sale;
             showModal.value = true;
         };
+
         onMounted(() => fetchSales());
 
         return {
@@ -196,3 +219,10 @@ export default defineComponent({
     },
 });
 </script>
+
+<style scoped>
+/* Smooth scrolling for mobile tables */
+.overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+}
+</style>
