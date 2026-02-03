@@ -47,8 +47,8 @@
                     v-if="item.route"
                     :to="item.route"
                     @click="handleItemClick"
-                    class="flex items-center h-12 px-4 cursor-pointer hover:bg-darkSoft transition-all duration-300 rounded-lg overflow-hidden group"
-                    active-class="font-bold text-primary bg-infoSoft"
+                    class="flex items-center h-12 px-4 cursor-pointer hover:bg-darkSoft transition-all duration-300 rounded-xl overflow-hidden group"
+                    active-class="font-bold text-primary bg-infoSoft border-l-4 border-primary"
                 >
                     <div
                         class="w-12 pr-4 flex-shrink-0 flex justify-center items-center"
