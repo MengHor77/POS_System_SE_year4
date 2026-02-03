@@ -1,7 +1,9 @@
 <template>
     <BackendLayout>
         <div class="p-4 md:p-6 bg-bgMain min-h-screen">
-            <h1 class="text-2xl font-bold mb-6 text-primary">
+            <h1
+                class="text-2xl md:text-3xl font-bold text-primary"
+            >
                 Inventory Management
             </h1>
 

@@ -2,7 +2,9 @@
     <BackendLayout>
         <div class="p-6 bg-bgMain min-h-screen">
             <div class="mb-8">
-                <h1 class="text-3xl font-bold text-primary tracking-tight">
+                <h1
+                    class="text-2xl md:text-3xl font-bold text-primary tracking-tight"
+                >
                     Sales Analytics
                 </h1>
                 <p class="text-muted">
