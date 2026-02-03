@@ -20,7 +20,7 @@
 
         <div class="flex items-center gap-2 md:gap-6">
             <div
-                class="flex items-center gap-2 md:gap-3 border border-gray-100 px-3 md:px-4 py-1.5 rounded-full shadow-sm bg-gray-50/50"
+                class="flex items-center gap-2 md:gap-3 border border-gray-100 px-3 md:px-4 py-1.5 rounded-full shadow-lg bg-gray-50/50"
             >
                 <div
                     class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600"
@@ -41,7 +41,7 @@
             </div>
 
             <button
-                class="border border-dark px-3 md:px-4 py-2 rounded hover:bg-red-500 hover:text-white hover:border-red-500 transition flex items-center gap-2"
+                class="border border-dark px-3 md:px-4 py-2 rounded-lg shadow-lg hover:bg-red-500 hover:text-white hover:border-red-500 transition flex items-center gap-2"
                 @click="logout"
             >
                 <i class="fas fa-sign-out-alt"></i>
